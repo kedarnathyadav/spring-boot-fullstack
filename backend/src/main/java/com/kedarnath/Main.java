@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Bean;
 
 
 
-import java.util.List;
 import java.util.Random;
 
 @SpringBootApplication
@@ -20,8 +19,8 @@ public class Main {
 
 
     public static void main(String[] args) {
-//        System.out.println(customers);
         SpringApplication.run(Main.class,args);
+
     }
 
     @Bean
