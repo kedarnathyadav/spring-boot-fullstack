@@ -44,13 +44,13 @@ jobs:
         run: echo "BUILD_NUMBER=$(date '+%d.%m.%Y.%H.%M.%S')" >> $GITHUB_OUTPUT
       - name: Build Package Push with Maven
         run: mvn -ntp -B verify -D docker.image.tag=${{steps.build-number.outputs.BUILD_NUMBER}} jib:build
-      - name: Update Dockerrun.aws.json api image tag with new build number
-        run:
-          echo "Dockerrun.aws.json before updating the tag"
-          cat Dockerrun.aws.json
-          sed -i -E 's_(dkedarnath/kedarnath-api:)([^"]*)_\1'${{steps.build-number.outputs.BUILD_NUMBER}}'_' Dockerrun.aws.json
-          echo "Dockerrun.aws.json after updating the tag"
-          cat Dockerrun.aws.json
+#      - name: Update Dockerrun.aws.json api image tag with new build number
+#        run:
+#          echo "Dockerrun.aws.json before updating the tag"
+#          cat Dockerrun.aws.json
+#          sed -i -E 's_(dkedarnath/kedarnath-api:)([^"]*)_\1'${{steps.build-number.outputs.BUILD_NUMBER}}'_' Dockerrun.aws.json
+#          echo "Dockerrun.aws.json after updating the tag"
+#          cat Dockerrun.aws.json
       - name: Update Dockerrun.aws.json api image tag with new build number
         run: |
           echo "Dockerrun.aws.json before updating the tag"
