@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "kedarnath-api",
-      "image": "dkedarnath/kedarnath-api:0.0.1-SNAPSHOT",
+      "image": "dkedarnath/kedarnath-api:09.10.2024.09.42.54",
       "essential": true,
       "memory": 512,
       "portMappings": [
