@@ -1617,13 +1617,2024 @@ jobs:
 
 ### step 357
 
+push the code to git hub.
+
 ### step 358
+
+do the exercise
 
 ### step 359
 
+add gender at backend and update the frontend accordingly
+
 ### step 360
+
+create a new fle under the db migration
+V3__Add_Gender_Enum_To_Customer.sql:
+
+```sql
+ALTER TABLE customer
+    ADD COLUMN gender TEXT NOT NULL;
+
+```
+
+delet all the rows from customer table.
 
 ### step 361
 
+UPDATE THE CUSTOMER.JAVA
+
+```java
+package com.kedarnath.customer;
+
+import jakarta.persistence.*;
+
+import java.util.Objects;
+
+@Entity
+@Table(
+        name = "customer",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "customer_email_unique",
+                        columnNames = "email"
+                )
+        }
+)
+public class Customer {
+    @Id
+    @SequenceGenerator(
+            name = "customer_id_seq",
+            sequenceName = "customer_id_seq",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "customer_id_seq"
+    )
+    private Long id;
+    @Column(
+            nullable = false
+    )
+    private String name;
+    @Column(
+            nullable = false
+    )
+    private String email;
+    @Column(
+            nullable = false
+    )
+    private Integer age;
+
+    @Column(
+            nullable = false
+    )
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    public Customer(Long id, String name, String email, Integer age, Gender gender) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public Customer(String name, String email, Integer age, Gender gender) {
+        this.name = name;
+        this.email = email;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public Customer() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Customer customer = (Customer) o;
+        return Objects.equals(id, customer.id) && Objects.equals(name, customer.name) && Objects.equals(email, customer.email) && Objects.equals(age, customer.age) && gender == customer.gender;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, email, age, gender);
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", age=" + age +
+                ", gender=" + gender +
+                '}';
+    }
+}
+
+```
+
+While changing customer constructor use refractor so that it will be change in tests as well.
+
+if you run the test cases of only customer a few tests will fail of CustomerJDBCDataAccessServiceTest.java
+
+we will fix it in next steps
+
 ### step 362
+
+UPDATE CustomerJDBCDataAccessServiceTest:
+
+```java
+package com.kedarnath.customer;
+
+import com.kedarnath.AbstractTestcontainersUnitTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class CustomerJDBCDataAccessServiceTest extends AbstractTestcontainersUnitTest {
+
+    private CustomerJDBCDataAccessService underTest;
+    private final CustomerRowMapper customerRowMapper = new CustomerRowMapper();
+
+    @BeforeEach
+    void setUp() {
+        underTest = new CustomerJDBCDataAccessService(
+                getJdbcTemplate(),
+                customerRowMapper
+        );
+    }
+
+    @Test
+    void selectAllCustomers() {
+        //Given
+        Customer customer = new Customer(
+                Faker.name().fullName(),
+                Faker.internet().safeEmailAddress() + "" + UUID.randomUUID(),
+                20,
+
+                Gender.MALE);
+        underTest.insertCustomer(customer);
+        //When
+        List<Customer> customers = underTest.selectAllCustomers();
+        //Then
+        assertThat(customers).isNotEmpty();
+    }
+
+    @Test
+    void selectCustomerById() {
+        //Given
+        String email = Faker.internet().safeEmailAddress() + "" + UUID.randomUUID();
+        Customer customer = new Customer(
+                Faker.name().fullName(),
+                email,
+                20,
+
+                Gender.MALE);
+        underTest.insertCustomer(customer);
+
+        int id = Math.toIntExact(underTest.selectAllCustomers()
+                .stream()
+                .filter(c -> c.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow());
+
+        //When
+        Optional<Customer> actual = underTest.selectCustomerById(id);
+        //Then
+        assertThat(actual).isPresent().hasValueSatisfying(
+                c -> {
+                    assertThat(c.getId()).isEqualTo(id);
+                    assertThat(c.getName()).isEqualTo(customer.getName());
+                    assertThat(c.getEmail()).isEqualTo(customer.getEmail());
+                    assertThat(c.getAge()).isEqualTo(customer.getAge());
+
+                }
+        );
+    }
+
+
+    @Test
+    void willReturnEmptyWhenSelectCustomerById() {
+        //Given
+
+        int id = -1;
+        //When
+        var actual = underTest.selectCustomerById(id);
+        //Then
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void insertCustomer() {
+        //Given
+
+        //When
+
+        //Then
+    }
+
+    @Test
+    void existsPersonWithEmail() {
+        //Given
+        String email = Faker.internet().safeEmailAddress() + "" + UUID.randomUUID();
+        Customer customer = new Customer(
+                Faker.name().fullName(),
+                email,
+                20,
+
+                Gender.MALE);
+        underTest.insertCustomer(customer);
+        //When
+        boolean actual = underTest.existsPersonWithEmail(email);
+        //Then
+        assertThat(actual).isTrue();
+
+    }
+
+    @Test
+    void existsPersonWithEmailReturnsFalseWhenDoesNotExists() {
+        //Given
+        String email = Faker.internet().safeEmailAddress() + "" + UUID.randomUUID();
+
+
+        //When
+        boolean actual = underTest.existsPersonWithEmail(email);
+
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void existsPersonWithId() {
+        //Given
+        String email = Faker.internet().safeEmailAddress() + "" + UUID.randomUUID();
+        Customer customer = new Customer(
+                Faker.name().fullName(),
+                email,
+                20,
+
+                Gender.MALE);
+        underTest.insertCustomer(customer);
+
+        int id = Math.toIntExact(underTest.selectAllCustomers()
+                .stream()
+                .filter(c -> c.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow());
+        //When
+        boolean actual = underTest.existsPersonWithId(id);
+        //Then
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void existsPersonWithIdReturnsFalseWhenDoesNotExists() {
+        //Given
+        int id = -1;
+        //When
+        boolean actual = underTest.existsPersonWithId(id);
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void deleteCustomerById() {
+        //Given
+        String email = Faker.internet().safeEmailAddress() + "" + UUID.randomUUID();
+        Customer customer = new Customer(
+                Faker.name().fullName(),
+                email,
+                20,
+
+                Gender.MALE);
+        underTest.insertCustomer(customer);
+
+        int id = Math.toIntExact(underTest.selectAllCustomers()
+                .stream()
+                .filter(c -> c.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow());
+
+        //When
+        underTest.deleteCustomerById(id);
+        //Then
+        var actual = underTest.selectCustomerById(id);
+        assertThat(actual).isNotPresent();
+    }
+
+    @Test
+    void updateCustomerName() {
+        //Given
+        String email = Faker.internet().safeEmailAddress() + "" + UUID.randomUUID();
+        Customer customer = new Customer(
+                Faker.name().fullName(),
+                email,
+                20,
+
+                Gender.MALE);
+        underTest.insertCustomer(customer);
+        int id = Math.toIntExact(underTest.selectAllCustomers()
+                .stream()
+                .filter(c -> c.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow());
+
+        var newName = "foo";
+
+        //When
+        Customer update = new Customer();
+        update.setId((long) id);
+        update.setName(newName);
+
+        underTest.updateCustomer(update);
+        //Then
+        Optional<Customer> actual = underTest.selectCustomerById(id);
+        assertThat(actual).isPresent().hasValueSatisfying(c -> {
+            assertThat(c.getId()).isEqualTo(id);
+            assertThat(c.getName()).isEqualTo(newName);
+            assertThat(c.getEmail()).isEqualTo(customer.getEmail());
+            assertThat(c.getAge()).isEqualTo(customer.getAge());
+
+        });
+    }
+
+    @Test
+    void updateCustomerAge() {
+        //Given
+        String email = Faker.internet().safeEmailAddress() + "" + UUID.randomUUID();
+        Customer customer = new Customer(
+                Faker.name().fullName(),
+                email,
+                20,
+
+                Gender.MALE);
+        underTest.insertCustomer(customer);
+        int id = Math.toIntExact(underTest.selectAllCustomers()
+                .stream()
+                .filter(c -> c.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow());
+
+        var newAge = 30;
+
+        //When
+        Customer update = new Customer();
+        update.setId((long) id);
+        update.setAge(newAge);
+
+        underTest.updateCustomer(update);
+        //Then
+        Optional<Customer> actual = underTest.selectCustomerById(id);
+        assertThat(actual).isPresent().hasValueSatisfying(c -> {
+            assertThat(c.getId()).isEqualTo(id);
+            assertThat(c.getName()).isEqualTo(customer.getName());
+            assertThat(c.getEmail()).isEqualTo(customer.getEmail());
+            assertThat(c.getAge()).isEqualTo(newAge);
+
+        });
+    }
+
+    @Test
+    void updateCustomerEmail() {
+        //Given
+        String email = Faker.internet().safeEmailAddress() + "" + UUID.randomUUID();
+        Customer customer = new Customer(
+                Faker.name().fullName(),
+                email,
+                20,
+
+                Gender.MALE);
+        underTest.insertCustomer(customer);
+        int id = Math.toIntExact(underTest.selectAllCustomers()
+                .stream()
+                .filter(c -> c.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow());
+
+        var newEmail = "foo@gmail.com";
+
+        //When
+        Customer update = new Customer();
+        update.setId((long) id);
+        update.setEmail(newEmail);
+
+        underTest.updateCustomer(update);
+        //Then
+        Optional<Customer> actual = underTest.selectCustomerById(id);
+        assertThat(actual).isPresent().hasValueSatisfying(c -> {
+            assertThat(c.getId()).isEqualTo(id);
+            assertThat(c.getName()).isEqualTo(customer.getName());
+            assertThat(c.getEmail()).isEqualTo(newEmail);
+            assertThat(c.getAge()).isEqualTo(customer.getAge());
+
+        });
+    }
+
+    @Test
+    void willUpdateAllPropertiesOfCustomer() {
+        //Given
+        String email = Faker.internet().safeEmailAddress() + "" + UUID.randomUUID();
+        Customer customer = new Customer(
+                Faker.name().fullName(),
+                email,
+                20,
+                Gender.MALE);
+
+        underTest.insertCustomer(customer);
+
+        int id = Math.toIntExact(underTest.selectAllCustomers()
+                .stream()
+                .filter(c -> c.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow());
+
+
+        //When update with new name, age and email
+        Customer update = new Customer();
+        update.setId((long) id);
+        update.setName("foo");
+        String newEmail = UUID.randomUUID().toString();
+        update.setEmail(newEmail);
+        update.setAge(30);
+
+        underTest.updateCustomer(update);
+        //Then
+        Optional<Customer> actual = underTest.selectCustomerById(id);
+
+        assertThat(actual).isPresent().hasValueSatisfying(updated -> {
+            assertThat(updated.getId()).isEqualTo(id);
+            assertThat(updated.getGender()).isEqualTo(Gender.MALE);
+            assertThat(updated.getName()).isEqualTo("foo");
+            assertThat(updated.getEmail()).isEqualTo(newEmail);
+            assertThat(updated.getAge()).isEqualTo(30);
+
+        });
+
+    }
+
+    @Test
+    void willNotUpdateWhenNothingToUpdate() {
+        //Given
+        String email = Faker.internet().safeEmailAddress() + "" + UUID.randomUUID();
+        Customer customer = new Customer(
+                Faker.name().fullName(),
+                email,
+                20,
+
+                Gender.MALE);
+        underTest.insertCustomer(customer);
+        int id = Math.toIntExact(underTest.selectAllCustomers()
+                .stream()
+                .filter(c -> c.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow());
+
+        //When
+        Customer update = new Customer();
+        update.setId((long) id);
+
+        underTest.updateCustomer(update);
+
+        //Then
+        Optional<Customer> actual = underTest.selectCustomerById(id);
+        assertThat(actual).isPresent().hasValueSatisfying(c -> {
+            assertThat(c.getId()).isEqualTo(id);
+            assertThat(c.getName()).isEqualTo(customer.getName());
+            assertThat(c.getEmail()).isEqualTo(customer.getEmail());
+            assertThat(c.getAge()).isEqualTo(customer.getAge());
+
+        });
+
+    }
+
+}
+```
+
+UPDATE CustomerRowMapperTest:
+
+```java
+package com.kedarnath.customer;
+
+import org.junit.jupiter.api.Test;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+class CustomerRowMapperTest {
+
+    @Test
+    void mapRow() throws SQLException {
+        //Given
+        CustomerRowMapper customerRowMapper = new CustomerRowMapper();
+
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.getInt("id")).thenReturn(1);
+        when(resultSet.getInt("age")).thenReturn(19);
+        when(resultSet.getString("name")).thenReturn("Vikram");
+        when(resultSet.getString("email")).thenReturn("Vikram@gmail.com");
+        when(resultSet.getString("gender")).thenReturn("FEMALE");
+        //When
+        Customer actual = customerRowMapper.mapRow(resultSet, 1);
+        //Then
+        Customer expected = new Customer(1L, "Vikram", "Vikram@gmail.com", 19, Gender.FEMALE);
+        assertThat(actual).isEqualTo(expected);
+    }
+
+
+}
+```
+
+Update CustomerJDBCDataAccessService:
+
+```java
+package com.kedarnath.customer;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository("jdbc")
+public class CustomerJDBCDataAccessService implements CustomerDao {
+
+    private final JdbcTemplate jdbcTemplate;
+    private final CustomerRowMapper customerRowMapper;
+
+    public CustomerJDBCDataAccessService(JdbcTemplate jdbcTemplate, CustomerRowMapper customerRowMapper) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.customerRowMapper = customerRowMapper;
+    }
+
+    @Override
+    public List<Customer> selectAllCustomers() {
+
+        var sql = """
+                SELECT id, name, email, age, gender
+                FROM customer
+                """;
+        List<Customer> customers = jdbcTemplate.query(sql, customerRowMapper);
+        return customers;
+    }
+
+    @Override
+    public Optional<Customer> selectCustomerById(Integer id) {
+        var sql = """
+                SELECT id, name, email, age, gender
+                FROM customer
+                WHERE id = ?
+                """;
+        return jdbcTemplate.query(sql, customerRowMapper, id).stream().findFirst();
+    }
+
+    @Override
+    public void insertCustomer(Customer customer) {
+        var sql = """
+                  INSERT INTO customer(name, email, age, gender)
+                  VALUES(?, ?, ?, ?)
+                """;
+        int result = jdbcTemplate.update(
+                sql,
+                customer.getName(),
+                customer.getEmail(),
+                customer.getAge(),
+                customer.getGender().name()
+        );
+
+        System.out.println("jdbcTemplate.update = " + result);
+    }
+
+    @Override
+    public boolean existsPersonWithEmail(String email) {
+        var sql = """
+                SELECT count(id)
+                FROM customer
+                WHERE email = ?
+                """;
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
+        return count != null && count > 0;
+    }
+
+    @Override
+    public boolean existsPersonWithId(Integer id) {
+        var sql = """
+                SELECT count(id)
+                FROM customer
+                WHERE id = ?
+                """;
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
+        return count != null && count > 0;
+    }
+
+    @Override
+    public void deleteCustomerById(Integer customerId) {
+        var sql = """
+                DELETE FROM customer
+                WHERE id = ?
+                """;
+        int result = jdbcTemplate.update(sql, customerId);
+        System.out.println("deleteCustomerById Result = " + result);
+    }
+
+    @Override
+    public void updateCustomer(Customer update) {
+        if (update.getName() != null) {
+            String sql = "UPDATE customer SET name = ? WHERE id = ?";
+            int result = jdbcTemplate.update(
+                    sql,
+                    update.getName(),
+                    update.getId()
+            );
+            System.out.println(" Update Customer Name Result = " + result);
+        }
+        if (update.getAge() != null) {
+            String sql = "UPDATE customer SET age = ? WHERE id = ?";
+            int result = jdbcTemplate.update(
+                    sql,
+                    update.getAge(),
+                    update.getId()
+            );
+            System.out.println(" Update Customer Age Result = " + result);
+        }
+        if (update.getEmail() != null) {
+            String sql = "UPDATE customer SET email = ? WHERE id = ?";
+            int result = jdbcTemplate.update(
+                    sql,
+                    update.getEmail(),
+                    update.getId()
+            );
+            System.out.println(" Update Customer Email Result = " + result);
+        }
+
+    }
+}
+
+```
+
+update CustomerRowMapper.java
+
+```java
+package com.kedarnath.customer;
+
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+@Component
+public class CustomerRowMapper implements RowMapper<Customer> {
+
+    @Override
+    public Customer mapRow(ResultSet rs, int rowNum) throws SQLException {
+        Customer customer = new Customer(
+                (long) rs.getInt("id"),
+                rs.getString("name"),
+                rs.getString("email"),
+                rs.getInt("age"),
+                Gender.valueOf(rs.getString("gender")));
+        return customer;
+    }
+}
+
+```
+
+Run all the tests and check it
+
+### step 363:
+
+update CustomerRegistrationRequest.java:
+
+```java
+package com.kedarnath.customer;
+
+public record CustomerRegistrationRequest(
+        String name,
+        String email,
+        Integer age,
+        Gender gender
+) {
+
+}
+
+```
+
+update CustomerService.java
+
+```java
+package com.kedarnath.customer;
+
+import com.kedarnath.exception.DuplicateResourceException;
+import com.kedarnath.exception.RequestValidationException;
+import com.kedarnath.exception.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class CustomerService {
+
+    private final CustomerDao customerDao;
+
+    public CustomerService(@Qualifier("jdbc") CustomerDao customerDao) {
+        this.customerDao = customerDao;
+    }
+
+    public List<Customer> getAllCustomers() {
+        return customerDao.selectAllCustomers();
+    }
+
+    public Customer getCustomer(Integer id) {
+        return customerDao
+                .selectCustomerById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("customer with id [%s] not found"
+                        .formatted(id)
+                ));
+    }
+
+    public void addCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
+        String email = customerRegistrationRequest.email();
+        if (customerDao.existsPersonWithEmail(email)) {
+            throw new DuplicateResourceException("customer with email [%s] already exists"
+                    .formatted(email));
+
+        }
+        //add
+        Customer customer = new Customer(
+                customerRegistrationRequest.name(),
+                customerRegistrationRequest.email(),
+                customerRegistrationRequest.age(),
+                customerRegistrationRequest.gender());
+
+        customerDao.insertCustomer(customer);
+    }
+
+    public void deleteCustomerById(Integer id) {
+
+        if (!customerDao.existsPersonWithId(id)) {
+            throw new ResourceNotFoundException("customer with id [%s] not found"
+                    .formatted(id));
+
+        }
+
+        customerDao.deleteCustomerById(id);
+    }
+
+    public void updateCustomer(Integer customerId, CustomerUpdateRequest updatedRequest) {
+        Customer customer = getCustomer(customerId);
+
+        boolean changes = false;
+
+        if (updatedRequest.name() != null && !updatedRequest.name().equals(customer.getName())) {
+            customer.setName(updatedRequest.name());
+            changes = true;
+        }
+
+        if (updatedRequest.age() != null && !updatedRequest.age().equals(customer.getAge())) {
+            customer.setAge(updatedRequest.age());
+            changes = true;
+        }
+
+        if (updatedRequest.email() != null && !updatedRequest.email().equals(customer.getEmail())) {
+            if (customerDao.existsPersonWithEmail(updatedRequest.email())) {
+                throw new DuplicateResourceException("customer with email [%s] already exists"
+                        .formatted(updatedRequest.email()));
+
+            }
+
+            customer.setEmail(updatedRequest.email());
+            changes = true;
+        }
+
+        if (!changes) {
+            throw new RequestValidationException("no data changes found");
+        }
+
+        customerDao.updateCustomer(customer);
+
+
+    }
+}
+
+```
+
+update CustomerIntegrationTest.java:
+
+```java
+package com.kedarnath.journey;
+
+import com.github.javafaker.Faker;
+import com.github.javafaker.Name;
+import com.kedarnath.customer.Customer;
+import com.kedarnath.customer.CustomerRegistrationRequest;
+import com.kedarnath.customer.CustomerUpdateRequest;
+import com.kedarnath.customer.Gender;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+public class CustomerIntegrationTest {
+    public static final String CUSTOMER_URI = "/api/v1/customers";
+    @Autowired
+    private WebTestClient webTestClient;
+    private static final Random RANDOM = new Random();
+
+    @Test
+    void canRegisterACustomer() {
+        //create registration request
+        Faker faker = new Faker();
+        Name fakerName = faker.name();
+        String name = fakerName.fullName();
+        String email = fakerName.lastName() + "-" + UUID.randomUUID() + "@kedarnath.com";
+        int age = RANDOM.nextInt(1, 100);
+
+        Gender gender = age % 2 == 0 ? Gender.MALE : Gender.FEMALE;
+
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(
+                name, email, age, gender
+        );
+        //send a post request
+        webTestClient.post()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(request), CustomerRegistrationRequest.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+        //get all customers
+        List<Customer> allCustomers = webTestClient.get()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(new ParameterizedTypeReference<Customer>() {
+                })
+                .returnResult()
+                .getResponseBody();
+
+        //make sure that customer is present
+        Customer expectedCustomer = new Customer(
+                name, email, age,
+                Gender.MALE);
+        assertThat(allCustomers)
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                .contains(expectedCustomer);
+
+
+        var id = allCustomers.stream()
+                .filter(customer -> customer.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow();
+
+
+        expectedCustomer.setId(id);
+        //get customer by id
+        webTestClient.get()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(new ParameterizedTypeReference<Customer>() {
+                })
+                .isEqualTo(expectedCustomer);
+
+    }
+
+    @Test
+    void canDeleteACustomer() {
+        //create registration request
+        Faker faker = new Faker();
+        Name fakerName = faker.name();
+        String name = fakerName.fullName();
+        String email = fakerName.lastName() + "-" + UUID.randomUUID() + "@kedarnath.com";
+        int age = RANDOM.nextInt(1, 100);
+        Gender gender = age % 2 == 0 ? Gender.MALE : Gender.FEMALE;
+
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(
+                name, email, age, gender
+        );
+        //send a post request
+        webTestClient.post()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(request), CustomerRegistrationRequest.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+        //get all customers
+        List<Customer> allCustomers = webTestClient.get()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(new ParameterizedTypeReference<Customer>() {
+                })
+                .returnResult()
+                .getResponseBody();
+
+        var id = allCustomers.stream()
+                .filter(customer -> customer.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow();
+
+        //delete the customer
+        webTestClient.delete()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        //get customer by id
+        webTestClient.get()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
+    void canUpdateACustomer() {
+        //create registration request
+        Faker faker = new Faker();
+        Name fakerName = faker.name();
+        String name = fakerName.fullName();
+        String email = fakerName.lastName() + "-" + UUID.randomUUID() + "@kedarnath.com";
+        int age = RANDOM.nextInt(1, 100);
+        Gender gender = age % 2 == 0 ? Gender.MALE : Gender.FEMALE;
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(
+                name, email, age, gender
+        );
+        //send a post request
+        webTestClient.post()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(request), CustomerRegistrationRequest.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+        //get all customers
+        List<Customer> allCustomers = webTestClient.get()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(new ParameterizedTypeReference<Customer>() {
+                })
+                .returnResult()
+                .getResponseBody();
+
+        var id = allCustomers.stream()
+                .filter(customer -> customer.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow();
+
+        String newName = "king";
+
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
+                newName, null, null
+        );
+        //update customer
+        webTestClient.put()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(updateRequest), CustomerUpdateRequest.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        //get customer by id
+        Customer updatedCustomer = webTestClient.get()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(Customer.class)
+                .returnResult()
+                .getResponseBody();
+
+        Customer expected = new Customer(
+                id, newName, email, age,
+                Gender.MALE);
+
+        assertThat(updatedCustomer).isEqualTo(expected);
+    }
+
+
+}
+
+```
+
+update CustomerIntegrationTest:
+
+```java
+package com.kedarnath.journey;
+
+import com.github.javafaker.Faker;
+import com.github.javafaker.Name;
+import com.kedarnath.customer.Customer;
+import com.kedarnath.customer.CustomerRegistrationRequest;
+import com.kedarnath.customer.CustomerUpdateRequest;
+import com.kedarnath.customer.Gender;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+public class CustomerIntegrationTest {
+    public static final String CUSTOMER_URI = "/api/v1/customers";
+    @Autowired
+    private WebTestClient webTestClient;
+    private static final Random RANDOM = new Random();
+
+    @Test
+    void canRegisterACustomer() {
+        //create registration request
+        Faker faker = new Faker();
+        Name fakerName = faker.name();
+        String name = fakerName.fullName();
+        String email = fakerName.lastName() + "-" + UUID.randomUUID() + "@kedarnath.com";
+        int age = RANDOM.nextInt(1, 100);
+
+        Gender gender = age % 2 == 0 ? Gender.MALE : Gender.FEMALE;
+
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(
+                name, email, age, gender
+        );
+        //send a post request
+        webTestClient.post()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(request), CustomerRegistrationRequest.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+        //get all customers
+        List<Customer> allCustomers = webTestClient.get()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(new ParameterizedTypeReference<Customer>() {
+                })
+                .returnResult()
+                .getResponseBody();
+
+        //make sure that customer is present
+        Customer expectedCustomer = new Customer(
+                name, email, age,
+                gender);
+        assertThat(allCustomers)
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                .contains(expectedCustomer);
+
+
+        var id = allCustomers.stream()
+                .filter(customer -> customer.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow();
+
+
+        expectedCustomer.setId(id);
+        //get customer by id
+        webTestClient.get()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(new ParameterizedTypeReference<Customer>() {
+                })
+                .isEqualTo(expectedCustomer);
+
+    }
+
+    @Test
+    void canDeleteACustomer() {
+        //create registration request
+        Faker faker = new Faker();
+        Name fakerName = faker.name();
+        String name = fakerName.fullName();
+        String email = fakerName.lastName() + "-" + UUID.randomUUID() + "@kedarnath.com";
+        int age = RANDOM.nextInt(1, 100);
+        Gender gender = age % 2 == 0 ? Gender.MALE : Gender.FEMALE;
+
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(
+                name, email, age, gender
+        );
+        //send a post request
+        webTestClient.post()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(request), CustomerRegistrationRequest.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+        //get all customers
+        List<Customer> allCustomers = webTestClient.get()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(new ParameterizedTypeReference<Customer>() {
+                })
+                .returnResult()
+                .getResponseBody();
+
+        var id = allCustomers.stream()
+                .filter(customer -> customer.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow();
+
+        //delete the customer
+        webTestClient.delete()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        //get customer by id
+        webTestClient.get()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
+    void canUpdateACustomer() {
+        //create registration request
+        Faker faker = new Faker();
+        Name fakerName = faker.name();
+        String name = fakerName.fullName();
+        String email = fakerName.lastName() + "-" + UUID.randomUUID() + "@kedarnath.com";
+        int age = RANDOM.nextInt(1, 100);
+        Gender gender = age % 2 == 0 ? Gender.MALE : Gender.FEMALE;
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(
+                name, email, age, gender
+        );
+        //send a post request
+        webTestClient.post()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(request), CustomerRegistrationRequest.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+        //get all customers
+        List<Customer> allCustomers = webTestClient.get()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(new ParameterizedTypeReference<Customer>() {
+                })
+                .returnResult()
+                .getResponseBody();
+
+        var id = allCustomers.stream()
+                .filter(customer -> customer.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow();
+
+        String newName = "king";
+
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
+                newName, null, null
+        );
+        //update customer
+        webTestClient.put()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(updateRequest), CustomerUpdateRequest.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        //get customer by id
+        Customer updatedCustomer = webTestClient.get()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(Customer.class)
+                .returnResult()
+                .getResponseBody();
+
+        Customer expected = new Customer(
+                id, newName, email, age,
+                gender);
+
+        assertThat(updatedCustomer).isEqualTo(expected);
+    }
+
+
+}
+
+```
+
+update CustomerServiceTest:
+
+```java
+package com.kedarnath.customer;
+
+import com.kedarnath.exception.DuplicateResourceException;
+import com.kedarnath.exception.RequestValidationException;
+import com.kedarnath.exception.ResourceNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class CustomerServiceTest {
+
+    private CustomerService underTest;
+
+    @Mock
+    private CustomerDao customerDao;
+
+    @BeforeEach
+    void setUp() {
+        underTest = new CustomerService(customerDao);
+    }
+
+
+    @Test
+    void getAllCustomers() {
+        //When
+        underTest.getAllCustomers();
+        //Then
+        verify(customerDao).selectAllCustomers();
+    }
+
+    @Test
+    void canGetCustomer() {
+        //Given
+        int id = 10;
+        Customer customer = new Customer(
+                (long) id, "alex", "alex@gmail.com", 19,
+                Gender.MALE);
+        when(customerDao.selectCustomerById(id)).thenReturn(Optional.of(customer));
+        //When
+        Customer actual = underTest.getCustomer(id);
+        //Then
+        assertThat(actual).isEqualTo(customer);
+    }
+
+    @Test
+    void willThrowWhenGetCustomerReturnEmptyOptional() {
+        //Given
+        int id = 10;
+        when(customerDao.selectCustomerById(id)).thenReturn(Optional.empty());
+        //When
+        //Then
+        assertThatThrownBy(() -> underTest.getCustomer(id))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage(
+                        "customer with id [%s] not found".formatted(id));
+
+    }
+
+    @Test
+    void addCustomer() {
+        //Given
+        String email = "alex@gmail.com";
+
+        when(customerDao.existsPersonWithEmail(email)).thenReturn(false);
+
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(
+                "alex", email, 19, Gender.MALE
+        );
+        //When
+        underTest.addCustomer(request);
+
+        //Then
+        ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
+        verify(customerDao).insertCustomer(customerArgumentCaptor.capture());
+
+        Customer capturedCustomer = customerArgumentCaptor.getValue();
+
+        assertThat(capturedCustomer.getId()).isNull();
+        assertThat(capturedCustomer.getName()).isEqualTo(request.name());
+        assertThat(capturedCustomer.getEmail()).isEqualTo(request.email());
+        assertThat(capturedCustomer.getAge()).isEqualTo(request.age());
+    }
+
+    @Test
+    void addCustomerThrowsExceptionWhenEmailExists() {
+        // Given
+        String email = "alex@gmail.com";
+        when(customerDao.existsPersonWithEmail(email)).thenReturn(true);
+
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(
+                "alex", email, 19, Gender.MALE
+        );
+
+        // When & Then
+        assertThatThrownBy(() -> underTest.addCustomer(request))
+                .isInstanceOf(DuplicateResourceException.class)
+                .hasMessageContaining("customer with email [alex@gmail.com] already exists");
+
+        // Verify that insertCustomer is never called
+        verify(customerDao, never()).insertCustomer(any());
+    }
+
+    @Test
+    void deleteCustomerById() {
+        //Given
+        int id = 10;
+
+        when(customerDao.existsPersonWithId(id)).thenReturn(true);
+        //When
+        underTest.deleteCustomerById(id);
+        //Then
+        verify(customerDao).deleteCustomerById(id);
+    }
+
+    @Test
+    void deleteCustomerByIdThrowsExceptionWhenIdNotExists() {
+        //Given
+        int id = 10;
+
+        when(customerDao.existsPersonWithId(id)).thenReturn(false);
+        //When
+        assertThatThrownBy(() -> underTest.deleteCustomerById(id))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("customer with id [%s] not found"
+                        .formatted(id));
+        //Then
+        verify(customerDao, never()).deleteCustomerById(any());
+    }
+
+    @Test
+    void canUpdateAllCustomerproperties() {
+        //Given
+        int id = 10;
+        String email = "alex@gmail.com";
+        Customer customer = new Customer(
+                (long) id, "alex", email, 19,
+                Gender.MALE);
+        when(customerDao.selectCustomerById(id)).thenReturn(Optional.of(customer));
+        String newEmail = "alexandra@gmail.com";
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
+                "alexandra", newEmail, 19
+        );
+
+        when(customerDao.existsPersonWithEmail(newEmail)).thenReturn(false);
+
+        //When
+        underTest.updateCustomer(id, updateRequest);
+
+        //Then
+        ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
+        verify(customerDao).updateCustomer(customerArgumentCaptor.capture());
+
+        Customer capturedCustomer = customerArgumentCaptor.getValue();
+
+        assertThat(capturedCustomer.getName()).isEqualTo(updateRequest.name());
+        assertThat(capturedCustomer.getEmail()).isEqualTo(updateRequest.email());
+        assertThat(capturedCustomer.getAge()).isEqualTo(updateRequest.age());
+    }
+
+    @Test
+    void canUpdateOnlyCustomerName() {
+        //Given
+        int id = 10;
+        Customer customer = new Customer(
+                (long) id, "alex", "alex@gmail.com", 19,
+                Gender.MALE);
+        when(customerDao.selectCustomerById(id)).thenReturn(Optional.of(customer));
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
+                "alexandra", null, null
+        );
+
+
+        //When
+        underTest.updateCustomer(id, updateRequest);
+
+        //Then
+        ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
+        verify(customerDao).updateCustomer(customerArgumentCaptor.capture());
+
+        Customer capturedCustomer = customerArgumentCaptor.getValue();
+
+        assertThat(capturedCustomer.getName()).isEqualTo(updateRequest.name());
+        assertThat(capturedCustomer.getEmail()).isEqualTo(customer.getEmail());
+        assertThat(capturedCustomer.getAge()).isEqualTo(customer.getAge());
+    }
+
+    @Test
+    void canUpdateOnlyCustomerAge() {
+        //Given
+        int id = 10;
+        Customer customer = new Customer(
+                (long) id, "alex", "alex@gmail.com", 19,
+                Gender.MALE);
+        when(customerDao.selectCustomerById(id)).thenReturn(Optional.of(customer));
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
+                null, null, 26
+        );
+
+
+        //When
+        underTest.updateCustomer(id, updateRequest);
+
+        //Then
+        ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
+        verify(customerDao).updateCustomer(customerArgumentCaptor.capture());
+
+        Customer capturedCustomer = customerArgumentCaptor.getValue();
+
+        assertThat(capturedCustomer.getName()).isEqualTo(customer.getName());
+        assertThat(capturedCustomer.getEmail()).isEqualTo(customer.getEmail());
+        assertThat(capturedCustomer.getAge()).isEqualTo(updateRequest.age());
+    }
+
+    @Test
+    void canUpdateOnlyCustomerEmail() {
+        //Given
+        int id = 10;
+        Customer customer = new Customer(
+                (long) id, "alex", "alex@gmail.com", 19,
+                Gender.MALE);
+        when(customerDao.selectCustomerById(id)).thenReturn(Optional.of(customer));
+        String newEmail = "alexandra@gmail.com";
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
+                null, newEmail, null
+        );
+        when(customerDao.existsPersonWithEmail(newEmail)).thenReturn(false);
+        //When
+        underTest.updateCustomer(id, updateRequest);
+
+        //Then
+        ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
+        verify(customerDao).updateCustomer(customerArgumentCaptor.capture());
+
+        Customer capturedCustomer = customerArgumentCaptor.getValue();
+
+        assertThat(capturedCustomer.getName()).isEqualTo(customer.getName());
+        assertThat(capturedCustomer.getEmail()).isEqualTo(newEmail);
+        assertThat(capturedCustomer.getAge()).isEqualTo(customer.getAge());
+    }
+
+    @Test
+    void willThrowWhenTryingToUpdateEmailWhenAlreadyTaken() {
+        //Given
+        int id = 10;
+        Customer customer = new Customer(
+                (long) id, "alex", "alex@gmail.com", 19,
+                Gender.MALE);
+        when(customerDao.selectCustomerById(id)).thenReturn(Optional.of(customer));
+        String newEmail = "alexandra@gmail.com";
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
+                null, newEmail, null
+        );
+        when(customerDao.existsPersonWithEmail(newEmail)).thenReturn(true);
+        //When
+        assertThatThrownBy(() -> underTest.updateCustomer(id, updateRequest))
+                .isInstanceOf(DuplicateResourceException.class)
+                .hasMessage("customer with email [%s] already exists"
+                        .formatted(newEmail));
+
+        //Then
+        verify(customerDao, never()).updateCustomer(any());
+    }
+
+    @Test
+    void willThrowWhenNoChnageInUpdate() {
+        //Given
+        int id = 10;
+        String email = "alex@gmail.com";
+        Customer customer = new Customer(
+                (long) id, "alex", email, 19,
+                Gender.MALE);
+        when(customerDao.selectCustomerById(id)).thenReturn(Optional.of(customer));
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
+                customer.getName(), customer.getEmail(), customer.getAge()
+        );
+
+        //When
+        assertThatThrownBy(() -> underTest.updateCustomer(id, updateRequest))
+                .isInstanceOf(RequestValidationException.class)
+                .hasMessage("no data changes found");
+
+        //Then
+        verify(customerDao, never()).updateCustomer(any());
+    }
+
+}
+```
+
+### step 364:
+
+update card.jsx:
+
+```jsx
+import {
+    Heading,
+    Avatar,
+    Box,
+    Center,
+    Image,
+    Flex,
+    Text,
+    Stack,
+    useColorModeValue, Tag,
+} from '@chakra-ui/react'
+
+export default function CardWithImage({id, email, image, age, name, gender, imageNumber}) { // Destructure props correctly
+    const randomUserGender = gender === "MALE" ? "men" : "women";
+    return (
+        <Center py={6}>
+            <Box
+                maxW={'300px'}
+                w={'full'}
+                bg={useColorModeValue('white', 'gray.800')}
+                boxShadow={'2xl'}
+                rounded={'md'}
+                overflow={'hidden'}>
+                <Image
+                    h={'120px'}
+                    w={'full'}
+                    src={
+                        image || 'https://images.unsplash.com/photo-1612865547334-09cb8cb455da?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80' // Use the image prop or default
+                    }
+                    objectFit="cover"
+                    alt="Card Image"
+                />
+                <Flex justify={'center'} mt={-12}>
+                    <Avatar
+                        size={'xl'}
+                        src={
+                            `https://randomuser.me/api/portraits/${randomUserGender}/${imageNumber}.jpg`
+                        }
+                        css={{
+                            border: '2px solid white',
+                        }}
+                    />
+                </Flex>
+
+
+                <Box p={6}>
+                    <Stack spacing={2} align={'center'} mb={5}>
+                        <Tag borderRadius='full'>{id}</Tag>
+                        <Heading fontSize={'2xl'} fontWeight={500} fontFamily={'body'}>
+                            {name || 'Anonymous'} {/* Add name or fallback to 'Anonymous' */}
+                        </Heading>
+                        <Text color={'gray.500'}>{email}</Text>
+                        <Text color={'gray.500'}>Age: {age}</Text>
+                    </Stack>
+                </Box>
+            </Box>
+        </Center>
+    );
+}
+
+```
+
+update App.jsx:
+
+```jsx
+import {
+    Wrap,
+    WrapItem,
+    Spinner,
+    Text,
+    Table,
+    Thead,
+    Tbody,
+    Tfoot,
+    Tr,
+    Th,
+    Td,
+    TableCaption,
+    TableContainer
+} from '@chakra-ui/react';
+import SidebarWithHeader from "./components/shared/SideBar";
+import {useEffect, useState} from "react";
+import {getCustomers} from "./services/client.js";
+import CardWithImage from "./components/Card";
+
+const App = () => {
+
+    const [customers, setCustomers] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setLoading(true);
+        setTimeout(() => {
+            getCustomers()
+                .then((res) => {
+                    console.log(res);
+                    setCustomers(res.data);
+                })
+                .catch((err) => {
+                    console.log(err);
+                }).finally(() => {
+                setLoading(false);
+            });
+        }, 300);
+    }, []);
+
+    if (loading) {
+        return (
+            <SidebarWithHeader>
+                <Spinner
+                    thickness='4px'
+                    speed='0.65s'
+                    emptyColor='gray.200'
+                    color='blue.500'
+                    size='xl'
+                />
+            </SidebarWithHeader>
+        );
+    }
+
+    if (customers.length <= 0) {
+        return (
+            <SidebarWithHeader>
+                <Text>
+                    No customers available.
+                </Text>
+            </SidebarWithHeader>
+        );
+    }
+
+    return (
+        <SidebarWithHeader>
+            <Wrap justify='center' spacing='30px'>
+                {customers.map((customer, index) => (
+                    <WrapItem key={customer.id}> {/* Added key prop */}
+                        <CardWithImage {...customer}
+                                       imageNumber={index}/>
+                    </WrapItem>
+                ))}
+            </Wrap>
+        </SidebarWithHeader>
+    );
+}
+
+export default App;
+
+```
+
+i made a mistake in integration test as its adding the same name evrytime:
+
+update CustomerIntegrationTest.java:
+
+```java
+package com.kedarnath.journey;
+
+import com.github.javafaker.Faker;
+import com.github.javafaker.Name;
+import com.kedarnath.customer.Customer;
+import com.kedarnath.customer.CustomerRegistrationRequest;
+import com.kedarnath.customer.CustomerUpdateRequest;
+import com.kedarnath.customer.Gender;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+public class CustomerIntegrationTest {
+    public static final String CUSTOMER_URI = "/api/v1/customers";
+    @Autowired
+    private WebTestClient webTestClient;
+    private static final Random RANDOM = new Random();
+
+    @Test
+    void canRegisterACustomer() {
+        //create registration request
+        Faker faker = new Faker();
+        Name fakerName = faker.name();
+        String name = fakerName.fullName();
+        String email = fakerName.lastName() + "-" + UUID.randomUUID() + "@kedarnath.com";
+        int age = RANDOM.nextInt(1, 100);
+
+        Gender gender = age % 2 == 0 ? Gender.MALE : Gender.FEMALE;
+
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(
+                name, email, age, gender
+        );
+        //send a post request
+        webTestClient.post()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(request), CustomerRegistrationRequest.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+        //get all customers
+        List<Customer> allCustomers = webTestClient.get()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(new ParameterizedTypeReference<Customer>() {
+                })
+                .returnResult()
+                .getResponseBody();
+
+        //make sure that customer is present
+        Customer expectedCustomer = new Customer(
+                name, email, age,
+                gender);
+        assertThat(allCustomers)
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                .contains(expectedCustomer);
+
+
+        var id = allCustomers.stream()
+                .filter(customer -> customer.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow();
+
+
+        expectedCustomer.setId(id);
+        //get customer by id
+        webTestClient.get()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(new ParameterizedTypeReference<Customer>() {
+                })
+                .isEqualTo(expectedCustomer);
+
+    }
+
+    @Test
+    void canDeleteACustomer() {
+        //create registration request
+        Faker faker = new Faker();
+        Name fakerName = faker.name();
+        String name = fakerName.fullName();
+        String email = fakerName.lastName() + "-" + UUID.randomUUID() + "@kedarnath.com";
+        int age = RANDOM.nextInt(1, 100);
+        Gender gender = age % 2 == 0 ? Gender.MALE : Gender.FEMALE;
+
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(
+                name, email, age, gender
+        );
+        //send a post request
+        webTestClient.post()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(request), CustomerRegistrationRequest.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+        //get all customers
+        List<Customer> allCustomers = webTestClient.get()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(new ParameterizedTypeReference<Customer>() {
+                })
+                .returnResult()
+                .getResponseBody();
+
+        var id = allCustomers.stream()
+                .filter(customer -> customer.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow();
+
+        //delete the customer
+        webTestClient.delete()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        //get customer by id
+        webTestClient.get()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
+    void canUpdateACustomer() {
+        //create registration request
+        Faker faker = new Faker();
+        Name fakerName = faker.name();
+        String name = fakerName.fullName();
+        String email = fakerName.lastName() + "-" + UUID.randomUUID() + "@kedarnath.com";
+        int age = RANDOM.nextInt(1, 100);
+        Gender gender = age % 2 == 0 ? Gender.MALE : Gender.FEMALE;
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(
+                name, email, age, gender
+        );
+        //send a post request
+        webTestClient.post()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(request), CustomerRegistrationRequest.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+        //get all customers
+        List<Customer> allCustomers = webTestClient.get()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(new ParameterizedTypeReference<Customer>() {
+                })
+                .returnResult()
+                .getResponseBody();
+
+        var id = allCustomers.stream()
+                .filter(customer -> customer.getEmail().equals(email))
+                .map(Customer::getId)
+                .findFirst()
+                .orElseThrow();
+
+        faker = new Faker();
+        fakerName = faker.name();
+        String newName = fakerName.fullName();
+
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
+                newName, null, null
+        );
+        //update customer
+        webTestClient.put()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(updateRequest), CustomerUpdateRequest.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        //get customer by id
+        Customer updatedCustomer = webTestClient.get()
+                .uri(CUSTOMER_URI + "/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(Customer.class)
+                .returnResult()
+                .getResponseBody();
+
+        Customer expected = new Customer(
+                id, newName, email, age,
+                gender);
+
+        assertThat(updatedCustomer).isEqualTo(expected);
+    }
+
+
+}
+
+```
+
+### step 365:
+
+now ssh into ec2instance database and delete all the customers as they got no gender if you remember.
 

@@ -17,11 +17,11 @@ public class CustomerService {
         this.customerDao = customerDao;
     }
 
-    public List<Customer> getAllCustomers(){
+    public List<Customer> getAllCustomers() {
         return customerDao.selectAllCustomers();
     }
 
-    public Customer getCustomer(Integer id){
+    public Customer getCustomer(Integer id) {
         return customerDao
                 .selectCustomerById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("customer with id [%s] not found"
@@ -29,30 +29,30 @@ public class CustomerService {
                 ));
     }
 
-    public void addCustomer(CustomerRegistrationRequest customerRegistrationRequest){
+    public void addCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
         String email = customerRegistrationRequest.email();
-        if(customerDao.existsPersonWithEmail(email)){
-                throw new DuplicateResourceException("customer with email [%s] already exists"
-                        .formatted(email));
+        if (customerDao.existsPersonWithEmail(email)) {
+            throw new DuplicateResourceException("customer with email [%s] already exists"
+                    .formatted(email));
 
-            }
+        }
         //add
         Customer customer = new Customer(
                 customerRegistrationRequest.name(),
                 customerRegistrationRequest.email(),
-                customerRegistrationRequest.age()
-        );
+                customerRegistrationRequest.age(),
+                customerRegistrationRequest.gender());
 
         customerDao.insertCustomer(customer);
     }
 
-    public void deleteCustomerById(Integer id){
+    public void deleteCustomerById(Integer id) {
 
-        if(!customerDao.existsPersonWithId(id)){
+        if (!customerDao.existsPersonWithId(id)) {
             throw new ResourceNotFoundException("customer with id [%s] not found"
                     .formatted(id));
 
-           }
+        }
 
         customerDao.deleteCustomerById(id);
     }
@@ -60,20 +60,20 @@ public class CustomerService {
     public void updateCustomer(Integer customerId, CustomerUpdateRequest updatedRequest) {
         Customer customer = getCustomer(customerId);
 
-        boolean changes =false;
+        boolean changes = false;
 
-        if(updatedRequest.name() != null && !updatedRequest.name().equals(customer.getName())){
+        if (updatedRequest.name() != null && !updatedRequest.name().equals(customer.getName())) {
             customer.setName(updatedRequest.name());
             changes = true;
         }
 
-        if(updatedRequest.age() != null && !updatedRequest.age().equals(customer.getAge())){
+        if (updatedRequest.age() != null && !updatedRequest.age().equals(customer.getAge())) {
             customer.setAge(updatedRequest.age());
             changes = true;
         }
 
-        if(updatedRequest.email() != null && !updatedRequest.email().equals(customer.getEmail())){
-            if(customerDao.existsPersonWithEmail(updatedRequest.email())){
+        if (updatedRequest.email() != null && !updatedRequest.email().equals(customer.getEmail())) {
+            if (customerDao.existsPersonWithEmail(updatedRequest.email())) {
                 throw new DuplicateResourceException("customer with email [%s] already exists"
                         .formatted(updatedRequest.email()));
 
@@ -83,12 +83,11 @@ public class CustomerService {
             changes = true;
         }
 
-        if(!changes){
+        if (!changes) {
             throw new RequestValidationException("no data changes found");
         }
 
         customerDao.updateCustomer(customer);
-
 
 
     }

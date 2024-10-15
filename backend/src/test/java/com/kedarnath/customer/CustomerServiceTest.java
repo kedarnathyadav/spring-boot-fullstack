@@ -43,14 +43,15 @@ class CustomerServiceTest {
         //Given
         int id = 10;
         Customer customer = new Customer(
-                (long) id, "alex", "alex@gmail.com",19
-        );
+                (long) id, "alex", "alex@gmail.com", 19,
+                Gender.MALE);
         when(customerDao.selectCustomerById(id)).thenReturn(Optional.of(customer));
         //When
         Customer actual = underTest.getCustomer(id);
         //Then
         assertThat(actual).isEqualTo(customer);
     }
+
     @Test
     void willThrowWhenGetCustomerReturnEmptyOptional() {
         //Given
@@ -58,10 +59,10 @@ class CustomerServiceTest {
         when(customerDao.selectCustomerById(id)).thenReturn(Optional.empty());
         //When
         //Then
-       assertThatThrownBy(()->underTest.getCustomer(id))
-               .isInstanceOf(ResourceNotFoundException.class)
-               .hasMessage(
-                       "customer with id [%s] not found".formatted(id));
+        assertThatThrownBy(() -> underTest.getCustomer(id))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage(
+                        "customer with id [%s] not found".formatted(id));
 
     }
 
@@ -73,7 +74,7 @@ class CustomerServiceTest {
         when(customerDao.existsPersonWithEmail(email)).thenReturn(false);
 
         CustomerRegistrationRequest request = new CustomerRegistrationRequest(
-                "alex", email, 19
+                "alex", email, 19, Gender.MALE
         );
         //When
         underTest.addCustomer(request);
@@ -97,7 +98,7 @@ class CustomerServiceTest {
         when(customerDao.existsPersonWithEmail(email)).thenReturn(true);
 
         CustomerRegistrationRequest request = new CustomerRegistrationRequest(
-                "alex", email, 19
+                "alex", email, 19, Gender.MALE
         );
 
         // When & Then
@@ -120,6 +121,7 @@ class CustomerServiceTest {
         //Then
         verify(customerDao).deleteCustomerById(id);
     }
+
     @Test
     void deleteCustomerByIdThrowsExceptionWhenIdNotExists() {
         //Given
@@ -141,8 +143,8 @@ class CustomerServiceTest {
         int id = 10;
         String email = "alex@gmail.com";
         Customer customer = new Customer(
-                (long) id,"alex", email, 19
-        );
+                (long) id, "alex", email, 19,
+                Gender.MALE);
         when(customerDao.selectCustomerById(id)).thenReturn(Optional.of(customer));
         String newEmail = "alexandra@gmail.com";
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
@@ -152,7 +154,7 @@ class CustomerServiceTest {
         when(customerDao.existsPersonWithEmail(newEmail)).thenReturn(false);
 
         //When
-        underTest.updateCustomer(id,updateRequest);
+        underTest.updateCustomer(id, updateRequest);
 
         //Then
         ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
@@ -164,13 +166,14 @@ class CustomerServiceTest {
         assertThat(capturedCustomer.getEmail()).isEqualTo(updateRequest.email());
         assertThat(capturedCustomer.getAge()).isEqualTo(updateRequest.age());
     }
+
     @Test
     void canUpdateOnlyCustomerName() {
         //Given
         int id = 10;
         Customer customer = new Customer(
-                (long) id,"alex", "alex@gmail.com", 19
-        );
+                (long) id, "alex", "alex@gmail.com", 19,
+                Gender.MALE);
         when(customerDao.selectCustomerById(id)).thenReturn(Optional.of(customer));
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
                 "alexandra", null, null
@@ -178,7 +181,7 @@ class CustomerServiceTest {
 
 
         //When
-        underTest.updateCustomer(id,updateRequest);
+        underTest.updateCustomer(id, updateRequest);
 
         //Then
         ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
@@ -190,13 +193,14 @@ class CustomerServiceTest {
         assertThat(capturedCustomer.getEmail()).isEqualTo(customer.getEmail());
         assertThat(capturedCustomer.getAge()).isEqualTo(customer.getAge());
     }
+
     @Test
     void canUpdateOnlyCustomerAge() {
         //Given
         int id = 10;
         Customer customer = new Customer(
-                (long) id,"alex", "alex@gmail.com", 19
-        );
+                (long) id, "alex", "alex@gmail.com", 19,
+                Gender.MALE);
         when(customerDao.selectCustomerById(id)).thenReturn(Optional.of(customer));
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
                 null, null, 26
@@ -204,7 +208,7 @@ class CustomerServiceTest {
 
 
         //When
-        underTest.updateCustomer(id,updateRequest);
+        underTest.updateCustomer(id, updateRequest);
 
         //Then
         ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
@@ -216,13 +220,14 @@ class CustomerServiceTest {
         assertThat(capturedCustomer.getEmail()).isEqualTo(customer.getEmail());
         assertThat(capturedCustomer.getAge()).isEqualTo(updateRequest.age());
     }
+
     @Test
     void canUpdateOnlyCustomerEmail() {
         //Given
         int id = 10;
         Customer customer = new Customer(
-                (long) id,"alex", "alex@gmail.com", 19
-        );
+                (long) id, "alex", "alex@gmail.com", 19,
+                Gender.MALE);
         when(customerDao.selectCustomerById(id)).thenReturn(Optional.of(customer));
         String newEmail = "alexandra@gmail.com";
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
@@ -230,7 +235,7 @@ class CustomerServiceTest {
         );
         when(customerDao.existsPersonWithEmail(newEmail)).thenReturn(false);
         //When
-        underTest.updateCustomer(id,updateRequest);
+        underTest.updateCustomer(id, updateRequest);
 
         //Then
         ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
@@ -242,13 +247,14 @@ class CustomerServiceTest {
         assertThat(capturedCustomer.getEmail()).isEqualTo(newEmail);
         assertThat(capturedCustomer.getAge()).isEqualTo(customer.getAge());
     }
+
     @Test
     void willThrowWhenTryingToUpdateEmailWhenAlreadyTaken() {
         //Given
         int id = 10;
         Customer customer = new Customer(
-                (long) id,"alex", "alex@gmail.com", 19
-        );
+                (long) id, "alex", "alex@gmail.com", 19,
+                Gender.MALE);
         when(customerDao.selectCustomerById(id)).thenReturn(Optional.of(customer));
         String newEmail = "alexandra@gmail.com";
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
@@ -256,13 +262,13 @@ class CustomerServiceTest {
         );
         when(customerDao.existsPersonWithEmail(newEmail)).thenReturn(true);
         //When
-        assertThatThrownBy(()->underTest.updateCustomer(id,updateRequest))
+        assertThatThrownBy(() -> underTest.updateCustomer(id, updateRequest))
                 .isInstanceOf(DuplicateResourceException.class)
                 .hasMessage("customer with email [%s] already exists"
                         .formatted(newEmail));
 
         //Then
-        verify(customerDao,never()).updateCustomer(any());
+        verify(customerDao, never()).updateCustomer(any());
     }
 
     @Test
@@ -271,20 +277,20 @@ class CustomerServiceTest {
         int id = 10;
         String email = "alex@gmail.com";
         Customer customer = new Customer(
-                (long) id,"alex", email, 19
-        );
+                (long) id, "alex", email, 19,
+                Gender.MALE);
         when(customerDao.selectCustomerById(id)).thenReturn(Optional.of(customer));
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
                 customer.getName(), customer.getEmail(), customer.getAge()
         );
 
         //When
-        assertThatThrownBy(()->underTest.updateCustomer(id,updateRequest))
+        assertThatThrownBy(() -> underTest.updateCustomer(id, updateRequest))
                 .isInstanceOf(RequestValidationException.class)
                 .hasMessage("no data changes found");
 
         //Then
-        verify(customerDao,never()).updateCustomer(any());
+        verify(customerDao, never()).updateCustomer(any());
     }
 
 }

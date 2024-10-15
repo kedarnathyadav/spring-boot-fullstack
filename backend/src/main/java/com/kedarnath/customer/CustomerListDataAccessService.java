@@ -7,38 +7,38 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository("list")
-public class CustomerListDataAccessService implements CustomerDao{
+public class CustomerListDataAccessService implements CustomerDao {
     private final static List<Customer> customers;
 
-    static{
+    static {
         customers = new ArrayList<>();
         Customer alex = new Customer(
                 1L,
                 "Vikram",
                 "vikram@gmail.com",
-                27
-        );
+                27,
+                Gender.MALE);
         customers.add(alex);
         Customer shruthi = new Customer(
                 2L,
                 "Shruthi",
                 "Shruthi@gmail.com",
-                26
-        );
+                26,
+                Gender.MALE);
         customers.add(shruthi);
         Customer priya = new Customer(
                 3L,
                 "Priya",
                 "Priya@gmail.com",
-                29
-        );
+                29,
+                Gender.MALE);
         customers.add(priya);
         Customer disha = new Customer(
                 4L,
                 "Disha",
                 "Disha@gmail.com",
-                26
-        );
+                26,
+                Gender.MALE);
         customers.add(disha);
     }
 
@@ -63,13 +63,13 @@ public class CustomerListDataAccessService implements CustomerDao{
     @Override
     public boolean existsPersonWithEmail(String email) {
         return customers.stream()
-                .anyMatch(c->c.getEmail().equals(email));
+                .anyMatch(c -> c.getEmail().equals(email));
     }
 
     @Override
     public boolean existsPersonWithId(Integer id) {
         return customers.stream()
-                .anyMatch(c->c.getId().equals(id));
+                .anyMatch(c -> c.getId().equals(id));
     }
 
     @Override

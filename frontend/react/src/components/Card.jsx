@@ -10,7 +10,8 @@ import {
     useColorModeValue, Tag,
 } from '@chakra-ui/react'
 
-export default function CardWithImage({id, email, image, age, name}) { // Destructure props correctly
+export default function CardWithImage({id, email, image, age, name, gender, imageNumber}) { // Destructure props correctly
+    const randomUserGender = gender === "MALE" ? "men" : "women";
     return (
         <Center py={6}>
             <Box
@@ -33,7 +34,7 @@ export default function CardWithImage({id, email, image, age, name}) { // Destru
                     <Avatar
                         size={'xl'}
                         src={
-                            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ'
+                            `https://randomuser.me/api/portraits/${randomUserGender}/${imageNumber}.jpg`
                         }
                         css={{
                             border: '2px solid white',
@@ -49,7 +50,7 @@ export default function CardWithImage({id, email, image, age, name}) { // Destru
                             {name || 'Anonymous'} {/* Add name or fallback to 'Anonymous' */}
                         </Heading>
                         <Text color={'gray.500'}>{email}</Text>
-                        <Text color={'gray.500'}>Age: {age}</Text>
+                        <Text color={'gray.500'}>Age: {age} | gender: {gender}</Text>
                     </Stack>
                 </Box>
             </Box>

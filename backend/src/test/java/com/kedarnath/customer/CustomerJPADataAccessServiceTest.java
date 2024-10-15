@@ -47,9 +47,9 @@ class CustomerJPADataAccessServiceTest {
     @Test
     void insertCustomer() {
         //Given
-        Customer customer= new Customer(
-                1L,"king","123@gmail.com",20
-        );
+        Customer customer = new Customer(
+                1L, "king", "123@gmail.com", 20,
+                Gender.MALE);
         //When
         underTest.insertCustomer(customer);
         //Then
@@ -69,7 +69,7 @@ class CustomerJPADataAccessServiceTest {
     @Test
     void existsPersonWithId() {
         //Given
-        Integer  id = 1;
+        Integer id = 1;
         //When
         underTest.existsPersonWithId(id);
         //Then
@@ -79,7 +79,7 @@ class CustomerJPADataAccessServiceTest {
     @Test
     void deleteCustomerById() {
         //Given
-        Integer  id = 1;
+        Integer id = 1;
         //When
         underTest.deleteCustomerById(id);
         //Then
@@ -89,9 +89,9 @@ class CustomerJPADataAccessServiceTest {
     @Test
     void updateCustomer() {
         //Given
-        Customer customer= new Customer(
-                1L,"king","123@gmail.com",20
-        );
+        Customer customer = new Customer(
+                1L, "king", "123@gmail.com", 20,
+                Gender.MALE);
         //When
         underTest.updateCustomer(customer);
         //Then

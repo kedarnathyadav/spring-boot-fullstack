@@ -1,6 +1,5 @@
 package com.kedarnath.customer;
 
-import com.github.javafaker.Faker;
 import com.kedarnath.AbstractTestcontainersUnitTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.ApplicationContext;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,6 +19,7 @@ class CustomerRepositoryTest extends AbstractTestcontainersUnitTest {
     private CustomerRepository underTest;
     @Autowired
     private ApplicationContext applicationContext;
+
     @BeforeEach
     void setUp() {
         underTest.deleteAll();
@@ -34,9 +33,9 @@ class CustomerRepositoryTest extends AbstractTestcontainersUnitTest {
         Customer customer = new Customer(
                 Faker.name().fullName(),
                 email,
-                20
+                20,
 
-        );
+                Gender.MALE);
         underTest.save(customer);
 
         int id = Math.toIntExact(underTest.findAll()
@@ -71,9 +70,9 @@ class CustomerRepositoryTest extends AbstractTestcontainersUnitTest {
         Customer customer = new Customer(
                 Faker.name().fullName(),
                 email,
-                20
+                20,
 
-        );
+                Gender.MALE);
         underTest.save(customer);
 
         int id = Math.toIntExact(underTest.findAll()
@@ -84,7 +83,7 @@ class CustomerRepositoryTest extends AbstractTestcontainersUnitTest {
                 .orElseThrow());
 
         //When
-          boolean actual = underTest.existsCustomerById(id);
+        boolean actual = underTest.existsCustomerById(id);
         //Then
         assertThat(actual).isTrue();
     }
@@ -93,7 +92,7 @@ class CustomerRepositoryTest extends AbstractTestcontainersUnitTest {
     void existsCustomerByIdFailsWhenIdNotPresent() {
         //Given
 
-        int id =-1;
+        int id = -1;
         //When
         boolean actual = underTest.existsCustomerById(id);
         //Then
