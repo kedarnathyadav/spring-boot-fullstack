@@ -3,15 +3,6 @@ import {
     WrapItem,
     Spinner,
     Text,
-    Table,
-    Thead,
-    Tbody,
-    Tfoot,
-    Tr,
-    Th,
-    Td,
-    TableCaption,
-    TableContainer
 } from '@chakra-ui/react';
 import SidebarWithHeader from "./components/shared/SideBar";
 import {useEffect, useState} from "react";
@@ -28,27 +19,26 @@ const App = () => {
 
     const fetchCustomers = () => {
         setLoading(true);
-        getCustomers()
-            .then(res => {
-                console.log('API Response:', res.data);  // Debugging the response
+        getCustomers().then(res => {
+            console.log('API Response:', res.data);  // Debugging the response
 
-                // Ensure the response is an array, or default to an empty array
-                if (Array.isArray(res.data)) {
-                    setCustomers(res.data);  // Set customers only if it's an array
-                } else {
-                    console.error("Unexpected response format:", res.data);
-                    setCustomers([]);  // Fallback to an empty array if response is invalid
-                    setError("Unexpected data format from API");
-                }
-            })
-            .catch((err) => {
-                console.error("Error fetching customers:", err);  // Log error for debugging
-                setError(err?.response?.data?.message || "An error occurred while fetching customers");
-                errorNotification(
-                    err.code,
-                    err?.response?.data?.message || "An error occurred"
-                );
-            })
+            // Ensure the response is an array, or default to an empty array
+            if (Array.isArray(res.data)) {
+                setCustomers(res.data);  // Set customers only if it's an array
+                setError("");  // Reset the error state if the fetch is successful
+            } else {
+                console.error("Unexpected response format:", res.data);
+                setCustomers([]);  // Fallback to an empty array if response is invalid
+                setError("Unexpected data format from API");
+            }
+        }).catch((err) => {
+            console.error("Error fetching customers:", err);  // Log error for debugging
+            setError(err?.response?.data?.message || "An error occurred while fetching customers");
+            errorNotification(
+                err.code,
+                err?.response?.data?.message || "An error occurred"
+            );
+        })
             .finally(() => {
                 setLoading(false);
             });
@@ -73,6 +63,7 @@ const App = () => {
     }
 
     if (err) {
+        console.log('Current error:', err);  // Log the error to understand its value
         return (
             <SidebarWithHeader>
                 <CreateCustomerDrawer fetchCustomers={fetchCustomers}/>
@@ -82,6 +73,7 @@ const App = () => {
     }
 
     if (!Array.isArray(customers) || customers.length === 0) {
+        console.log('Customers array is empty or not an array:', customers);  // Log for debugging
         return (
             <SidebarWithHeader>
                 <CreateCustomerDrawer fetchCustomers={fetchCustomers}/>

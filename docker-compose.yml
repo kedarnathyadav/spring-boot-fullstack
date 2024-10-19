@@ -5,6 +5,7 @@ services:
     environment:
       POSTGRES_USER: kedarnath
       POSTGRES_PASSWORD: password
+      POSTGRES_DB: customer
       PGDATA: /data/postgres
     volumes:
       - db:/data/postgres
@@ -13,7 +14,7 @@ services:
     networks:
       - db
     restart: unless-stopped
-  amigoscode-api:
+  kedarnath-api:
     container_name: kedarnath-api
     image: dkedarnath/kedarnath-api
     environment:
@@ -24,6 +25,18 @@ services:
       - db
     depends_on:
       - db
+    restart: unless-stopped
+  kedarnath-react:
+    container_name: kedarnath-react
+    image: dkedarnath/kedarnath-react
+    build:
+      context: frontend/react
+      args:
+        api_base_url: http://kedarnath-api:8088
+    ports:
+      - "3000:5173"
+    depends_on:
+      - kedarnath-api
     restart: unless-stopped
 
 networks:

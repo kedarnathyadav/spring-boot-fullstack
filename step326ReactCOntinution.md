@@ -6452,6 +6452,314 @@ cat .env
 
 ctrl + d - to come out
 
+### step 391:
+
+we are going to add the front end to docker compose.yml to test the applcation
+
+```
+docker rm -f frontend-react
 ```
 
-### step 391:
+got to main folder
+
+```
+ls
+docker compose up -d
+docker compose down
+```
+
+### step 392:
+
+deploy frontend to ec2 in next steps
+
+### step 393:
+
+update the docker-compose.yml
+
+```yaml
+services:
+  db:
+    container_name: postgres
+    image: postgres:16
+    environment:
+      POSTGRES_USER: kedarnath
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: customer
+      PGDATA: /data/postgres
+    volumes:
+      - db:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - db
+    restart: unless-stopped
+  kedarnath-api:
+    container_name: kedarnath-api
+    image: dkedarnath/kedarnath-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/customer
+    ports:
+      - "8088:8080"
+    networks:
+      - db
+    depends_on:
+      - db
+    restart: unless-stopped
+  kedarnath-react:
+    container_name: kedarnath-react
+    image: dkedarnath/kedarnath-react
+    build:
+      context: frontend/react
+      args:
+        api_base_url: http://kedarnath-api:8088
+    ports:
+      - "3000:5173"
+    depends_on:
+      - kedarnath-api
+    restart: unless-stopped
+
+networks:
+  db:
+    driver: bridge
+
+volumes:
+  db:
+
+
+```
+
+```bash
+    docker build . -t dkedarnath/kedarnath-react --build-arg <replace with elk url even bracts>:8080 
+```
+
+### step 394:
+
+bring the aws.json file outside the backend and into the main folder
+
+Dockerrun.aws.json:
+
+```json
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "kedarnath-react",
+      "image": "dkedarnath/kedarnath-react:latest",
+      "essential": true,
+      "memory": 256,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 5173
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:8080/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    },
+    {
+      "name": "kedarnath-api",
+      "image": "dkedarnath/kedarnath-api:15.10.2024.12.33.00",
+      "essential": true,
+      "memory": 512,
+      "portMappings": [
+        {
+          "hostPort": 8080,
+          "containerPort": 8080
+        }
+      ],
+      "environment": [
+        {
+          "name": "SPRING_DATASOURCE_URL",
+          "value": "jdbc:postgresql://awseb-e-nskvm2faru-stack-awsebrdsdatabase-xn3ngsekufx0.c1qawm2oqlx3.us-east-1.rds.amazonaws.com:5432/customer"
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:8080/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+}
+```
+
+backend-cd.yml:
+
+```yaml
+name: CD - Deploy Backend
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - backend/**
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16.3
+        env:
+          POSTGRES_USER: kedarnath
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: customer
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Slack commit message and sha
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"https://github.com/kedarnathyadav/spring-boot-fullstack/commit/${{ github.sha }} - ${{ github.event.head_commit.message }}"}' \
+          ${{secrets.SLACK_WEBHOOK_URL}}
+
+      - name: List Files in Working Directory
+        run: ls -la
+
+      - name: Send Slack Message
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"Deployment started :progress_bar: :spring:"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Send Slack Message
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":":docker: Image tag:${{ steps.build-number.outputs.BUILD_NUMBER }} pushed to https://hub.docker.com/layers/dkedarnath/kedarnath-api/"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+
+      - name: Set Build Number
+        id: build-number
+        run: echo "BUILD_NUMBER=$(date '+%d.%m.%Y.%H.%M.%S')" >> $GITHUB_OUTPUT
+
+      - name: Send Slack Message
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"Building with Maven :maven:"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Build Package Push with Maven
+        run: mvn -ntp -B verify -D docker.image.tag=${{ steps.build-number.outputs.BUILD_NUMBER }} jib:build
+
+      - name: Update Dockerrun.aws.json api image tag with new build number
+        run: |
+          echo "Dockerrun.aws.json before updating the tag"
+          cat ../Dockerrun.aws.json
+          sed -i -E 's|(dkedarnath/kedarnath-api:)[^"]*|\1'${{ steps.build-number.outputs.BUILD_NUMBER }}'|' ../Dockerrun.aws.json
+          echo "Dockerrun.aws.json after updating the tag"
+          cat ../Dockerrun.aws.json
+
+      - name: Send Slack Message
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":":aws: Starting deployment to Elastic Beanstalk "}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ secrets.EB_APPLICATION_NAME }}
+          environment_name: ${{ secrets.EB_ENVIRONMENT_NAME }}
+          version_label: ${{ steps.build-number.outputs.BUILD_NUMBER }}
+          version_description: ${{ github.sha }}
+          region: ${{ secrets.EB_REGION }}
+          deployment_package: Dockerrun.aws.json
+
+      - name: Send Slack Message
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":":githubloading: Committing to repo  "}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Commit and Push Dockerrun.aws.json
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add ../Dockerrun.aws.json
+          git commit -m "Update Dockerrun.aws.json docker image with new tag ${{ steps.build-number.outputs.BUILD_NUMBER }}"
+          git push
+
+      - name: Send Slack Message
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"Deployment and commit completed :github_check_mark: :party_blob: - https://kedarnath-api-env.eba-9pwqzaur.us-east-1.elasticbeanstalk.com/"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Send Slack Message
+        if: always()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"Job status ${{ job.status }} "} ' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+```
+
+### step 395:
+
+upload the aws file on elk and deploy
+
+it wont fetch any data from backend
+due to the security group
+
+### step 396:
+
+go to intsances running open the instance select the security tab and check the inbound rules
+go to rds and check the inbound rules- it will allow 5432 so we should also add for 8080 to make it work
+
+### step 397:
+
+go to security groups on aws website
+select the security group and click on edit inbound rules
+
+click on add rule
+type: Custom tcp
+Port range: 8080
+Source: custom
+0.0.0.0/0
+Description: spring boot api
+
+save 
+
+
+

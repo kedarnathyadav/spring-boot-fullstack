@@ -1,8 +1,9 @@
 FROM node:23-alpine
+ARG api_base_url
 WORKDIR /app
 COPY package*.json .
 RUN npm i
 COPY . .
-RUN echo "VITE_API_BASE_URL=http://host.docker.internal:8088" > .env
+RUN echo "VITE_API_BASE_URL=${api_base_url}" > .env
 EXPOSE 5173
 CMD ["npm","run","dev"]
