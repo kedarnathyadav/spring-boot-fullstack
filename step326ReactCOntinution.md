@@ -3638,3 +3638,2820 @@ public class CustomerIntegrationTest {
 
 now ssh into ec2instance database and delete all the customers as they got no gender if you remember.
 
+push it to github then it will be deployed
+
+### step 366:
+
+download the latest docker image and test it
+make sure you use the port 8088 if you are connecting it to frontend in .env file
+
+then use
+
+```bash
+docker compose down
+```
+
+```bash
+docker pull
+#it will dowload the latest image
+```
+
+```bash
+dockercompose up -d
+```
+
+thats it
+
+### step 367:
+
+make sure you made a note of the issue you have faced
+
+we got an error of incompatibily so we have updated the docker compose filw with postgres 16 to match
+
+```yaml
+services:
+  db:
+    container_name: postgres
+    image: postgres:16
+    #    above line we added 16
+    environment:
+      POSTGRES_USER: kedarnath
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - db:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - db
+    restart: unless-stopped
+  amigoscode-api:
+    container_name: kedarnath-api
+    image: dkedarnath/kedarnath-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/customer
+    ports:
+      - "8088:8080"
+    networks:
+      - db
+    depends_on:
+      - db
+    restart: unless-stopped
+
+networks:
+  db:
+    driver: bridge
+
+volumes:
+  db:
+
+
+```
+
+### step 368:
+
+we are going send request from frontend to backend
+
+### step 369:
+
+create a file CreateCustomerDrawer.jsx under components:
+
+```jsx
+import {Button} from "@chakra-ui/react";
+
+const AddIcon = () => "+";
+
+const CreateCustomerDrawer = () => {
+    return (
+        <Button
+            leftIcon={<AddIcon/>}
+            colorScheme={"teal"}
+            onClick={() => alert("create new customer")}
+        >
+            create customer
+        </Button>
+    )
+}
+
+export default CreateCustomerDrawer;
+```
+
+add this in the App.jsx
+
+### step 370:
+
+add side drawer in CreateCustomerDrawer.jsx
+
+```jsx
+import {
+    Button,
+    Drawer,
+    DrawerBody,
+    DrawerCloseButton, DrawerContent, DrawerFooter,
+    DrawerHeader,
+    DrawerOverlay, Input,
+    useDisclosure
+} from "@chakra-ui/react";
+
+const AddIcon = () => "+";
+
+const CreateCustomerDrawer = () => {
+    const {isOpen, onOpen, onClose} = useDisclosure()
+    return (
+        <>
+            <Button
+                leftIcon={<AddIcon/>}
+                colorScheme={"teal"}
+                onClick={onOpen}
+            >
+                create customer
+            </Button>
+            <Drawer isOpen={isOpen} onClose={onClose} size={"xl"}>
+                <DrawerOverlay/>
+                <DrawerContent>
+                    <DrawerCloseButton/>
+                    <DrawerHeader>Create your account</DrawerHeader>
+
+                    <DrawerBody>
+                        <form
+                            id='my-form'
+                            onSubmit={(e) => {
+                                e.preventDefault()
+                                console.log('submitted')
+                            }}
+                        >
+                            <Input name='nickname' placeholder='Type here...'/>
+                        </form>
+                    </DrawerBody>
+
+                    <DrawerFooter>
+                        <Button type='submit' form='my-form'>
+                            Save
+                        </Button>
+                    </DrawerFooter>
+                </DrawerContent>
+            </Drawer>
+        </>
+    )
+}
+
+export default CreateCustomerDrawer;
+
+```
+
+### step 371:
+
+refer https://formik.org/
+
+```bash
+npm i formik yup
+```
+
+### step 372:
+
+create file CreateCustomerForm.jsx under components
+
+```jsx
+import {Formik, Form, useField} from 'formik';
+import * as Yup from 'yup';
+
+const MyTextInput = ({label, ...props}) => {
+    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
+    // which we can spread on <input>. We can use field meta to show an error
+    // message if the field is invalid and it has been touched (i.e. visited)
+    const [field, meta] = useField(props);
+    return (
+        <>
+            <label htmlFor={props.id || props.name}>{label}</label>
+            <input className="text-input" {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <div className="error">{meta.error}</div>
+            ) : null}
+        </>
+    );
+};
+
+const MyCheckbox = ({children, ...props}) => {
+    // React treats radios and checkbox inputs differently from other input types: select and textarea.
+    // Formik does this too! When you specify `type` to useField(), it will
+    // return the correct bag of props for you -- a `checked` prop will be included
+    // in `field` alongside `name`, `value`, `onChange`, and `onBlur`
+    const [field, meta] = useField({...props, type: 'checkbox'});
+    return (
+        <div>
+            <label className="checkbox-input">
+                <input type="checkbox" {...field} {...props} />
+                {children}
+            </label>
+            {meta.touched && meta.error ? (
+                <div className="error">{meta.error}</div>
+            ) : null}
+        </div>
+    );
+};
+
+const MySelect = ({label, ...props}) => {
+    const [field, meta] = useField(props);
+    return (
+        <div>
+            <label htmlFor={props.id || props.name}>{label}</label>
+            <select {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <div className="error">{meta.error}</div>
+            ) : null}
+        </div>
+    );
+};
+
+// And now we can use these
+const CreateCustomerForm = () => {
+    return (
+        <>
+            <h1>Subscribe!</h1>
+            <Formik
+                initialValues={{
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    acceptedTerms: false, // added for our checkbox
+                    jobType: '', // added for our select
+                }}
+                validationSchema={Yup.object({
+                    firstName: Yup.string()
+                        .max(15, 'Must be 15 characters or less')
+                        .required('Required'),
+                    lastName: Yup.string()
+                        .max(20, 'Must be 20 characters or less')
+                        .required('Required'),
+                    email: Yup.string()
+                        .email('Invalid email address')
+                        .required('Required'),
+                    acceptedTerms: Yup.boolean()
+                        .required('Required')
+                        .oneOf([true], 'You must accept the terms and conditions.'),
+                    jobType: Yup.string()
+                        .oneOf(
+                            ['designer', 'development', 'product', 'other'],
+                            'Invalid Job Type'
+                        )
+                        .required('Required'),
+                })}
+                onSubmit={(values, {setSubmitting}) => {
+                    setTimeout(() => {
+                        alert(JSON.stringify(values, null, 2));
+                        setSubmitting(false);
+                    }, 400);
+                }}
+            >
+                <Form>
+                    <MyTextInput
+                        label="First Name"
+                        name="firstName"
+                        type="text"
+                        placeholder="Jane"
+                    />
+
+                    <MyTextInput
+                        label="Last Name"
+                        name="lastName"
+                        type="text"
+                        placeholder="Doe"
+                    />
+
+                    <MyTextInput
+                        label="Email Address"
+                        name="email"
+                        type="email"
+                        placeholder="jane@formik.com"
+                    />
+
+                    <MySelect label="Job Type" name="jobType">
+                        <option value="">Select a job type</option>
+                        <option value="designer">Designer</option>
+                        <option value="development">Developer</option>
+                        <option value="product">Product Manager</option>
+                        <option value="other">Other</option>
+                    </MySelect>
+
+                    <MyCheckbox name="acceptedTerms">
+                        I accept the terms and conditions
+                    </MyCheckbox>
+
+                    <button type="submit">Submit</button>
+                </Form>
+            </Formik>
+        </>
+    );
+};
+
+export default CreateCustomerForm;
+```
+
+add the above to CreateCustomerDrawer.jsx
+
+```jsx
+import {
+    Button,
+    Drawer,
+    DrawerBody,
+    DrawerCloseButton, DrawerContent, DrawerFooter,
+    DrawerHeader,
+    DrawerOverlay, Input,
+    useDisclosure
+} from "@chakra-ui/react";
+import CreateCustomerForm from "./CreateCustomerForm.jsx";
+
+const AddIcon = () => "+";
+
+const CreateCustomerDrawer = () => {
+    const {isOpen, onOpen, onClose} = useDisclosure()
+    return (
+        <>
+            <Button
+                leftIcon={<AddIcon/>}
+                colorScheme={"teal"}
+                onClick={onOpen}
+            >
+                create customer
+            </Button>
+            <Drawer isOpen={isOpen} onClose={onClose} size={"xl"}>
+                <DrawerOverlay/>
+                <DrawerContent>
+                    <DrawerCloseButton/>
+                    <DrawerHeader>Create your account</DrawerHeader>
+
+                    <DrawerBody>
+                        <CreateCustomerForm/>
+                    </DrawerBody>
+
+                    <DrawerFooter>
+                        <Button type='submit' form='my-form'>
+                            Save
+                        </Button>
+                    </DrawerFooter>
+                </DrawerContent>
+            </Drawer>
+        </>
+    )
+}
+
+export default CreateCustomerDrawer;
+
+```
+
+### step 373:
+
+update the CreateCustomerForm.jsx
+
+```jsx
+import {Formik, Form, useField} from 'formik';
+import * as Yup from 'yup';
+import {Alert, AlertIcon, Box, Button, FormLabel, Input, Select} from "@chakra-ui/react";
+
+const MyTextInput = ({label, ...props}) => {
+    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
+    // which we can spread on <input>. We can use field meta to show an error
+    // message if the field is invalid and it has been touched (i.e. visited)
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Input className="text-input" {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error">
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+const MySelect = ({label, ...props}) => {
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Select {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error">
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+// And now we can use these
+const CreateCustomerForm = () => {
+    return (
+        <>
+            <Formik
+                initialValues={{
+                    name: '',
+                    email: '',
+                    age: 0,
+                    gender: '', // added for our select
+                }}
+                validationSchema={Yup.object({
+                    name: Yup.string()
+                        .max(20, 'Must be 20 characters or less')
+                        .required('Required'),
+                    email: Yup.string()
+                        .email('Invalid email address')
+                        .required('Required'),
+                    age: Yup.number()
+                        .min(16, 'Must be atleast 16 years of age')
+                        .max(100, 'Must be less than 100 years of age')
+                        .required('Required'),
+                    gender: Yup.string()
+                        .oneOf(
+                            ['MALE', 'FEMALE'],
+                            'Invalid gender'
+                        )
+                        .required('Required'),
+                })}
+                onSubmit={(values, {setSubmitting}) => {
+                    setTimeout(() => {
+                        alert(JSON.stringify(values, null, 2));
+                        setSubmitting(false);
+                    }, 400);
+                }}
+            >
+                <Form>
+                    <MyTextInput
+                        label="name"
+                        name="name"
+                        type="text"
+                        placeholder="Enter your name"
+                    />
+
+
+                    <MyTextInput
+                        label="Email"
+                        name="email"
+                        type="text"
+                        placeholder="Enter your email"
+                    />
+                    <MyTextInput
+                        label="age"
+                        name="age"
+                        type="number"
+                        placeholder="16"
+                    />
+
+                    <MySelect label="gender" name="gender">
+                        <option value="">Select a gender</option>
+                        <option value="MALE">Male</option>
+                        <option value="FEMALE">Female</option>
+                    </MySelect>
+
+                    <Button type="submit" mt={"2"}>Submit</Button>
+                </Form>
+            </Formik>
+        </>
+    );
+};
+
+export default CreateCustomerForm;
+```
+
+### step 374:
+
+update CreateCustomerDrawer.jsx
+
+```jsx
+import {
+    Button,
+    Drawer,
+    DrawerBody,
+    DrawerCloseButton, DrawerContent, DrawerFooter,
+    DrawerHeader,
+    DrawerOverlay, Input,
+    useDisclosure
+} from "@chakra-ui/react";
+import CreateCustomerForm from "./CreateCustomerForm.jsx";
+
+const AddIcon = () => "+";
+const CloseIcon = () => "X";
+
+const CreateCustomerDrawer = () => {
+    const {isOpen, onOpen, onClose} = useDisclosure()
+    return (
+        <>
+            <Button
+                leftIcon={<AddIcon/>}
+                colorScheme={"teal"}
+                onClick={onOpen}
+            >
+                create customer
+            </Button>
+            <Drawer isOpen={isOpen} onClose={onClose} size={"xl"}>
+                <DrawerOverlay/>
+                <DrawerContent>
+                    <DrawerCloseButton/>
+                    <DrawerHeader>Create New Customer</DrawerHeader>
+
+                    <DrawerBody>
+                        <CreateCustomerForm/>
+                    </DrawerBody>
+
+                    <DrawerFooter>
+                        <Button
+                            leftIcon={<CloseIcon/>}
+                            colorScheme={"teal"}
+                            onClick={onClose}
+                        >
+                            Close
+                        </Button>
+                    </DrawerFooter>
+                </DrawerContent>
+            </Drawer>
+        </>
+    )
+}
+
+export default CreateCustomerDrawer;
+
+```
+
+update CreateCustomerForm.jsx
+
+```jsx
+import {Formik, Form, useField} from 'formik';
+import * as Yup from 'yup';
+import {Alert, AlertIcon, Box, Button, FormLabel, Input, Select, Stack} from "@chakra-ui/react";
+
+const MyTextInput = ({label, ...props}) => {
+    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
+    // which we can spread on <input>. We can use field meta to show an error
+    // message if the field is invalid and it has been touched (i.e. visited)
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Input className="text-input" {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+const MySelect = ({label, ...props}) => {
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Select {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+// And now we can use these
+const CreateCustomerForm = () => {
+    return (
+        <>
+            <Formik
+                initialValues={{
+                    name: '',
+                    email: '',
+                    age: 0,
+                    gender: '', // added for our select
+                }}
+                validationSchema={Yup.object({
+                    name: Yup.string()
+                        .max(20, 'Must be 20 characters or less')
+                        .required('Required'),
+                    email: Yup.string()
+                        .email('Invalid email address')
+                        .required('Required'),
+                    age: Yup.number()
+                        .min(16, 'Must be atleast 16 years of age')
+                        .max(100, 'Must be less than 100 years of age')
+                        .required('Required'),
+                    gender: Yup.string()
+                        .oneOf(
+                            ['MALE', 'FEMALE'],
+                            'Invalid gender'
+                        )
+                        .required('Required'),
+                })}
+                onSubmit={(values, {setSubmitting}) => {
+                    setTimeout(() => {
+                        alert(JSON.stringify(values, null, 2));
+                        setSubmitting(false);
+                    }, 400);
+                }}
+            >
+                <Form>
+                    <Stack spacing={"24px"}>
+                        <MyTextInput
+                            label="Name"
+                            name="name"
+                            type="text"
+                            placeholder="Enter your name"
+                        />
+
+
+                        <MyTextInput
+                            label="Email"
+                            name="email"
+                            type="text"
+                            placeholder="Enter your email"
+                        />
+                        <MyTextInput
+                            label="Age"
+                            name="age"
+                            type="number"
+                            placeholder="16"
+                        />
+
+                        <MySelect label="Gender" name="gender">
+                            <option value="">Select a gender</option>
+                            <option value="MALE">Male</option>
+                            <option value="FEMALE">Female</option>
+                        </MySelect>
+
+                        <Button type="submit" mt={2}>Submit</Button>
+                    </Stack>
+                </Form>
+            </Formik>
+        </>
+    );
+};
+
+export default CreateCustomerForm;
+```
+
+### step 375:
+
+update CreateCustomerForm.jsx
+--added feature the submit button will be enabled only when the fields are valid
+
+```jsx
+import {Formik, Form, useField} from 'formik';
+import * as Yup from 'yup';
+import {Alert, AlertIcon, Box, Button, FormLabel, Input, Select, Stack} from "@chakra-ui/react";
+
+const MyTextInput = ({label, ...props}) => {
+    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
+    // which we can spread on <input>. We can use field meta to show an error
+    // message if the field is invalid, and it has been touched (i.e. visited)
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Input className="text-input" {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+const MySelect = ({label, ...props}) => {
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Select {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+// And now we can use these
+const CreateCustomerForm = () => {
+    return (
+        <>
+            <Formik
+                initialValues={{
+                    name: '',
+                    email: '',
+                    age: 0,
+                    gender: '', // added for our select
+                }}
+                validationSchema={Yup.object({
+                    name: Yup.string()
+                        .max(20, 'Must be 20 characters or less')
+                        .required('Required'),
+                    email: Yup.string()
+                        .email('Invalid email address')
+                        .required('Required'),
+                    age: Yup.number()
+                        .integer('Age must be a whole number')
+                        .min(16, 'Must be at least 16 years of age')
+                        .max(100, 'Must be less than 100 years of age')
+                        .required('Required'),
+                    gender: Yup.string()
+                        .oneOf(
+                            ['MALE', 'FEMALE'],
+                            'Invalid gender'
+                        )
+                        .required('Required'),
+                })}
+                onSubmit={(values, {setSubmitting}) => {
+                    setTimeout(() => {
+                        alert(JSON.stringify(values, null, 2));
+                        setSubmitting(false);
+                    }, 400);
+                }}
+            >
+                {({isValid, isSubmitting}) => (
+                    <Form>
+                        <Stack spacing={"24px"}>
+                            <MyTextInput
+                                label="Name"
+                                name="name"
+                                type="text"
+                                placeholder="Enter your name"
+                            />
+
+
+                            <MyTextInput
+                                label="Email"
+                                name="email"
+                                type="text"
+                                placeholder="Enter your email"
+                            />
+                            <MyTextInput
+                                label="Age"
+                                name="age"
+                                type="number"
+                                placeholder="16"
+                            />
+
+                            <MySelect label="Gender" name="gender">
+                                <option value="">Select a gender</option>
+                                <option value="MALE">Male</option>
+                                <option value="FEMALE">Female</option>
+                            </MySelect>
+
+                            <Button
+                                disabled={!isValid || isSubmitting}
+                                type="submit" mt={2}>Submit</Button>
+                        </Stack>
+                    </Form>
+                )}
+            </Formik>
+        </>
+    );
+};
+
+export default CreateCustomerForm;
+```
+
+### step 376:
+
+update client.js:
+
+```js
+import axios from 'axios';
+
+export const getCustomers = async () => {
+    try {
+        return await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/customers`);
+    } catch (e) {
+        throw e;
+    }
+}
+
+export const saveCustomer = async (customer) => {
+    try {
+        return await axios.post(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers`,
+            customer // <-- move this inside the axios.post() function call
+        );
+    } catch (e) {
+        throw e;
+    }
+}
+
+```
+
+aded function save customer in client.js services
+
+### step 377:
+
+Update the customercreateForm.jsx:
+
+```jsx
+import {Formik, Form, useField} from 'formik';
+import * as Yup from 'yup';
+import {Alert, AlertIcon, Box, Button, FormLabel, Input, Select, Stack} from "@chakra-ui/react";
+import {saveCustomer} from "../services/client.js";
+
+const MyTextInput = ({label, ...props}) => {
+    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
+    // which we can spread on <input>. We can use field meta to show an error
+    // message if the field is invalid, and it has been touched (i.e. visited)
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Input className="text-input" {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+const MySelect = ({label, ...props}) => {
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Select {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+// And now we can use these
+const CreateCustomerForm = () => {
+    return (
+        <>
+            <Formik
+                initialValues={{
+                    name: '',
+                    email: '',
+                    age: 0,
+                    gender: '', // added for our select
+                }}
+                validationSchema={Yup.object({
+                    name: Yup.string()
+                        .max(20, 'Must be 20 characters or less')
+                        .required('Required'),
+                    email: Yup.string()
+                        .email('Invalid email address')
+                        .required('Required'),
+                    age: Yup.number()
+                        .integer('Age must be a whole number')
+                        .min(16, 'Must be at least 16 years of age')
+                        .max(100, 'Must be less than 100 years of age')
+                        .required('Required'),
+                    gender: Yup.string()
+                        .oneOf(
+                            ['MALE', 'FEMALE'],
+                            'Invalid gender'
+                        )
+                        .required('Required'),
+                })}
+                onSubmit={(customer, {setSubmitting}) => {
+                    setSubmitting(true);
+                    saveCustomer(customer)
+                        .then(res => {
+                            console.log(res);
+                            alert("customer saved");
+                        }).catch(err => {
+                        console.log(err);
+                    }).finally(() => {
+                        setSubmitting(false);
+                    });
+                }}
+            >
+                {({isValid, isSubmitting}) => (
+                    <Form>
+                        <Stack spacing={"24px"}>
+                            <MyTextInput
+                                label="Name"
+                                name="name"
+                                type="text"
+                                placeholder="Enter your name"
+                            />
+
+
+                            <MyTextInput
+                                label="Email"
+                                name="email"
+                                type="text"
+                                placeholder="Enter your email"
+                            />
+                            <MyTextInput
+                                label="Age"
+                                name="age"
+                                type="number"
+                                placeholder="16"
+                            />
+
+                            <MySelect label="Gender" name="gender">
+                                <option value="">Select a gender</option>
+                                <option value="MALE">Male</option>
+                                <option value="FEMALE">Female</option>
+                            </MySelect>
+
+                            <Button
+                                disabled={!isValid || isSubmitting}
+                                type="submit" mt={2}>Submit</Button>
+                        </Stack>
+                    </Form>
+                )}
+            </Formik>
+        </>
+    );
+};
+
+export default CreateCustomerForm;
+```
+
+--added the saveCustomer function in the form to send the customer details.
+we need to fix like the form should close after submitting and should get notification instead of alert
+
+### step 378:
+
+delete all the data from database because from front end it will start adding
+it will start from 1 and it might get issues
+
+```sql
+delete
+from customer;
+
+ALTER SEQUENCE customer_id_seq RESTART WITH 1;
+```
+
+to get the page get refreshed automatically after adding the user:
+
+```jsx
+import {
+    Wrap,
+    WrapItem,
+    Spinner,
+    Text,
+    Table,
+    Thead,
+    Tbody,
+    Tfoot,
+    Tr,
+    Th,
+    Td,
+    TableCaption,
+    TableContainer
+} from '@chakra-ui/react';
+import SidebarWithHeader from "./components/shared/SideBar";
+import {useEffect, useState} from "react";
+import {getCustomers} from "./services/client.js";
+import CardWithImage from "./components/Card";
+import CreateCustomerDrawer from "./components/CreateCustomerDrawer.jsx";
+
+const App = () => {
+
+    const [customers, setCustomers] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const fetchCustomers = () => {
+        setLoading(true);
+        getCustomers().then(res => {
+            setCustomers(res.data);
+        }).catch((err) => {
+            console.log(err);
+        }).finally(() => {
+            setLoading(false);
+        });
+    }
+    useEffect(() => {
+        fetchCustomers();
+    }, []);
+
+    if (loading) {
+        return (
+            <SidebarWithHeader>
+                <Spinner
+                    thickness='4px'
+                    speed='0.65s'
+                    emptyColor='gray.200'
+                    color='blue.500'
+                    size='xl'
+                />
+            </SidebarWithHeader>
+        );
+    }
+
+    if (customers.length <= 0) {
+        return (
+            <SidebarWithHeader>
+                <CreateCustomerDrawer
+                    fetchCustomers={fetchCustomers}
+                />
+                <Text mt={5}>
+                    No customers available.
+                </Text>
+            </SidebarWithHeader>
+        );
+    }
+
+    return (
+        <SidebarWithHeader>
+            <CreateCustomerDrawer
+                fetchCustomers={fetchCustomers}
+            />
+            <Wrap justify='center' spacing='30px'>
+                {customers.map((customer, index) => (
+                    <WrapItem key={customer.id}> {/* Added key prop */}
+                        <CardWithImage {...customer}
+                                       imageNumber={index}/>
+                    </WrapItem>
+                ))}
+            </Wrap>
+        </SidebarWithHeader>
+    );
+}
+
+export default App;
+
+```
+
+```jsx
+import {
+    Button,
+    Drawer,
+    DrawerBody,
+    DrawerCloseButton, DrawerContent, DrawerFooter,
+    DrawerHeader,
+    DrawerOverlay, Input,
+    useDisclosure
+} from "@chakra-ui/react";
+import CreateCustomerForm from "./CreateCustomerForm.jsx";
+
+const AddIcon = () => "+";
+const CloseIcon = () => "X";
+
+const CreateCustomerDrawer = ({fetchCustomers}) => {
+    const {isOpen, onOpen, onClose} = useDisclosure()
+    return (
+        <>
+            <Button
+                leftIcon={<AddIcon/>}
+                colorScheme={"teal"}
+                onClick={onOpen}
+            >
+                create customer
+            </Button>
+            <Drawer isOpen={isOpen} onClose={onClose} size={"xl"}>
+                <DrawerOverlay/>
+                <DrawerContent>
+                    <DrawerCloseButton/>
+                    <DrawerHeader>Create New Customer</DrawerHeader>
+
+                    <DrawerBody>
+                        <CreateCustomerForm
+                            fetchCustomers={fetchCustomers}
+                        />
+                    </DrawerBody>
+
+                    <DrawerFooter>
+                        <Button
+                            leftIcon={<CloseIcon/>}
+                            colorScheme={"teal"}
+                            onClick={onClose}
+                        >
+                            Close
+                        </Button>
+                    </DrawerFooter>
+                </DrawerContent>
+            </Drawer>
+        </>
+    )
+}
+
+export default CreateCustomerDrawer;
+
+```
+
+```jsx
+import {Formik, Form, useField} from 'formik';
+import * as Yup from 'yup';
+import {Alert, AlertIcon, Box, Button, FormLabel, Input, Select, Stack} from "@chakra-ui/react";
+import {saveCustomer} from "../services/client.js";
+
+const MyTextInput = ({label, ...props}) => {
+    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
+    // which we can spread on <input>. We can use field meta to show an error
+    // message if the field is invalid, and it has been touched (i.e. visited)
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Input className="text-input" {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+const MySelect = ({label, ...props}) => {
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Select {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+// And now we can use these
+const CreateCustomerForm = ({fetchCustomers}) => {
+    return (
+        <>
+            <Formik
+                initialValues={{
+                    name: '',
+                    email: '',
+                    age: 0,
+                    gender: '', // added for our select
+                }}
+                validationSchema={Yup.object({
+                    name: Yup.string()
+                        .max(20, 'Must be 20 characters or less')
+                        .required('Required'),
+                    email: Yup.string()
+                        .email('Invalid email address')
+                        .required('Required'),
+                    age: Yup.number()
+                        .integer('Age must be a whole number')
+                        .min(16, 'Must be at least 16 years of age')
+                        .max(100, 'Must be less than 100 years of age')
+                        .required('Required'),
+                    gender: Yup.string()
+                        .oneOf(
+                            ['MALE', 'FEMALE'],
+                            'Invalid gender'
+                        )
+                        .required('Required'),
+                })}
+                onSubmit={(customer, {setSubmitting}) => {
+                    setSubmitting(true);
+                    saveCustomer(customer)
+                        .then(res => {
+                            console.log(res);
+                            alert("customer saved");
+                            fetchCustomers();
+                        }).catch(err => {
+                        console.log(err);
+                    }).finally(() => {
+                        setSubmitting(false);
+                    });
+                }}
+            >
+                {({isValid, isSubmitting}) => (
+                    <Form>
+                        <Stack spacing={"24px"}>
+                            <MyTextInput
+                                label="Name"
+                                name="name"
+                                type="text"
+                                placeholder="Enter your name"
+                            />
+
+
+                            <MyTextInput
+                                label="Email"
+                                name="email"
+                                type="text"
+                                placeholder="Enter your email"
+                            />
+                            <MyTextInput
+                                label="Age"
+                                name="age"
+                                type="number"
+                                placeholder="16"
+                            />
+
+                            <MySelect label="Gender" name="gender">
+                                <option value="">Select a gender</option>
+                                <option value="MALE">Male</option>
+                                <option value="FEMALE">Female</option>
+                            </MySelect>
+
+                            <Button
+                                disabled={!isValid || isSubmitting}
+                                type="submit" mt={2}>Submit</Button>
+                        </Stack>
+                    </Form>
+                )}
+            </Formik>
+        </>
+    );
+};
+
+export default CreateCustomerForm;
+```
+
+### step 379:
+
+refer https://v2.chakra-ui.com/docs/components/toast
+
+add these to main.jsx and create a new file name notifcation.js
+under services
+
+main.jsx:
+
+```jsx
+import {StrictMode} from 'react'
+import {createRoot} from 'react-dom/client'
+import {ChakraProvider} from '@chakra-ui/react'
+import App from './App.jsx'
+import {createStandaloneToast} from '@chakra-ui/react'
+
+const {ToastContainer} = createStandaloneToast()
+
+createRoot(document.getElementById('root')).render(
+    <StrictMode>
+        <ChakraProvider>
+            <App/>
+            <ToastContainer/>
+        </ChakraProvider>
+    </StrictMode>,
+)
+
+```
+
+notification.js:
+
+```js
+import {createStandaloneToast} from "@chakra-ui/react";
+
+const {toast} = createStandaloneToast()
+
+const notification = (title, description, status) => {
+    toast(
+        {
+            title,
+            description,
+            status,
+            isClosable: true,
+            duration: 3000
+        }
+    )
+}
+
+export const successNotification = (title, description) => {
+    notification(
+        title,
+        description,
+        "success"
+    )
+}
+export const errorNotification = (title, description) => {
+    notification(
+        title,
+        description,
+        "error"
+    )
+}
+
+```
+
+### step 380
+
+added the notification when customer saved and close the form automatically and refresh the page
+App.jsx
+
+```jsx
+import {
+    Wrap,
+    WrapItem,
+    Spinner,
+    Text,
+    Table,
+    Thead,
+    Tbody,
+    Tfoot,
+    Tr,
+    Th,
+    Td,
+    TableCaption,
+    TableContainer
+} from '@chakra-ui/react';
+import SidebarWithHeader from "./components/shared/SideBar";
+import {useEffect, useState} from "react";
+import {getCustomers} from "./services/client.js";
+import CardWithImage from "./components/Card";
+import CreateCustomerDrawer from "./components/CreateCustomerDrawer.jsx";
+import {errorNotification} from "./services/notification.js";
+
+const App = () => {
+
+    const [customers, setCustomers] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [err, setError] = useState("");
+
+    const fetchCustomers = () => {
+        setLoading(true);
+        getCustomers().then(res => {
+            setCustomers(res.data);
+        }).catch((err) => {
+            setError(err.response.data.message)
+            errorNotification(
+                err.code,
+                err.response.data.message)
+        }).finally(() => {
+            setLoading(false);
+        });
+    }
+    useEffect(() => {
+        fetchCustomers();
+    }, []);
+
+    if (loading) {
+        return (
+            <SidebarWithHeader>
+                <Spinner
+                    thickness='4px'
+                    speed='0.65s'
+                    emptyColor='gray.200'
+                    color='blue.500'
+                    size='xl'
+                />
+            </SidebarWithHeader>
+        );
+    }
+
+    if (customers.length <= 0) {
+        return (
+            <SidebarWithHeader>
+                <CreateCustomerDrawer
+                    fetchCustomers={fetchCustomers}
+                />
+                <Text mt={5}>
+                    No customers available.
+                </Text>
+            </SidebarWithHeader>
+        );
+    }
+
+    if (err) {
+        return (
+            <SidebarWithHeader>
+                <CreateCustomerDrawer
+                    fetchCustomers={fetchCustomers}
+                />
+                <Text mt={5}>
+                    Oops there was an error
+                </Text>
+            </SidebarWithHeader>
+        );
+    }
+    return (
+        <SidebarWithHeader>
+            <CreateCustomerDrawer
+                fetchCustomers={fetchCustomers}
+            />
+            <Wrap justify='center' spacing='30px'>
+                {customers.map((customer, index) => (
+                    <WrapItem key={customer.id}> {/* Added key prop */}
+                        <CardWithImage {...customer}
+                                       imageNumber={index}/>
+                    </WrapItem>
+                ))}
+            </Wrap>
+        </SidebarWithHeader>
+    );
+}
+
+export default App;
+
+```
+
+CreateCustomerDrawer.jsx:
+
+```jsx
+import {
+    Button,
+    Drawer,
+    DrawerBody,
+    DrawerCloseButton, DrawerContent, DrawerFooter,
+    DrawerHeader,
+    DrawerOverlay, Input,
+    useDisclosure
+} from "@chakra-ui/react";
+import CreateCustomerForm from "./CreateCustomerForm.jsx";
+
+const AddIcon = () => "+";
+const CloseIcon = () => "X";
+
+const CreateCustomerDrawer = ({fetchCustomers}) => {
+    const {isOpen, onOpen, onClose} = useDisclosure();
+
+    return (
+        <>
+            <Button leftIcon={<AddIcon/>} colorScheme="teal" onClick={onOpen}>
+                Create Customer
+            </Button>
+            <Drawer isOpen={isOpen} onClose={onClose} size="xl">
+                <DrawerOverlay/>
+                <DrawerContent>
+                    <DrawerCloseButton/>
+                    <DrawerHeader>Create New Customer</DrawerHeader>
+                    <DrawerBody>
+                        <CreateCustomerForm fetchCustomers={fetchCustomers}
+                                            onClose={onClose}/> {/* Pass onClose here */}
+                    </DrawerBody>
+                    <DrawerFooter>
+                        <Button leftIcon={<CloseIcon/>} colorScheme="teal" onClick={onClose}>
+                            Close
+                        </Button>
+                    </DrawerFooter>
+                </DrawerContent>
+            </Drawer>
+        </>
+    );
+};
+
+
+export default CreateCustomerDrawer;
+
+```
+
+CreateCustomerForm.jsx:
+
+```jsx
+import {Formik, Form, useField} from 'formik';
+import * as Yup from 'yup';
+import {Alert, AlertIcon, Box, Button, FormLabel, Input, Select, Stack} from "@chakra-ui/react";
+import {saveCustomer} from "../services/client.js";
+import {errorNotification, successNotification} from "../services/notification.js";
+
+const MyTextInput = ({label, ...props}) => {
+    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
+    // which we can spread on <input>. We can use field meta to show an error
+    // message if the field is invalid, and it has been touched (i.e. visited)
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Input className="text-input" {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+const MySelect = ({label, ...props}) => {
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Select {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+// And now we can use these
+const CreateCustomerForm = ({fetchCustomers, onClose}) => {
+    return (
+        <>
+            <Formik
+                initialValues={{
+                    name: '',
+                    email: '',
+                    age: 0,
+                    gender: '',
+                }}
+                validationSchema={Yup.object({
+                    name: Yup.string()
+                        .max(20, 'Must be 20 characters or less')
+                        .required('Required'),
+                    email: Yup.string()
+                        .email('Invalid email address')
+                        .required('Required'),
+                    age: Yup.number()
+                        .integer('Age must be a whole number')
+                        .min(16, 'Must be at least 16 years of age')
+                        .max(100, 'Must be less than 100 years of age')
+                        .required('Required'),
+                    gender: Yup.string()
+                        .oneOf(['MALE', 'FEMALE'], 'Invalid gender')
+                        .required('Required'),
+                })}
+                onSubmit={(customer, {setSubmitting}) => {
+                    setSubmitting(true);
+                    saveCustomer(customer)
+                        .then(res => {
+                            successNotification(
+                                "Customer Saved",
+                                `${customer.name} was successfully saved`
+                            );
+                            fetchCustomers(); // Refresh customer list
+                            onClose(); // Close the drawer upon success
+                        })
+                        .catch(err => {
+                            errorNotification(
+                                err.code,
+                                err.response.data.message
+                            );
+                        })
+                        .finally(() => {
+                            setSubmitting(false);
+                        });
+                }}
+            >
+                {({isValid, isSubmitting}) => (
+                    <Form>
+                        <Stack spacing="24px">
+                            <MyTextInput label="Name" name="name" type="text" placeholder="Enter your name"/>
+                            <MyTextInput label="Email" name="email" type="text" placeholder="Enter your email"/>
+                            <MyTextInput label="Age" name="age" type="number" placeholder="16"/>
+                            <MySelect label="Gender" name="gender">
+                                <option value="">Select a gender</option>
+                                <option value="MALE">Male</option>
+                                <option value="FEMALE">Female</option>
+                            </MySelect>
+                            <Button
+                                disabled={!isValid || isSubmitting}
+                                type="submit" mt={2}>
+                                Submit
+                            </Button>
+                        </Stack>
+                    </Form>
+                )}
+            </Formik>
+        </>
+    );
+};
+
+export default CreateCustomerForm;
+```
+
+### step 381:
+
+exercise add a delete button to delete the cutsomer
+
+### step 382:
+
+add delete button in card.jsx and pass the fetch customers from APp.jsx
+App.jsx:
+
+```jsx
+import {
+    Wrap,
+    WrapItem,
+    Spinner,
+    Text,
+    Table,
+    Thead,
+    Tbody,
+    Tfoot,
+    Tr,
+    Th,
+    Td,
+    TableCaption,
+    TableContainer
+} from '@chakra-ui/react';
+import SidebarWithHeader from "./components/shared/SideBar";
+import {useEffect, useState} from "react";
+import {getCustomers} from "./services/client.js";
+import CardWithImage from "./components/Card";
+import CreateCustomerDrawer from "./components/CreateCustomerDrawer.jsx";
+import {errorNotification} from "./services/notification.js";
+
+const App = () => {
+
+    const [customers, setCustomers] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [err, setError] = useState("");
+
+    const fetchCustomers = () => {
+        setLoading(true);
+        getCustomers().then(res => {
+            setCustomers(res.data);
+        }).catch((err) => {
+            setError(err.response.data.message)
+            errorNotification(
+                err.code,
+                err.response.data.message)
+        }).finally(() => {
+            setLoading(false);
+        });
+    }
+    useEffect(() => {
+        fetchCustomers();
+    }, []);
+
+    if (loading) {
+        return (
+            <SidebarWithHeader>
+                <Spinner
+                    thickness='4px'
+                    speed='0.65s'
+                    emptyColor='gray.200'
+                    color='blue.500'
+                    size='xl'
+                />
+            </SidebarWithHeader>
+        );
+    }
+
+    if (customers.length <= 0) {
+        return (
+            <SidebarWithHeader>
+                <CreateCustomerDrawer
+                    fetchCustomers={fetchCustomers}
+                />
+                <Text mt={5}>
+                    No customers available.
+                </Text>
+            </SidebarWithHeader>
+        );
+    }
+
+    if (err) {
+        return (
+            <SidebarWithHeader>
+                <CreateCustomerDrawer
+                    fetchCustomers={fetchCustomers}
+                />
+                <Text mt={5}>
+                    Oops there was an error
+                </Text>
+            </SidebarWithHeader>
+        );
+    }
+    return (
+        <SidebarWithHeader>
+            <CreateCustomerDrawer
+                fetchCustomers={fetchCustomers}
+            />
+            <Wrap justify='center' spacing='30px'>
+                {customers.map((customer, index) => (
+                    <WrapItem key={customer.id}> {/* Added key prop */}
+                        <CardWithImage
+                            {...customer}
+                            imageNumber={index}
+                            fetchCustomers={fetchCustomers}
+
+                        />
+                    </WrapItem>
+                ))}
+            </Wrap>
+        </SidebarWithHeader>
+    );
+}
+
+export default App;
+
+```
+
+Card.jsx:
+
+```jsx
+import {
+    Heading,
+    Avatar,
+    Box,
+    Center,
+    Image,
+    Flex,
+    Text,
+    Stack,
+    useColorModeValue,
+    Tag,
+    Button,
+    useDisclosure,
+    AlertDialogFooter,
+    AlertDialog,
+    AlertDialogOverlay,
+    AlertDialogContent, AlertDialogBody, AlertDialogHeader,
+} from '@chakra-ui/react'
+import {useRef} from "react";
+import {deleteCustomer} from "../services/client.js";
+import {errorNotification, successNotification} from "../services/notification.js";
+
+export default function CardWithImage({id, email, image, age, name, gender, imageNumber, fetchCustomers}) { // Destructure props correctly
+    const randomUserGender = gender === "MALE" ? "men" : "women";
+    const {isOpen, onOpen, onClose} = useDisclosure();
+    const cancelRef = useRef();
+    return (
+        <Center py={6}>
+            <Box
+                maxW={'300px'}
+                w={'full'}
+                bg={useColorModeValue('white', 'gray.800')}
+                boxShadow={'2xl'}
+                rounded={'md'}
+                overflow={'hidden'}>
+                <Image
+                    h={'120px'}
+                    w={'full'}
+                    src={
+                        image || 'https://images.unsplash.com/photo-1612865547334-09cb8cb455da?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80' // Use the image prop or default
+                    }
+                    objectFit="cover"
+                    alt="Card Image"
+                />
+                <Flex justify={'center'} mt={-12}>
+                    <Avatar
+                        size={'xl'}
+                        src={
+                            `https://randomuser.me/api/portraits/${randomUserGender}/${imageNumber}.jpg`
+                        }
+                        css={{
+                            border: '2px solid white',
+                        }}
+                    />
+                </Flex>
+
+
+                <Box p={6}>
+                    <Stack spacing={2} align={'center'} mb={5}>
+                        <Tag borderRadius='full'>{id}</Tag>
+                        <Heading fontSize={'2xl'} fontWeight={500} fontFamily={'body'}>
+                            {name || 'Anonymous'} {/* Add name or fallback to 'Anonymous' */}
+                        </Heading>
+                        <Text color={'gray.500'}>{email}</Text>
+                        <Text color={'gray.500'}>Age: {age} | gender: {gender}</Text>
+
+                    </Stack>
+                </Box>
+                <Stack m={8}>
+                    <Button
+                        mt={8}
+                        bg={'red.400'}
+                        color={'white'}
+                        rounded={'full'}
+                        _hover={{
+                            transform: 'translateY(-2px)',
+                            boxShadow: 'lg'
+                        }}
+                        _focus={{
+                            bg: 'green.500'
+                        }}
+
+                        onClick={onOpen}
+                    >
+                        Delete
+                    </Button>
+                    <AlertDialog
+                        isOpen={isOpen}
+                        leastDestructiveRef={cancelRef}
+                        onClose={onClose}
+                    >
+                        <AlertDialogOverlay>
+                            <AlertDialogContent>
+                                <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                                    Delete Customer
+                                </AlertDialogHeader>
+
+                                <AlertDialogBody>
+                                    Are you sure want to delet {name}? You can't undo this action afterwards.
+                                </AlertDialogBody>
+
+                                <AlertDialogFooter>
+                                    <Button ref={cancelRef} onClick={onClose}>
+                                        Cancel
+                                    </Button>
+                                    <Button colorScheme='red' onClick={() => {
+                                        deleteCustomer(id)
+                                            .then(res => {
+                                                successNotification(
+                                                    'Customer deleted',
+                                                    `${name} was successfully deleted`
+                                                );
+                                                onClose();
+                                                fetchCustomers();
+
+                                            }).catch(err => {
+                                            errorNotification(
+                                                err.code,
+                                                err.response.data.message)
+                                        }).finally(() => {
+                                                onClose();
+                                            }
+                                        )
+
+                                    }} ml={3}>
+                                        Delete
+                                    </Button>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialogOverlay>
+                    </AlertDialog>
+                </Stack>
+            </Box>
+        </Center>
+    );
+}
+
+```
+
+### step 383
+
+exercise add edit and edit the details
+
+### step 384:
+
+app.jsx:
+
+```jsx
+import {
+    Wrap,
+    WrapItem,
+    Spinner,
+    Text,
+    Table,
+    Thead,
+    Tbody,
+    Tfoot,
+    Tr,
+    Th,
+    Td,
+    TableCaption,
+    TableContainer
+} from '@chakra-ui/react';
+import SidebarWithHeader from "./components/shared/SideBar";
+import {useEffect, useState} from "react";
+import {getCustomers} from "./services/client.js";
+import CardWithImage from "./components/Card";
+import CreateCustomerDrawer from "./components/CreateCustomerDrawer.jsx";
+import {errorNotification} from "./services/notification.js";
+
+const App = () => {
+
+    const [customers, setCustomers] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [err, setError] = useState("");
+
+    const fetchCustomers = () => {
+        setLoading(true);
+        getCustomers().then(res => {
+            setCustomers(res.data);
+        }).catch((err) => {
+            setError(err.response.data.message)
+            errorNotification(
+                err.code,
+                err.response.data.message)
+        }).finally(() => {
+            setLoading(false);
+        });
+    }
+    useEffect(() => {
+        fetchCustomers();
+    }, []);
+
+    if (loading) {
+        return (
+            <SidebarWithHeader>
+                <Spinner
+                    thickness='4px'
+                    speed='0.65s'
+                    emptyColor='gray.200'
+                    color='blue.500'
+                    size='xl'
+                />
+            </SidebarWithHeader>
+        );
+    }
+
+
+    if (err) {
+        return (
+            <SidebarWithHeader>
+                <CreateCustomerDrawer
+                    fetchCustomers={fetchCustomers}
+                />
+                <Text mt={5}>
+                    Oops there was an error
+                </Text>
+            </SidebarWithHeader>
+        );
+    }
+
+    if (customers.length <= 0) {
+        return (
+            <SidebarWithHeader>
+                <CreateCustomerDrawer
+                    fetchCustomers={fetchCustomers}
+                />
+                <Text mt={5}>
+                    No customers available.
+                </Text>
+            </SidebarWithHeader>
+        );
+    }
+
+    return (
+        <SidebarWithHeader>
+            <CreateCustomerDrawer
+                fetchCustomers={fetchCustomers}
+            />
+            <Wrap justify='center' spacing='30px'>
+                {customers.map((customer, index) => (
+                    <WrapItem key={index}> {/* Added key prop */}
+                        <CardWithImage
+                            {...customer}
+                            imageNumber={index}
+                            fetchCustomers={fetchCustomers}
+
+                        />
+                    </WrapItem>
+                ))}
+            </Wrap>
+        </SidebarWithHeader>
+    );
+}
+
+export default App;
+
+```
+
+Client.js:
+
+```js
+import axios from 'axios';
+
+export const getCustomers = async () => {
+    try {
+        return await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/customers`);
+    } catch (e) {
+        throw e;
+    }
+}
+
+export const saveCustomer = async (customer) => {
+    try {
+        return await axios.post(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers`,
+            customer // <-- move this inside the axios.post() function call
+        );
+    } catch (e) {
+        throw e;
+    }
+}
+export const deleteCustomer = async (id) => {
+    try {
+        return await axios.delete(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers/${id}`
+        );
+    } catch (e) {
+        throw e;
+    }
+}
+export const updateCustomer = async (id, update) => {
+    try {
+        return await axios.put(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers/${id}`,
+            update
+        );
+    } catch (e) {
+        throw e;
+    }
+}
+
+
+```
+
+UpdateCustomerDrawer.jsx:
+
+```jsx
+import {
+    Button,
+    Drawer,
+    DrawerBody,
+    DrawerCloseButton, DrawerContent, DrawerFooter,
+    DrawerHeader,
+    DrawerOverlay, Input,
+    useDisclosure
+} from "@chakra-ui/react";
+import CreateCustomerForm from "./CreateCustomerForm.jsx";
+import UpdateCustomerForm from "./UpdateCustomerForm.jsx";
+
+const AddIcon = () => "+";
+const CloseIcon = () => "X";
+
+const UpdateCustomerDrawer = ({fetchCustomers, initialValues, customerId}) => {
+    const {isOpen, onOpen, onClose} = useDisclosure();
+
+    return (
+        <>
+            <Button
+                bg={'gray.200'}
+                color={'black'}
+                rounded={'full'}
+                _hover={{
+                    transform: 'translateY(-2px)',
+                    boxShadow: 'lg'
+                }}
+                onClick={onOpen}
+            >
+                Update Customer
+            </Button>
+            <Drawer isOpen={isOpen} onClose={onClose} size="xl">
+                <DrawerOverlay/>
+                <DrawerContent>
+                    <DrawerCloseButton/>
+                    <DrawerHeader>Update Customer</DrawerHeader>
+                    <DrawerBody>
+                        <UpdateCustomerForm
+                            fetchCustomers={fetchCustomers}
+                            initialValues={initialValues}
+                            customerId={customerId}
+                            onClose={onClose}
+                        />
+                    </DrawerBody>
+                    <DrawerFooter>
+                        <Button leftIcon={<CloseIcon/>} colorScheme="teal" onClick={onClose}>
+                            Close
+                        </Button>
+                    </DrawerFooter>
+                </DrawerContent>
+            </Drawer>
+        </>
+    );
+};
+
+
+export default UpdateCustomerDrawer;
+
+```
+
+UpdateCustomerForm.jsx:
+
+```jsx
+import {Formik, Form, useField} from 'formik';
+import * as Yup from 'yup';
+import {Alert, AlertIcon, Box, Button, FormLabel, Input, Select, Stack} from "@chakra-ui/react";
+import {saveCustomer, updateCustomer} from "../services/client.js";
+import {errorNotification, successNotification} from "../services/notification.js";
+
+const MyTextInput = ({label, ...props}) => {
+    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
+    // which we can spread on <input>. We can use field meta to show an error
+    // message if the field is invalid, and it has been touched (i.e. visited)
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Input className="text-input" {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+// And now we can use these
+const UpdateCustomerForm = ({fetchCustomers, initialValues, customerId, onClose}) => {
+    return (
+        <>
+            <Formik
+                initialValues={initialValues}
+                validationSchema={Yup.object({
+                    name: Yup.string()
+                        .max(20, 'Must be 20 characters or less')
+                        .required('Required'),
+                    email: Yup.string()
+                        .email('Invalid email address')
+                        .required('Required'),
+                    age: Yup.number()
+                        .integer('Age must be a whole number')
+                        .min(16, 'Must be at least 16 years of age')
+                        .max(100, 'Must be less than 100 years of age')
+                        .required('Required'),
+                })}
+                onSubmit={(updatedCustomer, {setSubmitting}) => {
+                    setSubmitting(true);
+                    updateCustomer(customerId, updatedCustomer)
+                        .then(res => {
+                            console.log(res);
+                            successNotification(
+                                "Customer Updated",
+                                `${updatedCustomer.name} was successfully Updated`
+                            );
+                            onClose();
+                            fetchCustomers();
+
+                        }).catch(err => {
+                        console.log(err);
+                        errorNotification(
+                            err.code,
+                            err.response.data.message || 'Failed to update customer'
+                        );
+                    }).finally(() => {
+                        setSubmitting(false);
+                    });
+                }}
+            >
+                {({isValid, isSubmitting, dirty}) => (
+                    <Form>
+                        <Stack spacing="24px">
+                            <MyTextInput label="Name" name="name" type="text" placeholder="Enter your name"/>
+                            <MyTextInput label="Email" name="email" type="text" placeholder="Enter your email"/>
+                            <MyTextInput label="Age" name="age" type="number" placeholder="16"/>
+                            <Button
+                                disabled={!(isValid && dirty) || isSubmitting}
+                                type="submit" mt={2}>
+                                Submit
+                            </Button>
+                        </Stack>
+                    </Form>
+                )}
+            </Formik>
+        </>
+    );
+};
+
+export default UpdateCustomerForm;
+```
+
+Card.jsx:
+
+```jsx
+import {
+    Heading,
+    Avatar,
+    Box,
+    Center,
+    Image,
+    Flex,
+    Text,
+    Stack,
+    useColorModeValue,
+    Tag,
+    Button,
+    useDisclosure,
+    AlertDialogFooter,
+    AlertDialog,
+    AlertDialogOverlay,
+    AlertDialogContent, AlertDialogBody, AlertDialogHeader,
+} from '@chakra-ui/react'
+import {useRef} from "react";
+import {deleteCustomer} from "../services/client.js";
+import {errorNotification, successNotification} from "../services/notification.js";
+import UpdateCustomerDrawer from "./UpdateCustomerDrawer.jsx";
+
+export default function CardWithImage({id, name, email, age, gender, imageNumber, fetchCustomers}) { // Destructure props correctly
+    const randomUserGender = gender === "MALE" ? "men" : "women";
+
+    const {isOpen, onOpen, onClose} = useDisclosure();
+    const cancelRef = useRef();
+
+    return (
+        <Center py={6}>
+            <Box
+                maxW={'300px'}
+                w={'full'}
+                bg={useColorModeValue('white', 'gray.800')}
+                boxShadow={'2xl'}
+                rounded={'md'}
+                overflow={'hidden'}>
+                <Image
+                    h={'120px'}
+                    w={'full'}
+                    src={
+                        'https://images.unsplash.com/photo-1612865547334-09cb8cb455da?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80' // Use the image prop or default
+                    }
+                    objectFit={'cover'}
+                />
+                <Flex justify={'center'} mt={-12}>
+                    <Avatar
+                        size={'xl'}
+                        src={
+                            `https://randomuser.me/api/portraits/${randomUserGender}/${imageNumber}.jpg`
+                        }
+                        alt={'Author'}
+                        css={{
+                            border: '2px solid white',
+                        }}
+                    />
+                </Flex>
+
+
+                <Box p={6}>
+                    <Stack spacing={2} align={'center'} mb={5}>
+                        <Tag borderRadius={'full'}>{id}</Tag>
+                        <Heading fontSize={'2xl'} fontWeight={500} fontFamily={'body'}>
+                            {name}
+                        </Heading>
+                        <Text color={'gray.500'}>{email}</Text>
+                        <Text color={'gray.500'}>Age: {age} | gender: {gender}</Text>
+
+                    </Stack>
+                </Box>
+                <Stack direction={'row'} justify={'center'} spacing={6}>
+                    <Stack>
+                        <UpdateCustomerDrawer
+                            initialValues={{name, email, age}}
+                            customerId={id}
+                            fetchCustomers={fetchCustomers}
+                        />
+                    </Stack>
+                    <Stack>
+                        <Button
+                            bg={'red.400'}
+                            color={'white'}
+                            rounded={'full'}
+                            _hover={{
+                                transform: 'translateY(-2px)',
+                                boxShadow: 'lg'
+                            }}
+                            _focus={{
+                                bg: 'green.500'
+                            }}
+                            onClick={onOpen}
+                        >
+                            Delete
+                        </Button>
+                        <AlertDialog
+                            isOpen={isOpen}
+                            leastDestructiveRef={cancelRef}
+                            onClose={onClose}
+                        >
+                            <AlertDialogOverlay>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                                        Delete Customer
+                                    </AlertDialogHeader>
+
+                                    <AlertDialogBody>
+                                        Are you sure want to delet {name}? You can't undo this action afterwards.
+                                    </AlertDialogBody>
+
+                                    <AlertDialogFooter>
+                                        <Button ref={cancelRef} onClick={onClose}>
+                                            Cancel
+                                        </Button>
+                                        <Button colorScheme='red' onClick={() => {
+                                            deleteCustomer(id)
+                                                .then(res => {
+                                                    successNotification(
+                                                        'Customer deleted',
+                                                        `${name} was successfully deleted`
+                                                    );
+                                                    onClose();
+                                                    fetchCustomers();
+
+                                                }).catch(err => {
+                                                errorNotification(
+                                                    err.code,
+                                                    err.response.data.message)
+                                            }).finally(() => {
+                                                    onClose();
+                                                }
+                                            )
+
+                                        }} ml={3}>
+                                            Delete
+                                        </Button>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialogOverlay>
+                        </AlertDialog>
+                    </Stack>
+                </Stack>
+            </Box>
+        </Center>
+    );
+}
+
+```
+
+### step 385:
+
+make it look better:
+Card.jsx:
+
+```jsx
+import {
+    Heading,
+    Avatar,
+    Box,
+    Center,
+    Image,
+    Flex,
+    Text,
+    Stack,
+    useColorModeValue,
+    Tag,
+    Button,
+    useDisclosure,
+    AlertDialogFooter,
+    AlertDialog,
+    AlertDialogOverlay,
+    AlertDialogContent, AlertDialogBody, AlertDialogHeader,
+} from '@chakra-ui/react'
+import {useRef} from "react";
+import {deleteCustomer} from "../services/client.js";
+import {errorNotification, successNotification} from "../services/notification.js";
+import UpdateCustomerDrawer from "./UpdateCustomerDrawer.jsx";
+
+export default function CardWithImage({id, name, email, age, gender, imageNumber, fetchCustomers}) { // Destructure props correctly
+    const randomUserGender = gender === "MALE" ? "men" : "women";
+
+    const {isOpen, onOpen, onClose} = useDisclosure();
+    const cancelRef = useRef();
+
+    return (
+        <Center py={6}>
+            <Box
+                maxW={'300px'}
+                minW={'300px'}
+                w={'full'}
+                m={2}
+                bg={useColorModeValue('white', 'gray.800')}
+                boxShadow={'lg'}
+                rounded={'md'}
+                overflow={'hidden'}>
+                <Image
+                    h={'120px'}
+                    w={'full'}
+                    src={
+                        'https://images.unsplash.com/photo-1612865547334-09cb8cb455da?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80' // Use the image prop or default
+                    }
+                    objectFit={'cover'}
+                />
+                <Flex justify={'center'} mt={-12}>
+                    <Avatar
+                        size={'xl'}
+                        src={
+                            `https://randomuser.me/api/portraits/${randomUserGender}/${imageNumber}.jpg`
+                        }
+                        alt={'Author'}
+                        css={{
+                            border: '2px solid white',
+                        }}
+                    />
+                </Flex>
+
+
+                <Box p={6}>
+                    <Stack spacing={2} align={'center'} mb={5}>
+                        <Tag borderRadius={'full'}>{id}</Tag>
+                        <Heading fontSize={'2xl'} fontWeight={500} fontFamily={'body'}>
+                            {name}
+                        </Heading>
+                        <Text color={'gray.500'}>{email}</Text>
+                        <Text color={'gray.500'}>Age: {age} | gender: {gender}</Text>
+
+                    </Stack>
+                </Box>
+                <Stack direction={'row'} justify={'center'} spacing={6} p={4}>
+                    <Stack>
+                        <UpdateCustomerDrawer
+                            initialValues={{name, email, age}}
+                            customerId={id}
+                            fetchCustomers={fetchCustomers}
+                        />
+                    </Stack>
+                    <Stack>
+                        <Button
+                            bg={'red.400'}
+                            color={'white'}
+                            rounded={'full'}
+                            _hover={{
+                                transform: 'translateY(-2px)',
+                                boxShadow: 'lg'
+                            }}
+                            _focus={{
+                                bg: 'green.500'
+                            }}
+                            onClick={onOpen}
+                        >
+                            Delete
+                        </Button>
+                        <AlertDialog
+                            isOpen={isOpen}
+                            leastDestructiveRef={cancelRef}
+                            onClose={onClose}
+                        >
+                            <AlertDialogOverlay>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                                        Delete Customer
+                                    </AlertDialogHeader>
+
+                                    <AlertDialogBody>
+                                        Are you sure want to delet {name}? You can't undo this action afterwards.
+                                    </AlertDialogBody>
+
+                                    <AlertDialogFooter>
+                                        <Button ref={cancelRef} onClick={onClose}>
+                                            Cancel
+                                        </Button>
+                                        <Button colorScheme='red' onClick={() => {
+                                            deleteCustomer(id)
+                                                .then(res => {
+                                                    successNotification(
+                                                        'Customer deleted',
+                                                        `${name} was successfully deleted`
+                                                    );
+                                                    onClose();
+                                                    fetchCustomers();
+
+                                                }).catch(err => {
+                                                errorNotification(
+                                                    err.code,
+                                                    err.response.data.message)
+                                            }).finally(() => {
+                                                    onClose();
+                                                }
+                                            )
+
+                                        }} ml={3}>
+                                            Delete
+                                        </Button>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialogOverlay>
+                        </AlertDialog>
+                    </Stack>
+                </Stack>
+            </Box>
+        </Center>
+    );
+}
+
+```
+
+Sidebar.jsx:
+
+```jsx
+'use client'
+
+import {
+    IconButton,
+    Avatar,
+    Box,
+    CloseButton,
+    Flex,
+    HStack,
+    VStack,
+    Icon,
+    useColorModeValue,
+    Text,
+    Drawer,
+    DrawerContent,
+    useDisclosure,
+    Menu,
+    MenuButton,
+    MenuDivider,
+    MenuItem,
+    MenuList, Image,
+} from '@chakra-ui/react'
+import {
+    FiHome,
+    FiTrendingUp,
+    FiCompass,
+    FiStar,
+    FiSettings,
+    FiMenu,
+    FiBell,
+    FiChevronDown,
+} from 'react-icons/fi'
+
+const LinkItems = [
+    {name: 'Home', icon: FiHome},
+    {name: 'Trending', icon: FiTrendingUp},
+    {name: 'Explore', icon: FiCompass},
+    {name: 'Favourites', icon: FiStar},
+    {name: 'Settings', icon: FiSettings},
+]
+
+const SidebarContent = ({onClose, ...rest}) => {
+    return (
+        <Box
+            transition="3s ease"
+            bg={useColorModeValue('white', 'gray.900')}
+            borderRight="1px"
+            borderRightColor={useColorModeValue('gray.200', 'gray.700')}
+            w={{base: 'full', md: 60}}
+            pos="fixed"
+            h="full"
+            {...rest}>
+            <Flex h="20" flexDirection="column" alignItems="center" mx="8" mb={70} mt={2}
+                  justifyContent="space-between">
+                <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" mb={5}>
+                    Dashboard
+                </Text>
+                <Image
+                    borderRadius='full'
+                    boxSize='75px'
+                    src='https://bit.ly/dan-abramov'
+                    alt='Dan Abramov'
+                />
+                <CloseButton display={{base: 'flex', md: 'none'}} onClick={onClose}/>
+            </Flex>
+            {LinkItems.map((link) => (
+                <NavItem key={link.name} icon={link.icon}>
+                    {link.name}
+                </NavItem>
+            ))}
+        </Box>
+    )
+}
+
+const NavItem = ({icon, children, ...rest}) => {
+    return (
+        <Box
+            as="a"
+            href="#"
+            style={{textDecoration: 'none'}}
+            _focus={{boxShadow: 'none'}}>
+            <Flex
+                align="center"
+                p="4"
+                mx="4"
+                borderRadius="lg"
+                role="group"
+                cursor="pointer"
+                _hover={{
+                    bg: 'red.400',
+                    color: 'white',
+                }}
+                {...rest}>
+                {icon && (
+                    <Icon
+                        mr="4"
+                        fontSize="16"
+                        _groupHover={{
+                            color: 'white',
+                        }}
+                        as={icon}
+                    />
+                )}
+                {children}
+            </Flex>
+        </Box>
+    )
+}
+
+const MobileNav = ({onOpen, ...rest}) => {
+    return (
+        <Flex
+            ml={{base: 0, md: 60}}
+            px={{base: 4, md: 4}}
+            height="20"
+            alignItems="center"
+            bg={useColorModeValue('white', 'gray.900')}
+            borderBottomWidth="1px"
+            borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
+            justifyContent={{base: 'space-between', md: 'flex-end'}}
+            {...rest}>
+            <IconButton
+                display={{base: 'flex', md: 'none'}}
+                onClick={onOpen}
+                variant="outline"
+                aria-label="open menu"
+                icon={<FiMenu/>}
+            />
+
+            <Text
+                display={{base: 'flex', md: 'none'}}
+                fontSize="2xl"
+                fontFamily="monospace"
+                fontWeight="bold">
+                Logo
+            </Text>
+
+            <HStack spacing={{base: '0', md: '6'}}>
+                <IconButton size="lg" variant="ghost" aria-label="open menu" icon={<FiBell/>}/>
+                <Flex alignItems={'center'}>
+                    <Menu>
+                        <MenuButton py={2} transition="all 0.3s" _focus={{boxShadow: 'none'}}>
+                            <HStack>
+                                <Avatar
+                                    size={'sm'}
+                                    src={
+                                        'https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
+                                    }
+                                />
+                                <VStack
+                                    display={{base: 'none', md: 'flex'}}
+                                    alignItems="flex-start"
+                                    spacing="1px"
+                                    ml="2">
+                                    <Text fontSize="sm">Justina Clark</Text>
+                                    <Text fontSize="xs" color="gray.600">
+                                        Admin
+                                    </Text>
+                                </VStack>
+                                <Box display={{base: 'none', md: 'flex'}}>
+                                    <FiChevronDown/>
+                                </Box>
+                            </HStack>
+                        </MenuButton>
+                        <MenuList
+                            bg={useColorModeValue('white', 'gray.900')}
+                            borderColor={useColorModeValue('gray.200', 'gray.700')}>
+                            <MenuItem>Profile</MenuItem>
+                            <MenuItem>Settings</MenuItem>
+                            <MenuItem>Billing</MenuItem>
+                            <MenuDivider/>
+                            <MenuItem>Sign out</MenuItem>
+                        </MenuList>
+                    </Menu>
+                </Flex>
+            </HStack>
+        </Flex>
+    )
+}
+
+const SidebarWithHeader = ({children}) => {
+    const {isOpen, onOpen, onClose} = useDisclosure()
+
+    return (
+        <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
+            <SidebarContent onClose={() => onClose} display={{base: 'none', md: 'block'}}/>
+            <Drawer
+                isOpen={isOpen}
+                placement="left"
+                onClose={onClose}
+                returnFocusOnClose={false}
+                onOverlayClick={onClose}
+                size="full">
+                <DrawerContent>
+                    <SidebarContent onClose={onClose}/>
+                </DrawerContent>
+            </Drawer>
+            {/* mobilenav */}
+            <MobileNav onOpen={onOpen}/>
+            <Box ml={{base: 0, md: 60}} p="4">
+                {children} {/* Content */}
+            </Box>
+        </Box>
+    )
+}
+
+export default SidebarWithHeader
+
+```
+
+### step 386:
+
+we are going to deploy our front end
+
+### step 387:
+
+create two files:
+Dockerfile under react folder
+.dockerignore under react folder
+Dockerfile:
+
+```dockerfile
+
+FROM node:23-alpine
+WORKDIR /app
+COPY package*.json .
+RUN npm i --silent
+COPY . .
+RUN echo "VITE_API_BASE_URL=http://localhost:8088" .env
+EXPOSE 5173
+CMD ["npm","run","dev"]
+```
+
+.dockerignore
+
+```text
+node_modules
+Dockerfile
+.env
+```
+
+### step 388:
+
+open the react folder in git
+to create image
+
+```bash
+docker build . -t dkedarnath/kedarnath-react
+```
+
+to push the image
+
+```bash
+docker push dkedarnath/kedarnath-react
+```
+
+### step 389:
+
+we get issues i dont know why but i have updatedted the docker file to make it work
+
+Dockerfilr:
+
+```dockerfile
+FROM node:23-alpine
+WORKDIR /app
+COPY package*.json .
+RUN npm i --silent
+COPY . .
+RUN echo "VITE_API_BASE_URL=http://host.docker.internal:8088" > .env
+EXPOSE 5173
+CMD ["npm","run","dev"]
+```
+
+```bash
+docker run --rm --name frontend-react -p 3000:5173 dkedarnath/kedarnath-react
+```
+
+update package.json:
+package.json
+"dev": "vite --host", this line is updated
+
+```json
+{
+  "name": "react",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^2.10.2",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "axios": "^1.7.7",
+    "formik": "^2.4.6",
+    "framer-motion": "^11.11.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.3.0",
+    "yup": "^1.4.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.11.1",
+    "@types/react": "^18.3.10",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.2",
+    "eslint": "^9.11.1",
+    "eslint-plugin-react": "^7.37.0",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.12",
+    "globals": "^15.9.0",
+    "vite": "^5.4.8"
+  }
+}
+
+```
+
+### step 390: 19th oct 24
+
+```bash
+docker run -d --name frontend-react -p 3000:5173 dkedarnath/kedarnath-react
+```
+
+```bash
+docker exec -it frontend-react sh
+pwd
+ls - a
+cat .env
+
+```
+
+ctrl + d - to come out
+
+```
+
+### step 391:
