@@ -7,7 +7,7 @@ import java.util.Optional;
 
 
 @Repository("jpa")
-public class CustomerJPADataAccessService implements  CustomerDao{
+public class CustomerJPADataAccessService implements CustomerDao {
 
     private final CustomerRepository customerRepository;
 
@@ -22,6 +22,7 @@ public class CustomerJPADataAccessService implements  CustomerDao{
 
     @Override
     public Optional<Customer> selectCustomerById(Integer id) {
+
         return customerRepository.findById(id);
     }
 
@@ -32,7 +33,7 @@ public class CustomerJPADataAccessService implements  CustomerDao{
 
     @Override
     public boolean existsPersonWithEmail(String email) {
-      return  customerRepository.existsCustomerByEmail(email);
+        return customerRepository.existsCustomerByEmail(email);
 
     }
 
@@ -49,5 +50,10 @@ public class CustomerJPADataAccessService implements  CustomerDao{
     @Override
     public void updateCustomer(Customer update) {
         customerRepository.save(update);
+    }
+
+    @Override
+    public Optional<Customer> selectUserByEmail(String email) {
+        return customerRepository.findCustomersByEmail(email);
     }
 }

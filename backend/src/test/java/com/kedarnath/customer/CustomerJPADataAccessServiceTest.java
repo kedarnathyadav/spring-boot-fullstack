@@ -48,8 +48,8 @@ class CustomerJPADataAccessServiceTest {
     void insertCustomer() {
         //Given
         Customer customer = new Customer(
-                1L, "king", "123@gmail.com", 20,
-                Gender.MALE);
+                1L, "king", "123@gmail.com", "password", Gender.MALE, 20
+        );
         //When
         underTest.insertCustomer(customer);
         //Then
@@ -90,8 +90,8 @@ class CustomerJPADataAccessServiceTest {
     void updateCustomer() {
         //Given
         Customer customer = new Customer(
-                1L, "king", "123@gmail.com", 20,
-                Gender.MALE);
+                1L, "king", "123@gmail.com", "password", Gender.MALE, 20
+        );
         //When
         underTest.updateCustomer(customer);
         //Then

@@ -2,11 +2,15 @@ package com.kedarnath.customer;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CustomerRepository extends JpaRepository<Customer, Integer>{
+import java.util.Optional;
+
+public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
 
     boolean existsCustomerByEmail(String email);
 
-
     boolean existsCustomerById(Integer id);
+
+    Optional<Customer> findCustomersByEmail(String email);
+
 }
