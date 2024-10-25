@@ -1070,7 +1070,7 @@ refer: https://chakra-templates.vercel.app/components/cards
 
 create a "compoenents" named new directory under src in frontend
 move shared folder to this directory
-create a file Card.jsx
+create a file CustomerCard.jsx
 
 ```jsx
 import {
@@ -5339,7 +5339,7 @@ export default App;
 
 ```
 
-Card.jsx:
+CustomerCard.jsx:
 
 ```jsx
 import {
@@ -5803,7 +5803,7 @@ const UpdateCustomerForm = ({fetchCustomers, initialValues, customerId, onClose}
 export default UpdateCustomerForm;
 ```
 
-Card.jsx:
+CustomerCard.jsx:
 
 ```jsx
 import {
@@ -5958,7 +5958,7 @@ export default function CardWithImage({id, name, email, age, gender, imageNumber
 ### step 385:
 
 make it look better:
-Card.jsx:
+CustomerCard.jsx:
 
 ```jsx
 import {

@@ -36,7 +36,12 @@ public class SecurityFilterChainConfig {
                 .authorizeHttpRequests(authorization -> authorization
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/customers",
-                                "api/v1/auth/login")
+                                "api/v1/auth/login"
+                        )
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/ping"
+                        )
                         .permitAll()  // Allow unauthenticated access to this endpoint
                         .anyRequest().authenticated()  // All other requests require authentication
                 )

@@ -7,8 +7,8 @@ import {
 import SidebarWithHeader from "./components/shared/SideBar";
 import {useEffect, useState} from "react";
 import {getCustomers} from "./services/client.js";
-import CardWithImage from "./components/Card";
-import CreateCustomerDrawer from "./components/CreateCustomerDrawer.jsx";
+import CardWithImage from "./components/customer/CustomerCard.jsx";
+import CreateCustomerDrawer from "./components/customer/CreateCustomerDrawer.jsx";
 import {errorNotification} from "./services/notification.js";
 
 const App = () => {
@@ -20,7 +20,7 @@ const App = () => {
     const fetchCustomers = () => {
         setLoading(true);
         getCustomers().then(res => {
-            console.log('API Response:', res.data);  // Debugging the response
+            // console.log('API Response:', res.data);  // Debugging the response
 
             // Ensure the response is an array, or default to an empty array
             if (Array.isArray(res.data)) {
@@ -73,7 +73,7 @@ const App = () => {
     }
 
     if (!Array.isArray(customers) || customers.length === 0) {
-        console.log('Customers array is empty or not an array:', customers);  // Log for debugging
+        // console.log('Customers array is empty or not an array:', customers);  // Log for debugging
         return (
             <SidebarWithHeader>
                 <CreateCustomerDrawer fetchCustomers={fetchCustomers}/>
