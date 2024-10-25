@@ -37,7 +37,7 @@ Done. Now run:
 
 ### step 327
 
-delete the gitignore file in the react project folder and paste the code into the main gitignore file
+Delete the gitignore file in the React project folder and paste the code into the main gitignore file
 
 ### step 328
 
@@ -1617,7 +1617,7 @@ jobs:
 
 ### step 357
 
-push the code to git hub.
+push the code to GitHub.
 
 ### step 358
 
@@ -1632,13 +1632,13 @@ add gender at backend and update the frontend accordingly
 create a new fle under the db migration
 V3__Add_Gender_Enum_To_Customer.sql:
 
-```sql
+```txt
 ALTER TABLE customer
     ADD COLUMN gender TEXT NOT NULL;
 
 ```
 
-delet all the rows from customer table.
+Delete all the rows from customer table.
 
 ### step 361
 
@@ -1787,7 +1787,7 @@ we will fix it in next steps
 
 UPDATE CustomerJDBCDataAccessServiceTest:
 
-```java
+```text
 package com.kedarnath.customer;
 
 import com.kedarnath.AbstractTestcontainersUnitTest;
@@ -2334,7 +2334,7 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
 
 update CustomerRowMapper.java
 
-```java
+```text
 package com.kedarnath.customer;
 
 import org.springframework.jdbc.core.RowMapper;
@@ -3398,7 +3398,7 @@ export default App;
 
 ```
 
-i made a mistake in integration test as its adding the same name evrytime:
+I made a mistake in integration test as its adding the same name everytime:
 
 update CustomerIntegrationTest.java:
 
@@ -3636,9 +3636,9 @@ public class CustomerIntegrationTest {
 
 ### step 365:
 
-now ssh into ec2instance database and delete all the customers as they got no gender if you remember.
+now ssh into EC2 Instance database and delete all the customers as they got no gender if you remember.
 
-push it to github then it will be deployed
+push it to GitHub then it will be deployed
 
 ### step 366:
 
@@ -3660,7 +3660,7 @@ docker pull
 dockercompose up -d
 ```
 
-thats it
+That's it
 
 ### step 367:
 
@@ -4590,7 +4590,7 @@ we need to fix like the form should close after submitting and should get notifi
 delete all the data from database because from front end it will start adding
 it will start from 1 and it might get issues
 
-```sql
+```text
 delete
 from customer;
 
@@ -6358,7 +6358,7 @@ Dockerfile
 
 ### step 388:
 
-open the react folder in git
+open the React folder in git
 to create image
 
 ```bash
@@ -6373,7 +6373,7 @@ docker push dkedarnath/kedarnath-react
 
 ### step 389:
 
-we get issues i dont know why but i have updatedted the docker file to make it work
+we get issues i dont know why, but I have updated the docker file to make it work
 
 Dockerfilr:
 
@@ -6745,7 +6745,7 @@ due to the security group
 ### step 396:
 
 go to intsances running open the instance select the security tab and check the inbound rules
-go to rds and check the inbound rules- it will allow 5432 so we should also add for 8080 to make it work
+go to rds and check the inbound rules- it will allow 5432, so we should also add for 8080 to make it work
 
 ### step 397:
 

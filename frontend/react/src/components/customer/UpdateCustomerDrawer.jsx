@@ -4,10 +4,9 @@ import {
     DrawerBody,
     DrawerCloseButton, DrawerContent, DrawerFooter,
     DrawerHeader,
-    DrawerOverlay, Input,
+    DrawerOverlay,
     useDisclosure
 } from "@chakra-ui/react";
-import CreateCustomerForm from "./CreateCustomerForm.jsx";
 import UpdateCustomerForm from "./UpdateCustomerForm.jsx";
 
 const AddIcon = () => "+";
