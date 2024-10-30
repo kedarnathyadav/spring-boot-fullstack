@@ -17,7 +17,7 @@ management:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/customer
+    url: jdbc:postgresql://awseb-e-nskvm2faru-stack-awsebrdsdatabase-xn3ngsekufx0.c1qawm2oqlx3.us-east-1.rds.amazonaws.com:5432/ebdb
     username: kedarnath
     password: password
   jpa:

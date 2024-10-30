@@ -7,7 +7,7 @@ import {
     DrawerOverlay,
     useDisclosure
 } from "@chakra-ui/react";
-import CreateCustomerForm from "./CreateCustomerForm.jsx";
+import CreateCustomerForm from "../shared/CreateCustomerForm.jsx";
 
 const AddIcon = () => "+";
 const CloseIcon = () => "X";
@@ -26,8 +26,8 @@ const CreateCustomerDrawer = ({fetchCustomers}) => {
                     <DrawerCloseButton/>
                     <DrawerHeader>Create New Customer</DrawerHeader>
                     <DrawerBody>
-                        <CreateCustomerForm fetchCustomers={fetchCustomers}
-                                            onClose={onClose}/> {/* Pass onClose here */}
+                        <CreateCustomerForm onSuccess={fetchCustomers}
+                        />
                     </DrawerBody>
                     <DrawerFooter>
                         <Button leftIcon={<CloseIcon/>} colorScheme="teal" onClick={onClose}>

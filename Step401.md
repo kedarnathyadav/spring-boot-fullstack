@@ -4763,7 +4763,7 @@ Update main.jsx:
 import {StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'
 import {ChakraProvider} from '@chakra-ui/react'
-import App from './App.jsx'
+import App from './Customer.jsx'
 import {createStandaloneToast} from '@chakra-ui/react'
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 
@@ -4864,7 +4864,7 @@ open main.jsx
 import {StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'
 import {ChakraProvider} from '@chakra-ui/react'
-import App from './App.jsx'
+import App from './Customer.jsx'
 import {createStandaloneToast} from '@chakra-ui/react'
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Login from "./components/login/Login.jsx";
@@ -5293,7 +5293,7 @@ let go to main and update the code
 import {StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'
 import {ChakraProvider} from '@chakra-ui/react'
-import App from './App.jsx'
+import App from './Customer.jsx'
 import {createStandaloneToast} from '@chakra-ui/react'
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Login from "./components/login/Login.jsx";
@@ -6358,7 +6358,7 @@ add this in main.jsx:
 import {StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'
 import {ChakraProvider} from '@chakra-ui/react'
-import App from './App.jsx'
+import App from './Customer.jsx'
 import {createStandaloneToast} from '@chakra-ui/react'
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Login from "./components/login/Login.jsx";
@@ -7291,5 +7291,2124 @@ public class JWTUtil {
 
 ### step 483:
 
-now lets deploy it on aws
- 
+now let's deploy it on aws
+![](backend/src/main/resources/static/images/img_7.png)
+Everything should work fine even in aws
+
+### step 484:
+
+exercise is to build a registration form for customer
+
+### step 485
+
+Create a folder named signup under components
+
+create a file named Signup.jsx
+Signup.jsx
+
+```text
+import {useAuth} from "../context/AuthContext.jsx";
+import {useNavigate} from "react-router-dom";
+import {useEffect} from "react";
+import {Flex, Heading, Image, Link, Stack, Text} from "@chakra-ui/react";
+import CreateCustomerForm from "../shared/CreateCustomerForm.jsx";
+
+const Signup = () => {
+    const {customer} = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (customer) {
+            navigate("/dashboard");
+        }
+    })
+
+    return (
+        <Stack minH={'100vh'} direction={{base: 'column', md: 'row'}}>
+            <Flex p={8} flex={1} align={'center'} justifyContent={'center'}>
+                <Stack spacing={4} w={'full'} maxW={'md'}>
+                    <Image
+                        src={""}
+                        boxSize={"200px"}
+                        alt={"Kedarnath Logo"}
+
+                    />
+                    <Heading fontSize={'2xl'} mb={15}>Register for an account</Heading>
+                    <CreateCustomerForm/>
+                    <Link color={"blue.500"} href={"/"}>
+                        Have an account? Login now.
+                    </Link>
+                </Stack>
+            </Flex>
+            <Flex flex={1} p={10} flexDirection={"column"}
+                  alignItems={"center"}
+                  justifyContent={"center"}
+                  bgGradient={{sm: 'linear(to-r, blue.600, purple.600)'}}>
+                <Text fontSize={"6xl"} color={"white"} fontWeight={"bold"} mb={5}>
+                    <Link href={"#"}>
+                        Enroll Now
+                    </Link>
+                </Text>
+                <Image
+                    alt={'Login Image'}
+                    objectFit={'scale-down'}
+                    src={
+                        'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1352&q=80'
+                    }
+                />
+            </Flex>
+        </Stack>
+    )
+
+}
+export default Signup;
+```
+
+Update CreateCustomerForm.jsx
+
+```text
+import {Formik, Form, useField} from 'formik';
+import * as Yup from 'yup';
+import {Alert, AlertIcon, Box, Button, FormLabel, Input, Select, Stack} from "@chakra-ui/react";
+import {saveCustomer} from "../../services/client.js";
+import {errorNotification, successNotification} from "../../services/notification.js";
+
+const MyTextInput = ({label, ...props}) => {
+    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
+    // which we can spread on <input>. We can use field meta to show an error
+    // message if the field is invalid, and it has been touched (i.e. visited)
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Input className="text-input" {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+const MySelect = ({label, ...props}) => {
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Select {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+// And now we can use these
+const CreateCustomerForm = ({fetchCustomers, onClose}) => {
+    return (
+        <>
+            <Formik
+                initialValues={{
+                    name: '',
+                    email: '',
+                    age: 0,
+                    gender: '',
+                    password: ''
+                }}
+                validationSchema={Yup.object({
+                    name: Yup.string()
+                        .max(20, 'Must be 20 characters or less')
+                        .required('Required'),
+                    email: Yup.string()
+                        .email('Invalid email address')
+                        .required('Required'),
+                    age: Yup.number()
+                        .integer('Age must be a whole number')
+                        .min(16, 'Must be at least 16 years of age')
+                        .max(100, 'Must be less than 100 years of age')
+                        .required('Required'),
+                    password: Yup.string()
+                        .min(7, 'Password should be 7 characters or more')
+                        .max(20, 'Password should be 20 characters or less')
+                        .required('Required'),
+                    gender: Yup.string()
+                        .oneOf(['MALE', 'FEMALE'], 'Invalid gender')
+                        .required('Required'),
+                })}
+                onSubmit={(customer, {setSubmitting}) => {
+                    setSubmitting(true);
+                    saveCustomer(customer)
+                        .then(res => {
+                            successNotification(
+                                "Customer Saved",
+                                `${customer.name} was successfully saved`
+                            );
+                            fetchCustomers && fetchCustomers(); // Refresh customer list
+                            onClose(); // Close the drawer upon success
+                        })
+                        .catch(err => {
+                            errorNotification(
+                                err.code,
+                                err.response.data.message
+                            );
+                        })
+                        .finally(() => {
+                            setSubmitting(false);
+                        });
+                }}
+            >
+                {({isValid, isSubmitting}) => (
+                    <Form>
+                        <Stack spacing="24px">
+                            <MyTextInput label="Name" name="name" type="text" placeholder="Enter your name"/>
+                            <MyTextInput label="Email" name="email" type="text" placeholder="Enter your email"/>
+                            <MyTextInput label="Age" name="age" type="number" placeholder="16"/>
+                            <MyTextInput label="Password" name="password" type="password"
+                                         placeholder={"pick a secured password"}/>
+                            <MySelect label="Gender" name="gender">
+                                <option value="">Select a gender</option>
+                                <option value="MALE">Male</option>
+                                <option value="FEMALE">Female</option>
+                            </MySelect>
+                            <Button
+                                disabled={!isValid || isSubmitting}
+                                type="submit" mt={2}>
+                                Submit
+                            </Button>
+                        </Stack>
+                    </Form>
+                )}
+            </Formik>
+        </>
+    );
+};
+
+export default CreateCustomerForm;
+```
+
+Update main.jsx for the route
+
+```text
+import {StrictMode} from 'react'
+import {createRoot} from 'react-dom/client'
+import {ChakraProvider} from '@chakra-ui/react'
+import App from './Customer.jsx'
+import {createStandaloneToast} from '@chakra-ui/react'
+import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import Login from "./components/login/Login.jsx";
+import AuthProvider from "./components/context/AuthContext.jsx";
+import ProtectedRoute from "./services/ProtectedRoute.jsx";
+import Signup from "./components/signup/Signup";
+
+const {ToastContainer} = createStandaloneToast()
+
+const router = createBrowserRouter(
+    [
+        {
+            path: "/",
+            element: <Login/>
+        },
+        {
+            path: "/signup",
+            element: <Signup/>
+        },
+        {
+            path: "dashboard",
+            element: <ProtectedRoute><App/></ProtectedRoute>
+        }
+    ]
+)
+createRoot(document.getElementById('root')).render(
+    <StrictMode>
+        <ChakraProvider>
+            <AuthProvider>
+                <RouterProvider router={router}/>
+            </AuthProvider>
+            <ToastContainer/>
+        </ChakraProvider>
+    </StrictMode>,
+)
+
+```
+
+in the dashboard page on the right corner the details of the customer will be mising lets fix it
+
+### step 486:
+
+in AuthContext.jsx extract the set customer to method and export it
+
+```text
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState
+} from "react";
+import {login as performLogin} from "../../services/client.js";
+import {jwtDecode} from "jwt-decode";
+
+
+const AuthContext = createContext({});
+
+const AuthProvider = ({children}) => {
+    const [customer, setCustomer] = useState(null);
+
+    const setCustomerFromToken = () => {
+        let token = localStorage.getItem("access_token");
+        if (token) {
+            token = jwtDecode(token);
+            setCustomer({
+                username: token.sub,
+                roles: token.scopes
+            })
+        }
+    }
+
+    useEffect(() => {
+        setCustomerFromToken();
+    }, [])
+
+    const login = async (usernameAndPassword) => {
+        return new Promise((resolve, reject) => {
+            performLogin(usernameAndPassword).then(
+                res => {
+                    const jwtToken = res.headers["authorization"];
+                    localStorage.setItem("access_token", jwtToken);
+                    // console.log(jwtToken);
+                    const decodeToken = jwtDecode(jwtToken);
+                    setCustomer({
+                        username: decodeToken.sub,
+                        roles: decodeToken.scopes
+                    })
+                    resolve(res);
+                }
+            ).catch(err => {
+                reject(err);
+            })
+        })
+    }
+    const logout = () => {
+        localStorage.removeItem("access_token")
+        setCustomer(null)
+    }
+
+    const isCustomerAuthenticated = () => {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            return false;
+        }
+        const {exp: expiration} = jwtDecode(token);
+        if (Date.now() > expiration * 1000) {
+            logout()
+            return false;
+        }
+
+        return true;
+
+    }
+
+
+    return (
+        <AuthContext.Provider value={{customer, login, logout, isCustomerAuthenticated, setCustomerFromToken}}>
+            {children} {/* Ensure children are rendered */}
+        </AuthContext.Provider>
+    );
+}
+
+
+export const useAuth = () => useContext(AuthContext);
+
+export default AuthProvider;
+```
+
+update CreateCustomerForm with onSuccess()
+
+```text
+import {Formik, Form, useField} from 'formik';
+import * as Yup from 'yup';
+import {Alert, AlertIcon, Box, Button, FormLabel, Input, Select, Stack} from "@chakra-ui/react";
+import {saveCustomer} from "../../services/client.js";
+import {errorNotification, successNotification} from "../../services/notification.js";
+
+const MyTextInput = ({label, ...props}) => {
+    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
+    // which we can spread on <input>. We can use field meta to show an error
+    // message if the field is invalid, and it has been touched (i.e. visited)
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Input className="text-input" {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+const MySelect = ({label, ...props}) => {
+    const [field, meta] = useField(props);
+    return (
+        <Box>
+            <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+            <Select {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <Alert className="error" status={"error"} mt={"2"}>
+                    <AlertIcon/>
+                    {meta.error}
+                </Alert>
+            ) : null}
+        </Box>
+    );
+};
+
+// And now we can use these
+const CreateCustomerForm = ({onSuccess}) => {
+    return (
+        <>
+            <Formik
+                initialValues={{
+                    name: '',
+                    email: '',
+                    age: 0,
+                    gender: '',
+                    password: ''
+                }}
+                validationSchema={Yup.object({
+                    name: Yup.string()
+                        .max(20, 'Must be 20 characters or less')
+                        .required('Required'),
+                    email: Yup.string()
+                        .email('Invalid email address')
+                        .required('Required'),
+                    age: Yup.number()
+                        .integer('Age must be a whole number')
+                        .min(16, 'Must be at least 16 years of age')
+                        .max(100, 'Must be less than 100 years of age')
+                        .required('Required'),
+                    password: Yup.string()
+                        .min(7, 'Password should be 7 characters or more')
+                        .max(20, 'Password should be 20 characters or less')
+                        .required('Required'),
+                    gender: Yup.string()
+                        .oneOf(['MALE', 'FEMALE'], 'Invalid gender')
+                        .required('Required'),
+                })}
+                onSubmit={(customer, {setSubmitting}) => {
+                    setSubmitting(true);
+                    saveCustomer(customer)
+                        .then(res => {
+                            successNotification(
+                                "Customer Saved",
+                                `${customer.name} was successfully saved`
+                            );
+                            onSuccess(res.headers["authorization"]);
+                        })
+                        .catch(err => {
+                            errorNotification(
+                                err.code,
+                                err.response.data.message
+                            );
+                        })
+                        .finally(() => {
+                            setSubmitting(false);
+                        });
+                }}
+            >
+                {({isValid, isSubmitting}) => (
+                    <Form>
+                        <Stack spacing="24px">
+                            <MyTextInput label="Name" name="name" type="text" placeholder="Enter your name"/>
+                            <MyTextInput label="Email" name="email" type="text" placeholder="Enter your email"/>
+                            <MyTextInput label="Age" name="age" type="number" placeholder="16"/>
+                            <MyTextInput label="Password" name="password" type="password"
+                                         placeholder={"pick a secured password"}/>
+                            <MySelect label="Gender" name="gender">
+                                <option value="">Select a gender</option>
+                                <option value="MALE">Male</option>
+                                <option value="FEMALE">Female</option>
+                            </MySelect>
+                            <Button
+                                disabled={!isValid || isSubmitting}
+                                type="submit" mt={2}>
+                                Submit
+                            </Button>
+                        </Stack>
+                    </Form>
+                )}
+            </Formik>
+        </>
+    );
+};
+
+export default CreateCustomerForm;
+```
+
+update CreateCustomerDrawer with onSuccess()
+
+```
+import {
+    Button,
+    Drawer,
+    DrawerBody,
+    DrawerCloseButton, DrawerContent, DrawerFooter,
+    DrawerHeader,
+    DrawerOverlay,
+    useDisclosure
+} from "@chakra-ui/react";
+import CreateCustomerForm from "../shared/CreateCustomerForm.jsx";
+
+const AddIcon = () => "+";
+const CloseIcon = () => "X";
+
+const CreateCustomerDrawer = ({fetchCustomers}) => {
+    const {isOpen, onOpen, onClose} = useDisclosure();
+
+    return (
+        <>
+            <Button leftIcon={<AddIcon/>} colorScheme="teal" onClick={onOpen}>
+                Create Customer
+            </Button>
+            <Drawer isOpen={isOpen} onClose={onClose} size="xl">
+                <DrawerOverlay/>
+                <DrawerContent>
+                    <DrawerCloseButton/>
+                    <DrawerHeader>Create New Customer</DrawerHeader>
+                    <DrawerBody>
+                        <CreateCustomerForm onSuccess={fetchCustomers}
+                        />
+                    </DrawerBody>
+                    <DrawerFooter>
+                        <Button leftIcon={<CloseIcon/>} colorScheme="teal" onClick={onClose}>
+                            Close
+                        </Button>
+                    </DrawerFooter>
+                </DrawerContent>
+            </Drawer>
+        </>
+    );
+};
+
+
+export default CreateCustomerDrawer;
+```
+
+last Signup.jsx
+
+```text
+import {useAuth} from "../context/AuthContext.jsx";
+import {useNavigate} from "react-router-dom";
+import {useEffect} from "react";
+import {Flex, Heading, Image, Link, Stack, Text} from "@chakra-ui/react";
+import CreateCustomerForm from "../shared/CreateCustomerForm.jsx";
+
+const Signup = () => {
+    const {customer, setCustomerFromToken} = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (customer) {
+            navigate("/dashboard");
+        }
+    })
+
+    return (
+        <Stack minH={'100vh'} direction={{base: 'column', md: 'row'}}>
+            <Flex p={8} flex={1} align={'center'} justifyContent={'center'}>
+                <Stack spacing={4} w={'full'} maxW={'md'}>
+                    <Image
+                        src={""}
+                        boxSize={"200px"}
+                        alt={"Kedarnath Logo"}
+
+                    />
+                    <Heading fontSize={'2xl'} mb={15}>Register for an account</Heading>
+                    <CreateCustomerForm onSuccess={(token) => {
+                        localStorage.setItem("access_token", token)
+                        setCustomerFromToken()
+                        navigate("/dashboard");
+                    }}/>
+                    <Link color={"blue.500"} href={"/"}>
+                        Have an account? Login now.
+                    </Link>
+                </Stack>
+            </Flex>
+            <Flex flex={1} p={10} flexDirection={"column"}
+                  alignItems={"center"}
+                  justifyContent={"center"}
+                  bgGradient={{sm: 'linear(to-r, blue.600, purple.600)'}}>
+                <Text fontSize={"6xl"} color={"white"} fontWeight={"bold"} mb={5}>
+                    <Link href={"#"}>
+                        Enroll Now
+                    </Link>
+                </Text>
+                <Image
+                    alt={'Login Image'}
+                    objectFit={'scale-down'}
+                    src={
+                        'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1352&q=80'
+                    }
+                />
+            </Flex>
+        </Stack>
+    )
+
+}
+export default Signup;
+```
+
+Next step is to deploy on elastic bean stalk
+
+### step 487:
+
+commit all the changes with the commit message
+
+```text
+Registration Solution - React
+```
+
+### step 488:
+
+only one instance cant handle all the requests you might need more ec2 to handle the request.
+
+### step 489:
+
+![](backend/src/main/resources/static/images/img_8.png)
+
+above represents the things we have done so far
+![](backend/src/main/resources/static/images/img_9.png)
+we are going to use amazon amplify to deploy angular or react
+the request will be sent to load balancer
+
+we can configure in a way that if there is 50% usage in one ec2 then the load balancer could
+add one more ec2 and so on. if one fails it stops sending the traffic to that instance.
+
+### step 490:
+
+elastic load balancing
+Refer : https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html
+
+### step 491:
+
+we are going to create a load balancer in a public subnet
+
+if we go to the current environment and try to add a load balancer the problem is it
+
+will create a elb - elastic load balancer which is version 1 which is going to get stopped soon
+
+we have to create using alb - application load balancer thats why we are
+going to create a new environment with alb and delete the existing one
+
+### step 492:
+
+click create new environment
+
+select web server environment
+
+application name: kedarnath-api
+
+Environment name: kedarnath-api
+
+domain name: kedarnath-api
+
+platform: Docker
+branch : ecs running 0n 64bit amazon linux 2
+version: recommended
+
+Application code:--upload your code--
+version label: v1
+upload your code->local file->
+
+you need to upload Dockerrun.aws.json
+
+update the Dockerrun.aws.json from
+
+```text
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "kedarnath-react",
+      "image": "dkedarnath/kedarnath-react:latest",
+      "essential": true,
+      "memory": 256,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 5173
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:8080/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    },
+    {
+      "name": "kedarnath-api",
+      "image": "dkedarnath/kedarnath-api:15.10.2024.12.33.00",
+      "essential": true,
+      "memory": 512,
+      "portMappings": [
+        {
+          "hostPort": 8080,
+          "containerPort": 8080
+        }
+      ],
+      "environment": [
+        {
+          "name": "SPRING_DATASOURCE_URL",
+          "value": "jdbc:postgresql://awseb-e-nskvm2faru-stack-awsebrdsdatabase-xn3ngsekufx0.c1qawm2oqlx3.us-east-1.rds.amazonaws.com:5432/customer"
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:8080/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+}
+```
+
+Update to below by removing the front end we will change the rds url after deploying this
+
+```text
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+       {
+      "name": "kedarnath-api",
+      "image": "dkedarnath/kedarnath-api:15.10.2024.12.33.00",
+      "essential": true,
+      "memory": 512,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 8080
+        }
+      ],
+      "environment": [
+        {
+          "name": "SPRING_DATASOURCE_URL",
+          "value": "jdbc:postgresql://awseb-e-nskvm2faru-stack-awsebrdsdatabase-xn3ngsekufx0.c1qawm2oqlx3.us-east-1.rds.amazonaws.com:5432/customer"
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:8080/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+}
+```
+
+RDS url needs to be updated we will do it after creating the environment
+upload this file now
+
+click next
+
+Presets: custom configuration
+
+In Instances:
+```Security group```:-
+select default
+
+In capacity:
+
+```Max instances```: 2
+
+```Processor```: arm64
+
+```Instance types```: t4g.micro
+
+```Placement```:select all three zones
+
+In Modify rolling updates and deployments:
+```Deployment policy```: Rolling
+
+In security select the key pair created earlier
+leave the IAM instance profile as it is.
+
+In network:
+
+```Load Balancer subnets```:
+
+1. eu-west-1a
+2. eu-west-1b
+
+Instance settings:
+
+1. enable Public ip address
+2. Instance subnets :
+    1. eu-west-1a
+    2. eu-west-1b
+
+Database Settings:
+
+1. Database subnets
+1. eu-west-1a
+2. eu-west-1b
+
+In Database:
+
+1. snapshot: none
+2. Database Setttings:
+    1. Engine: postgres
+    2. Engine version: 13.7 or any latest version
+    3. Instance Class: select free tier t3 micro/small
+    4. Storage: 40
+    5. Username: kedarnath
+    6. Password: password
+3. Database deletion policy
+    1. Select ```Delete```
+
+finished just save it.
+wait it gets finished building.
+
+### step 493:
+
+1. The health conditions will be severe.
+   ELB health is failing or not available for all instances
+2. Go to configuration
+    1. copy RDS Endpoint without port
+    2. Go to Dockerrun.aws.json--> update the rds url.
+3. refer https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.managing.db.html
+
+```text
+          "value": "jdbc:postgresql://awseb-e-nskvm2faru-stack-awsebrdsdatabase-xn3ngsekufx0.c1qawm2oqlx3.us-east-1.rds.amazonaws.com:5432/ebdb"
+
+```
+
+4. The default db given by ELB is ebdb. let use it for now.
+
+5. deploy the file on ELB.
+
+6. Eventually we will automate this with git hub actions.
+
+7. wait for some time.
+
+8. we haven't configured the configured the load balancer end point and how to behave.
+9. The environment will fail again due to spring security
+10. We will fix it in next step
+
+### step 494:
+
+1. Load balancer asking the ec2 instance is it ready to accept the traffic but the ec2 rejecting it with 403 error.
+2. Go to Environment-> go to configuration -> navigate to load balancer-> edit
+3. you will listener port 80 and processor. Don't make any changes here.
+4. Go to ec2 instance-> navigate to load balancer -> click on it
+5. Copy the Dns url and paste it in new tab -> you get a message 403.
+6. Navigate to listeners-> click on default route column -> Forwarded to starting with aws...
+7. You will go to target groups - you will see the target group is unhealthy
+8. click on Health checks -> edit -> update the success code to 403.
+9. After a while the group becomes healthy
+10. After a while environment turns healthy as well
+11. We know that is not right just revert the changes back to status code 200.
+12. We will fix this in next step
+
+### step 495:
+
+1. Refer https://docs.spring.io/spring-boot/docs/2.2.x/reference/html/production-ready-features.html
+2. Actuator helps to monitor your application.
+3. Ther are many end points be careful which one are you exposing. Our main concentration is on health.
+4. add the dependency to pom.xml
+    ```text
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+            </dependency>
+    ```
+5. update the SecurityFilterChainConfig.java
+   ```text
+        package com.kedarnath.security;
+
+import com.kedarnath.jwt.JWTAuthenticationFilter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityFilterChainConfig {
+
+    private final AuthenticationProvider authenticationProvider;
+    private final JWTAuthenticationFilter jwtAuthenticationFilter;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+
+    public SecurityFilterChainConfig(AuthenticationProvider authenticationProvider, JWTAuthenticationFilter jwtAuthenticationFilter, AuthenticationEntryPoint authenticationEntryPoint) {
+        this.authenticationProvider = authenticationProvider;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF for stateless APIs
+                .authorizeHttpRequests(authorization -> authorization
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/customers",
+                                "api/v1/auth/login"
+                        )
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/ping"
+                        )
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/actuator/**"
+                        )
+                        .permitAll()  // Allow unauthenticated access to this endpoint
+                        .anyRequest().authenticated()  // All other requests require authentication
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Use stateless session management
+                )
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)// Add JWT filter
+                .exceptionHandling(exceptionHandling ->
+                        exceptionHandling.authenticationEntryPoint(authenticationEntryPoint)
+                );
+
+           return http.build();
+        }
+    }
+
+    ```
+
+6. Test ```http://localhost:8080/actuator```. You will see only few.
+7. update the application.yml
+
+```yaml
+server:
+  port: 8080
+  error:
+    include-message: always
+
+cors:
+  allowed-origins: "*"
+  allowed-methods: "*"
+  allowed-headers: "*"
+  exposed-headers: "*"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/customer
+    username: kedarnath
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show_sql: true
+  main:
+    web-application-type: servlet
+```
+
+```include: "health,info"``` in here instead of health, info you can use * to get all the endpoints.which is not good as
+someone can even shutdown as there is a endpoint shutdown.
+
+### step 496: 29th oct 2024 11:02 AM
+
+1. Go to github
+2. Go to current project settings
+3. Navigate to Secrets and variables.
+4. Update the EB-APPLICATION_NAME,EB_ENVIRONMENT_NAME,EB_ENVIRONMENT_URL
+
+FINISHED AT 11:14 aM
+
+### STEP 497: 29TH OCT 11:14 AM
+
+1. you can remove the below code fromDockerrun.aws.json and add it to application.yml.
+    ```json  
+        "environment": [
+            {
+              "name": "SPRING_DATASOURCE_URL",
+              "value": "jdbc:postgresql://awseb-e-nskvm2faru-stack-awsebrdsdatabase-xn3ngsekufx0.c1qawm2oqlx3.us-east-1.rds.amazonaws.com:5432/ebdb"
+            }
+          ],
+    ```
+
+2. for now we dont want any changes in application.yml so we left the above code as it is but created a new filw
+   application-dev.yml and updated in it for the future reference.
+    ```yaml
+    server:
+      port: 8080
+      error:
+        include-message: always
+    
+    cors:
+      allowed-origins: "*"
+      allowed-methods: "*"
+      allowed-headers: "*"
+      exposed-headers: "*"
+    
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: "health,info"
+    
+    spring:
+      datasource:
+    #    below line is the code updated
+        url: jdbc:postgresql://awseb-e-nskvm2faru-stack-awsebrdsdatabase-xn3ngsekufx0.c1qawm2oqlx3.us-east-1.rds.amazonaws.com:5432/ebdb
+        username: kedarnath
+        password: password
+      jpa:
+        hibernate:
+          ddl-auto: validate
+        properties:
+          hibernate:
+            dialect: org.hibernate.dialect.PostgreSQLDialect
+            format_sql: true
+        show_sql: true
+      main:
+        web-application-type: servlet
+    ```
+3. Now push the code to GitHub with the commit message ```Expose health and info metrics and add application-dev.yml```
+4. Wait for couple of minutes first it will be then it goes sever as we haven't configured the load balancer yet.
+
+FINISHED AT 11:28 AM
+
+### STEP 498 29TH OCT 11:29 AM:
+
+1. Go to the configuration
+2. Edit load balancer
+    1. Under Processes -> select the default
+    2. Click->Actions-> edit
+    3. Path:/acuator/health->save
+    4. Apply
+3. Go to Ec2 instance -> load balancers -> click on load balancer we are using
+4. Navigate to Forward to starting with "aws...." under listeners - you can see its still failing the health checks.
+5. Come back and select Health checks-> you can see the Path is updated.
+6. After a couple of minutes this turns healthy.
+7. Copy the DNS name and go to postman -> try to request with get by adding "/actuator/health" at the end-> you get
+   status : up
+8. Now if you check even the environment will be healthy.
+9. Now delete the previous environment.
+
+FINISHED AT 11:49 AM
+
+### STEP 499 29TH OCT 11:50 AM
+
+1. Amazon Route 53 -> link: https://aws.amazon.com/route53/
+2. Click on get started
+3. you will see options like Register domain , Transfer domain and few more.
+4. Our first thing is to obtain a domain.
+5. So select the Register domain -> Get started
+6. give a name(kedarnath.dev) and try there are many option you can choose any and purchase a domain. look for the
+   cheaper one...:-))
+
+FINISHED AT 11:56 AM
+
+### STEP 500 29TH OCT 11:56 AM
+
+1. After purchasing if you go to Route 53 dashboard you will see 1 Hosted zone and 1 Domain registration.
+2. click on Hosted zone
+3. Select the hosted zone you have got.
+4. click on create a new record.
+    1. Record-name: customer-api
+    2. Record-type: A-/routes traffic to an IPV4 address and some AWS resources
+    3. Enable Alias
+    4. choose endpoint: Alias to Application and load balancer
+    5. choose Region: select same region as load balancer.
+    6. Choose loadbalance: select the load balance you hav got
+    7. Routing policy: Simple routing
+    8. click on Create Records
+5. copy the name of the record created and go to post man
+    1. paste "customer-api.kedarnath.dev/actuator/health"  in post man
+    2. Do get request
+    3. you get the response "status : up"
+6. As you this is http:// .... but we want to use https we will do it in next step.
+
+FINISHED AT 12:16 PM
+
+### STEP 501 29TH OCT 12:17 PM
+
+1. Refer https://en.wikipedia.org/wiki/Transport_Layer_Security
+2. ![](backend/src/main/resources/static/images/img_10.png)
+
+FINISHED AT 12:25 PM
+
+### STEP 502 29TH OCT 12:25 PM
+
+1. Go to certificate manager on aws
+2. click on Request a certificate
+3. select request a public certicate
+    1. Fully qualified domain name: customer-api.kedarnath.dev
+    2. Leave the rest default
+    3. click on request
+4. Now we have certificate -> click on it
+    1. status will pending validation-> we will validate in next steps
+    2. click on create records in Route 53
+    3. select your domain and click create record
+    4. after couple of minutes the pending will change to success.
+5. As we got the certificate now we can attach it to our load balancer.
+
+FINISHED AT 12:34 PM
+
+### step 503 29TH OCT 12:34 PM
+
+1. Open ELB environment
+2. select the configuration
+3. edit load balancer
+4. Navigate to listeners and click on add listener
+    1. Port: 443
+    2. Protocol: HTTPS
+    3. select the ssl certificate we just created
+    4. SSl_policy: ELBSecurityPolicy-2016-08
+    5. click on Add
+5. Navigate to Processess and click on add Process
+    1. Name: https
+    2. Port: 443
+    3. Protocol: HTTPS
+    4. HTTP code: 200
+    5. Path: "/acutuator/health"
+    6. Leave the rest default
+    7. click on Add
+6. click Apply
+7. Wait for the Environment to load.
+8. after successfully loading -> go to ec2 instance -> load balancers -> select the load balancer -> you will see two
+   listeners.
+    1. click on the new https:443 forwarded to
+    2. you will see the healthy: 1
+9. Lets test it go to chrome ```https://customer-api.kedarnath.dev``` -> you get the 403 error
+10. you will also see the lock symbol on left next to url. That means connection is secure.
+11. next we want to forward the http requests to https
+12. open terminal type
+    ```text
+            curl http://customer-api.kedarnath.dev
+    ```
+    you will get the 403 error
+13. which shouldn't happen. we are going configure it to https in next step.
+
+FINISHED AT 1:51 PM
+
+### STEP 504 29TH OCT 1:51 PM
+
+1. Go to load balancer -> select your load balancer
+2. select the HTTP:80 -> click on actions and delete it
+3. Now add a listener
+    1. Port: 80
+    2. Protocol: HTTP
+    3. Action: Redirect
+        1. Protocol:HTTPS
+        2. Port: 443
+        3. leave the rest default
+    4. click on add
+4. Now it is done and test it by going to terminal
+   ```text
+            curl http://customer-api.kedarnath.dev
+    ```
+   you will get the 301 moved permanently
+5. go to terminal
+   ```text
+            curl https://customer-api.kedarnath.dev
+    ```
+   you will get the 403 error
+
+FINISHED AT 2:11 PM
+
+### STEP 505 29TH OCT 2:12 PM
+
+1. Have a knowledge of it properly and take responsibility and try to fix the issues
+
+FINISHED AT 2:13 PM
+
+### STEP 506 29TH OCT 2:14PM
+
+1. Now we are going to deploy our frontend
+2. Its not good practice to deploy front ends on docker.
+3. Best way to deploy frontend is to use the manage solution aws amplify is one them.
+4. If you are using nextjs then you use Vercel
+5. Search for aws amplify in aws and click on it
+6. Refer: https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html
+
+FINISHED at 2:21 PM
+
+### STEP 507 29TH OCT 3:12 PM
+
+1. SELECT Github -> click continue
+2. Grant permission of repository to aws
+3. select all for now // if you are doing it for your company select Only select repositories
+4. In this page we select the repository before that let me show you the apps that got access of your github.
+5. Go to Github
+6. Go to settings
+7. Navigate to Integration-> application
+8. there you can see the apps that got access you can also revoke the permission
+9. rest we do it next step
+
+FINISHED AT 3:21 pm
+
+### STEP 508 29TH OCT 3:22 PM
+
+1. SELECT the repository
+2. Branch: main
+3. Enable Connecting a monorepo
+4. path: frontend/react
+
+FINISHED AT 3:24 pm
+
+### STEP 509 29TH OCT 3:25 PM
+
+1. Click next
+2. Build settings:
+    1. App name: Full stack Course - react
+    2. before we go further lets do some things
+3. Go to intellij-> go to terminal ->
+    1. ```cd frontend/react```
+    2. ```node -v```
+    3. ```npm help``` -- you will see list of all commands
+    4. ```npm ci```
+    5. ```npm run build```
+    6. we get a folder called dist
+    7. remember that we need to configure the .env file >> VITE_API_BASE_URL=http://loalhoset:8080
+4. Now lets go back to aws amplify
+   FINISHED AT 3:45 PM
+5.
+
+### STEP 510 29TH OCT 4:00 PM
+
+1. Go to aws Amplify
+2. click on edit build and test settings
+
+```yaml
+version: 1
+applications:
+  -frontend:
+    phases:
+      preBuild:
+        commands:
+          - npm use ${VERSION_NODE_17}
+          - npm ci
+        build:
+          commands:
+            - npm use ${VERSION_NODE_17}
+            - echo 'VITE_API_BASE_URL=$VITE_API_BASE_UR' > .env.production
+            - npm run build
+      artifacts:
+        baseDirectory: /dist
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/**
+    appRoot: frontend/react
+
+```
+
+3. click on save
+4. click on advanced setting
+5. add and environment variable key: VITE_API_BASE_URL, value: https://customer-api.amigoscode.dev
+
+FINISHED AT 4:33 PM 6 MIN 33 SEC VIDEO
+
+### STEP 511 29TH OCT 4:34 PM
+
+1. Click next
+2. click save and deploy
+3. wait for it
+4. click on url -> tada your front end is ready
+5. we have successfully deployed our application
+6. Test it
+
+FINISHED AT 4:41 PM
+
+### STEP 512 29TH OCT 4:41 PM
+
+1. Go to aws amplify
+2. click on full stack course - react under the all apps-> you will see few steps to do
+3. now we cover only few let do first domain management -> on the left navigate to domain management
+4. click on add domain
+5. full-stack-react.kedarnath.dev
+6. leave the rest default and click on save
+7. you see a text saying The required CNAME records are not yet configured for the below subdomains
+8. click Actions -> View DND Records
+9. there will be two copy first one
+10. go to route 53 -> select the hosted zone -> select your hosted zone -> click create record
+    1. record name: www.full-stack-react
+    2. Record type: CNAME
+    3. value: paste the value you have copied
+    4. leave the rest default
+    5. click on add another record
+    6. record name: full-stack-react
+    7. value: same value as above record
+    8. click create record by leaving the rest as default
+    9. if it says it already exists check by going back ifnot thats fine
+11. if you go back to domain management-> you will see we verified domain ownership we are propagating takes up to 30
+    mins
+
+FINISHED AT 5:36 PM
+
+### STEP 513 29TH OCT 5:37 PM
+
+1. if you want to access control with username and password you can do it as well.
+2. we dont need it right for admin control you can create something like that.
+3.
+
+FINISHED AT 5:50 PM
+
+### STEP 514 29TH OCT 5:52 PM
+
+1. go to aws amplify
+2. click on previews
+3. click enable previews
+4. Install github app
+5. select the branch -> click on manage
+6. enable Pull request Previews -> confirm
+   FINISHED AT 6:02 PM
+
+### STEP 515 29TH OCT 6:02 PM
+
+1. now lets make some changes in our app to test the preview of aws amplify for ci /cd
+2. let add links to home for dashboard by creating new component.
+3. Create new component Home.jsx
+    ```text
+    import {
+        Wrap,
+        WrapItem,
+        Spinner,
+        Text,
+    } from '@chakra-ui/react';
+    import SidebarWithHeader from "./components/shared/SideBar";
+    import {useEffect, useState} from "react";
+    import {getCustomers} from "./services/client.js";
+    import CardWithImage from "./components/customer/CustomerCard.jsx";
+    import CreateCustomerDrawer from "./components/customer/CreateCustomerDrawer.jsx";
+    import {errorNotification} from "./services/notification.js";
+    
+    const Home = () => {
+    
+        return (
+            <SidebarWithHeader>
+                <Text fontSize={"6xl"}>DashBoard</Text>
+            </SidebarWithHeader>
+        );
+    };
+    
+    export default Home;
+    
+    ```
+4. Update Customer.jsx
+    ```text
+    import {
+        Wrap,
+        WrapItem,
+        Spinner,
+        Text,
+    } from '@chakra-ui/react';
+    import SidebarWithHeader from "./components/shared/SideBar";
+    import {useEffect, useState} from "react";
+    import {getCustomers} from "./services/client.js";
+    import CardWithImage from "./components/customer/CustomerCard.jsx";
+    import CreateCustomerDrawer from "./components/customer/CreateCustomerDrawer.jsx";
+    import {errorNotification} from "./services/notification.js";
+    
+    const Customer = () => {
+    
+        const [customers, setCustomers] = useState([]); // Initialize as an array
+        const [loading, setLoading] = useState(false);
+        const [err, setError] = useState("");
+    
+        const fetchCustomers = () => {
+            setLoading(true);
+            getCustomers().then(res => {
+                // console.log('API Response:', res.data);  // Debugging the response
+    
+                // Ensure the response is an array, or default to an empty array
+                if (Array.isArray(res.data)) {
+                    setCustomers(res.data);  // Set customers only if it's an array
+                    setError("");  // Reset the error state if the fetch is successful
+                } else {
+                    console.error("Unexpected response format:", res.data);
+                    setCustomers([]);  // Fallback to an empty array if response is invalid
+                    setError("Unexpected data format from API");
+                }
+            }).catch((err) => {
+                console.error("Error fetching customers:", err);  // Log error for debugging
+                setError(err?.response?.data?.message || "An error occurred while fetching customers");
+                errorNotification(
+                    err.code,
+                    err?.response?.data?.message || "An error occurred"
+                );
+            })
+                .finally(() => {
+                    setLoading(false);
+                });
+        };
+    
+        useEffect(() => {
+            fetchCustomers();
+        }, []);
+    
+        if (loading) {
+            return (
+                <SidebarWithHeader>
+                    <Spinner
+                        thickness='4px'
+                        speed='0.65s'
+                        emptyColor='gray.200'
+                        color='blue.500'
+                        size='xl'
+                    />
+                </SidebarWithHeader>
+            );
+        }
+    
+        if (err) {
+            console.log('Current error:', err);  // Log the error to understand its value
+            return (
+                <SidebarWithHeader>
+                    <CreateCustomerDrawer fetchCustomers={fetchCustomers}/>
+                    <Text mt={5}>Oops, there was an error: {err}</Text>
+                </SidebarWithHeader>
+            );
+        }
+    
+        if (!Array.isArray(customers) || customers.length === 0) {
+            // console.log('Customers array is empty or not an array:', customers);  // Log for debugging
+            return (
+                <SidebarWithHeader>
+                    <CreateCustomerDrawer fetchCustomers={fetchCustomers}/>
+                    <Text mt={5}>No customers available.</Text>
+                </SidebarWithHeader>
+            );
+        }
+    
+        return (
+            <SidebarWithHeader>
+                <CreateCustomerDrawer fetchCustomers={fetchCustomers}/>
+                <Wrap justify="center" spacing="30px">
+                    {customers.map((customer, index) => (
+                        <WrapItem key={index}>
+                            <CardWithImage
+                                {...customer}
+                                imageNumber={index}
+                                fetchCustomers={fetchCustomers}
+                            />
+                        </WrapItem>
+                    ))}
+                </Wrap>
+            </SidebarWithHeader>
+        );
+    };
+    
+    export default Customer;
+    
+    ```
+5. Update Login.jsx
+    ```text
+    import {
+        Button,
+        Flex,
+        Text,
+        FormLabel,
+        Heading,
+        Input,
+        Stack,
+        Image, Link, Box, Alert, AlertIcon,
+    } from '@chakra-ui/react';
+    import {Formik, Form, useField} from "formik";
+    import * as Yup from 'yup';
+    import {useAuth} from "../context/AuthContext.jsx";
+    import {errorNotification} from "../../services/notification.js";
+    import {useNavigate} from "react-router-dom";
+    import {useEffect} from "react";
+    
+    const MyTextInput = ({label, ...props}) => {
+        // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
+        // which we can spread on <input>. We can use field meta to show an error
+        // message if the field is invalid, and it has been touched (i.e. visited)
+        const [field, meta] = useField(props);
+        return (
+            <Box>
+                <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+                <Input className="text-input" {...field} {...props} />
+                {meta.touched && meta.error ? (
+                    <Alert className="error" status={"error"} mt={"2"}>
+                        <AlertIcon/>
+                        {meta.error}
+                    </Alert>
+                ) : null}
+            </Box>
+        );
+    };
+    
+    const LoginForm = () => {
+        const {login} = useAuth();
+        const navigate = useNavigate();
+    
+        return (
+            <Formik
+                validateOnMount={true}
+                validationSchema={
+                    Yup.object({
+                        username: Yup.string().email("Must be Valid email").required("Email is required"),
+                        password: Yup.string()
+                            .max(20, "Password cannot be more than 20 characters")
+                            .required("Password is required")
+                    })}
+                initialValues={{username: '', password: ''}}
+                onSubmit={(values, {setSubmitting}) => {
+                    // alert(JSON.stringify(values, null, 0));
+                    setSubmitting(true);
+                    login(values).then(res => {
+                        // TODO: navigate to dashboard
+                        navigate("/dashboard");
+                        console.log("Successfully  logged in");
+                    }).catch(err => {
+                        errorNotification(
+                            err.code,
+                            err.response.data.message
+                        )
+                    }).finally(() => {
+                        setSubmitting(false);
+                    })
+                }}>
+                {({isValid, isSubmitting}) => (
+                    <Form>
+                        <Stack spacing={15}>
+                            <MyTextInput
+                                label={"Email"}
+                                name={"username"}
+                                type={"email"}
+                                placeholder={"Enter your username"}
+                            />
+                            <MyTextInput
+                                label={"Password"}
+                                name={"password"}
+                                type={"password"}
+                                placeholder={"Enter your Password"}
+                            />
+                            <Button
+                                type={"submit"}
+                                disabled={!isValid || isSubmitting}>
+                                Login
+                            </Button>
+                        </Stack>
+                    </Form>)
+                }
+            </Formik>
+        );
+    };
+    
+    
+    const Login = () => {
+        const {customer} = useAuth();
+        const navigate = useNavigate();
+    
+        useEffect(() => {
+            if (customer) {
+                navigate("/dashboard/customers");
+            }
+        })
+    
+        return (
+            <Stack minH={'100vh'} direction={{base: 'column', md: 'row'}}>
+                <Flex p={8} flex={1} align={'center'} justifyContent={'center'}>
+                    <Stack spacing={4} w={'full'} maxW={'md'}>
+                        <Image
+                            src={""}
+                            boxSize={"200px"}
+                            alt={"Kedarnath Logo"}
+    
+                        />
+                        <Heading fontSize={'2xl'} mb={15}>Sign in to your account</Heading>
+                        <LoginForm/>
+                        <Link color={"blue.500"} href={"/signup"}>
+                            Don't have an account? Signup now.
+                        </Link>
+                    </Stack>
+                </Flex>
+                <Flex flex={1} p={10} flexDirection={"column"}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      bgGradient={{sm: 'linear(to-r, blue.600, purple.600)'}}>
+                    <Text fontSize={"6xl"} color={"white"} fontWeight={"bold"} mb={5}>
+                        <Link href={"#"}>
+                            Enroll Now
+                        </Link>
+                    </Text>
+                    <Image
+                        alt={'Login Image'}
+                        objectFit={'scale-down'}
+                        src={
+                            'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1352&q=80'
+                        }
+                    />
+                </Flex>
+            </Stack>
+        )
+    }
+    
+    export default Login;
+    ```
+6. Update signup.jsx
+    ```text
+    import {useAuth} from "../context/AuthContext.jsx";
+    import {useNavigate} from "react-router-dom";
+    import {useEffect} from "react";
+    import {Flex, Heading, Image, Link, Stack, Text} from "@chakra-ui/react";
+    import CreateCustomerForm from "../shared/CreateCustomerForm.jsx";
+    
+    const Signup = () => {
+        const {customer, setCustomerFromToken} = useAuth();
+        const navigate = useNavigate();
+    
+        useEffect(() => {
+            if (customer) {
+                navigate("/dashboard/customers");
+            }
+        })
+    
+        return (
+            <Stack minH={'100vh'} direction={{base: 'column', md: 'row'}}>
+                <Flex p={8} flex={1} align={'center'} justifyContent={'center'}>
+                    <Stack spacing={4} w={'full'} maxW={'md'}>
+                        <Image
+                            src={""}
+                            boxSize={"200px"}
+                            alt={"Kedarnath Logo"}
+    
+                        />
+                        <Heading fontSize={'2xl'} mb={15}>Register for an account</Heading>
+                        <CreateCustomerForm onSuccess={(token) => {
+                            localStorage.setItem("access_token", token)
+                            setCustomerFromToken()
+                            navigate("/dashboard");
+                        }}/>
+                        <Link color={"blue.500"} href={"/"}>
+                            Have an account? Login now.
+                        </Link>
+                    </Stack>
+                </Flex>
+                <Flex flex={1} p={10} flexDirection={"column"}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      bgGradient={{sm: 'linear(to-r, blue.600, purple.600)'}}>
+                    <Text fontSize={"6xl"} color={"white"} fontWeight={"bold"} mb={5}>
+                        <Link href={"#"}>
+                            Enroll Now
+                        </Link>
+                    </Text>
+                    <Image
+                        alt={'Login Image'}
+                        objectFit={'scale-down'}
+                        src={
+                            'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1352&q=80'
+                        }
+                    />
+                </Flex>
+            </Stack>
+        )
+    
+    }
+    export default Signup;
+    ```
+7. Update SideBar.jsx
+    ```text
+    'use client'
+    
+    import {
+        IconButton,
+        Avatar,
+        Box,
+        CloseButton,
+        Flex,
+        HStack,
+        VStack,
+        Icon,
+        useColorModeValue,
+        Text,
+        Drawer,
+        DrawerContent,
+        useDisclosure,
+        Menu,
+        MenuButton,
+        MenuDivider,
+        MenuItem,
+        MenuList, Image,
+    } from '@chakra-ui/react'
+    import {
+        FiHome,
+        FiSettings,
+        FiMenu,
+        FiBell,
+        FiChevronDown, FiUsers,
+    } from 'react-icons/fi'
+    import {useAuth} from "../context/AuthContext.jsx";
+    
+    const LinkItems = [
+        {name: 'Home', route: '/dashboard', icon: FiHome},
+        {name: 'Customers', route: '/dashboard/customers', icon: FiUsers},
+        {name: 'Settings', route: '/dashboard/sttings', icon: FiSettings}
+    ]
+    
+    const SidebarContent = ({onClose, ...rest}) => {
+        return (
+            <Box
+                transition="3s ease"
+                bg={useColorModeValue('white', 'gray.900')}
+                borderRight="1px"
+                borderRightColor={useColorModeValue('gray.200', 'gray.700')}
+                w={{base: 'full', md: 60}}
+                pos="fixed"
+                h="full"
+                {...rest}>
+                <Flex h="20" flexDirection="column" alignItems="center" mx="8" mb={70} mt={2}
+                      justifyContent="space-between">
+                    <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" mb={5}>
+                        Dashboard
+                    </Text>
+                    <Image
+                        borderRadius='full'
+                        boxSize='75px'
+                        src='https://bit.ly/dan-abramov'
+                        alt='Dan Abramov'
+                    />
+                    <CloseButton display={{base: 'flex', md: 'none'}} onClick={onClose}/>
+                </Flex>
+                {LinkItems.map((link) => (
+                    <NavItem key={link.name} route={link.route} icon={link.icon}>
+                        {link.name}
+                    </NavItem>
+                ))}
+            </Box>
+        )
+    }
+    
+    const NavItem = ({icon, route, children, ...rest}) => {
+        return (
+            <Box
+                as="a"
+                href={`${route}`}
+                style={{textDecoration: 'none'}}
+                _focus={{boxShadow: 'none'}}>
+                <Flex
+                    align="center"
+                    p="4"
+                    mx="4"
+                    borderRadius="lg"
+                    role="group"
+                    cursor="pointer"
+                    _hover={{
+                        bg: 'red.400',
+                        color: 'white',
+                    }}
+                    {...rest}>
+                    {icon && (
+                        <Icon
+                            mr="4"
+                            fontSize="16"
+                            _groupHover={{
+                                color: 'white',
+                            }}
+                            as={icon}
+                        />
+                    )}
+                    {children}
+                </Flex>
+            </Box>
+        )
+    }
+    
+    const MobileNav = ({onOpen, ...rest}) => {
+        const {logout, customer} = useAuth();
+        return (
+            <Flex
+                ml={{base: 0, md: 60}}
+                px={{base: 4, md: 4}}
+                height="20"
+                alignItems="center"
+                bg={useColorModeValue('white', 'gray.900')}
+                borderBottomWidth="1px"
+                borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
+                justifyContent={{base: 'space-between', md: 'flex-end'}}
+                {...rest}>
+                <IconButton
+                    display={{base: 'flex', md: 'none'}}
+                    onClick={onOpen}
+                    variant="outline"
+                    aria-label="open menu"
+                    icon={<FiMenu/>}
+                />
+    
+                <Text
+                    display={{base: 'flex', md: 'none'}}
+                    fontSize="2xl"
+                    fontFamily="monospace"
+                    fontWeight="bold">
+                    Logo
+                </Text>
+    
+                <HStack spacing={{base: '0', md: '6'}}>
+                    <IconButton size="lg" variant="ghost" aria-label="open menu" icon={<FiBell/>}/>
+                    <Flex alignItems={'center'}>
+                        <Menu>
+                            <MenuButton py={2} transition="all 0.3s" _focus={{boxShadow: 'none'}}>
+                                <HStack>
+                                    <Avatar
+                                        size={'sm'}
+                                        src={
+                                            'https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
+                                        }
+                                    />
+                                    <VStack
+                                        display={{base: 'none', md: 'flex'}}
+                                        alignItems="flex-start"
+                                        spacing="1px"
+                                        ml="2">
+                                        <Text fontSize="sm">{customer?.username}</Text>
+                                        {customer?.roles.map((role, id) => (
+                                            <Text key={id} fontSize="xs" color="gray.600">
+                                                {role}
+                                            </Text>
+                                        ))}
+    
+                                    </VStack>
+                                    <Box display={{base: 'none', md: 'flex'}}>
+                                        <FiChevronDown/>
+                                    </Box>
+                                </HStack>
+                            </MenuButton>
+                            <MenuList
+                                bg={useColorModeValue('white', 'gray.900')}
+                                borderColor={useColorModeValue('gray.200', 'gray.700')}>
+                                <MenuItem>Profile</MenuItem>
+                                <MenuItem>Settings</MenuItem>
+                                <MenuItem>Billing</MenuItem>
+                                <MenuDivider/>
+                                <MenuItem onClick={logout}>Sign out</MenuItem>
+                            </MenuList>
+                        </Menu>
+                    </Flex>
+                </HStack>
+            </Flex>
+        )
+    }
+    
+    const SidebarWithHeader = ({children}) => {
+        const {isOpen, onOpen, onClose} = useDisclosure()
+    
+        return (
+            <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
+                <SidebarContent onClose={() => onClose} display={{base: 'none', md: 'block'}}/>
+                <Drawer
+                    isOpen={isOpen}
+                    placement="left"
+                    onClose={onClose}
+                    returnFocusOnClose={false}
+                    onOverlayClick={onClose}
+                    size="full">
+                    <DrawerContent>
+                        <SidebarContent onClose={onClose}/>
+                    </DrawerContent>
+                </Drawer>
+                {/* mobilenav */}
+                <MobileNav onOpen={onOpen}/>
+                <Box ml={{base: 0, md: 60}} p="4">
+                    {children} {/* Content */}
+                </Box>
+            </Box>
+        )
+    }
+    
+    export default SidebarWithHeader
+    
+    ```
+8. Update Home.jsx
+    ```text
+    import {
+        Wrap,
+        WrapItem,
+        Spinner,
+        Text,
+    } from '@chakra-ui/react';
+    import SidebarWithHeader from "./components/shared/SideBar";
+    import {useEffect, useState} from "react";
+    import {getCustomers} from "./services/client.js";
+    import CardWithImage from "./components/customer/CustomerCard.jsx";
+    import CreateCustomerDrawer from "./components/customer/CreateCustomerDrawer.jsx";
+    import {errorNotification} from "./services/notification.js";
+    
+    const Home = () => {
+    
+        return (
+            <SidebarWithHeader>
+                <Text fontSize={"6xl"}>DashBoard</Text>
+            </SidebarWithHeader>
+        );
+    };
+    
+    export default Home;
+    
+    ```
+9. Last update the main.jsx
+    ```text
+    import {StrictMode} from 'react'
+    import {createRoot} from 'react-dom/client'
+    import {ChakraProvider, Text} from '@chakra-ui/react'
+    import Customer from './Customer.jsx'
+    import {createStandaloneToast} from '@chakra-ui/react'
+    import {createBrowserRouter, RouterProvider} from "react-router-dom";
+    import Login from "./components/login/Login.jsx";
+    import AuthProvider from "./components/context/AuthContext.jsx";
+    import ProtectedRoute from "./services/ProtectedRoute.jsx";
+    import Signup from "./components/signup/Signup";
+    import Home from "./Home.jsx";
+    
+    const {ToastContainer} = createStandaloneToast()
+    
+    const router = createBrowserRouter(
+        [
+            {
+                path: "/",
+                element: <Login/>
+            },
+            {
+                path: "/signup",
+                element: <Signup/>
+            },
+            {
+                path: "dashboard",
+                element: <ProtectedRoute><Home/></ProtectedRoute>
+            },
+            {
+                path: "dashboard/customers",
+                element: <ProtectedRoute><Customer/></ProtectedRoute>
+            }
+        ]
+    )
+    createRoot(document.getElementById('root')).render(
+        <StrictMode>
+            <ChakraProvider>
+                <AuthProvider>
+                    <RouterProvider router={router}/>
+                </AuthProvider>
+                <ToastContainer/>
+            </ChakraProvider>
+        </StrictMode>,
+    )
+    
+    ```
+10. We push this to git now
+
+FINISHED AT 30TH OCT 9:23 AM
+
+### STEP 516 30TH OCT : AM
+
+1. under github work actions update the frontend-react-cd.yml not to work because its taken care by aws amplify.
+
+    ```text
+    name: CD - Deploy Frontend React
+    
+    on:
+      workflow_dispatch:
+      push:
+        branches:
+          - main
+        paths:
+          - frontend/react/**
+    
+    jobs:
+      deploy:
+        if: false
+        runs-on: ubuntu-latest
+        defaults:
+          run:
+            working-directory: ./frontend/react
+    
+        steps:
+          - uses: actions/checkout@v4
+    
+          - name: Slack commit message and sha
+            run: |
+              curl -X POST -H 'Content-type: application/json' \
+              --data '{"text":"https://github.com/kedarnathyadav/spring-boot-fullstack/commit/${{ github.sha }} - ${{ github.event.head_commit.message }}"}' \
+              ${{secrets.SLACK_WEBHOOK_URL}}
+    
+          - name: List Files in Working Directory
+            run: ls -la
+    
+          - name: Send Slack Message
+            run: |
+              curl -X POST -H 'Content-type: application/json' \
+              --data '{"text":"Deployment started :progress_bar: :spring:"}' \
+              ${{ secrets.SLACK_WEBHOOK_URL }}
+    
+          - name: Set Build Number
+            id: build-number
+            run: echo "BUILD_NUMBER=$(date '+%d.%m.%Y.%H.%M.%S')" >> $GITHUB_OUTPUT
+    
+          - name: Login to Docker Hub
+            uses: docker/login-action@v2
+            with:
+              username: ${{ secrets.DOCKERHUB_USERNAME }}
+              password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+    
+          - name: Docker Build and Push
+            run: |
+              chmod +x ../../.ci/build-publish.sh
+              USERNAME=dkedarnath \
+              REPO=kedarnath-react \
+              TAG=${{ steps.build-number.outputs.BUILD_NUMBER }} \
+              ../../.ci/build-publish.sh . \
+               --build-arg api_base_url=${{ secrets.API_BASE_URL }}:8080
+    
+          - name: Send Slack Message
+            run: |
+              curl -X POST -H 'Content-type: application/json' \
+              --data '{"text":":docker: Image tag:${{ steps.build-number.outputs.BUILD_NUMBER }} pushed to https://hub.docker.com/repository/docker/dkedarnath/kedarnath-react"}' \
+              ${{ secrets.SLACK_WEBHOOK_URL }}
+    
+          - name: Update Dockerrun.aws.json api image tag with new build number
+            run: |
+              echo "Dockerrun.aws.json before updating the tag"
+              cat ../../Dockerrun.aws.json
+              sed -i -E 's|(dkedarnath/kedarnath-react:)[^"]*|\1'${{ steps.build-number.outputs.BUILD_NUMBER }}'|' ../../Dockerrun.aws.json
+              echo "Dockerrun.aws.json after updating the tag"
+              cat ../../Dockerrun.aws.json
+    
+          - name: Send Slack Message
+            run: |
+              curl -X POST -H 'Content-type: application/json' \
+              --data '{"text":":aws: Starting deployment to Elastic Beanstalk "}' \
+              ${{ secrets.SLACK_WEBHOOK_URL }}
+    
+          - name: Deploy to EB
+            uses: einaregilsson/beanstalk-deploy@v22
+            with:
+              aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+              aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              application_name: ${{ secrets.EB_APPLICATION_NAME }}
+              environment_name: ${{ secrets.EB_ENVIRONMENT_NAME }}
+              version_label: ${{ steps.build-number.outputs.BUILD_NUMBER }}
+              version_description: ${{ github.SHA }}
+              region: ${{ secrets.EB_REGION }}
+              deployment_package: Dockerrun.aws.json
+              wait_for_environmnt_recovery: 60
+    
+          - name: Send Slack Message
+            run: |
+              curl -X POST -H 'Content-type: application/json' \
+              --data '{"text":":githubloading: Committing to repo  "}' \
+              ${{ secrets.SLACK_WEBHOOK_URL }}
+    
+          - name: Commit and Push Dockerrun.aws.json
+            run: |
+              git config user.name github-actions
+              git config user.email github-actions@github.com
+              git add ../../Dockerrun.aws.json
+              git commit -m "Update Dockerrun.aws.json docker image with new tag ${{ steps.build-number.outputs.BUILD_NUMBER }}"
+              git push
+    
+          - name: Send Slack Message
+            run: |
+              curl -X POST -H 'Content-type: application/json' \
+              --data '{"text":"Deployment and commit completed :github_check_mark: :party_blob: - https://kedarnath-api-env.eba-9pwqzaur.us-east-1.elasticbeanstalk.com/"}' \
+              ${{ secrets.SLACK_WEBHOOK_URL }}
+    
+          - name: Send Slack Message
+            if: always()
+            run: |
+              curl -X POST -H 'Content-type: application/json' \
+              --data '{"text":"Job status ${{ job.status }} "} ' \
+              ${{ secrets.SLACK_WEBHOOK_URL }}
+    
+    ```
+2. open terminal in frontend
+
+    ```text
+    git checkout -b improve-routes
+    git status
+    pwd
+    cd ../../
+    ls
+    git add .
+    git commit -m "New React routes"
+    ```
+3. push using intellij
+4. go to git hub and create pull request you will see aws amplify preview running
+5. Go to aws amplify-> previews -> wait till the status completes
+6. it takes around 9 min
+7. if you go back to github you can see a link for preview link -> test it but normally you should separate test api to
+   test
+
+FINISHED AT 10:10 AM
+
+### STEP 517 30TH OCT 10:11 AM
+
+1. Rebase and merge
+2. Delete the branch
+3.
+
+FINISHED AT 30TH OCT : AM
+
+### STEP 518 30TH OCT : AM
+
+FINISHED AT 30TH OCT : AM
+
+### STEP 519 30TH OCT : AM
+
+FINISHED AT 30TH OCT : AM
+
+### STEP 520 30TH OCT : AM
+
+FINISHED AT 30TH OCT : AM
+
+### STEP 520 30TH OCT : AM
+
+FINISHED AT 30TH OCT : AM
+
+### STEP 520 30TH OCT : AM
+
+FINISHED AT 30TH OCT : AM
+
+### STEP 520 30TH OCT : AM
+
+FINISHED AT 30TH OCT : AM

@@ -52,7 +52,7 @@ npm run build to build production ready dist folder
 ### step 330
 
 delete App.css
-update App.jsx
+update Customer.jsx
 
 ```javascript
 function App() {
@@ -77,7 +77,7 @@ we are going to start basics of react
 
 ### step 332
 
-App.jsx
+Customer.jsx
 
 ```jsx
 function App() {
@@ -128,7 +128,7 @@ const UserProfile = () => {
 export default UserProfile;
 ```
 
-update App.jsx
+update Customer.jsx
 
 ```jsx
 import UserProfile from "./UserProfile";
@@ -150,7 +150,7 @@ export default App;
 
 ### step 335
 
-App.jsx:
+Customer.jsx:
 
 ```jsx
 import UserProfile from "./UserProfile.jsx";
@@ -198,7 +198,7 @@ React components always starts with capital letter
 ### step 336
 
 Children:
-App.jsx
+Customer.jsx
 
 ```jsx
 import UserProfile from "./UserProfile.jsx";
@@ -251,7 +251,7 @@ export default UserProfile;
 
 ### step 339
 
-App.jsx:
+Customer.jsx:
 
 ```jsx
 import UserProfile from "./UserProfile.jsx";
@@ -357,7 +357,7 @@ upadate main.jsx
 import {StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'
 import {ChakraProvider} from '@chakra-ui/react'
-import App from './App.jsx'
+import App from './Customer.jsx'
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -604,7 +604,7 @@ export default SidebarWithHeader
 
 ```
 
-update the App.jsx:
+update the Customer.jsx:
 
 ```jsx
 import {Button, ButtonGroup} from '@chakra-ui/react'
@@ -886,7 +886,7 @@ export const getCustomers = async () => {
 
 ### step 349
 
-update App.jsx
+update Customer.jsx
 
 ```jsx
 import {Button} from '@chakra-ui/react';
@@ -1159,7 +1159,7 @@ export default function CardWithImage() {
 }
 ```
 
-update App.jsx:
+update Customer.jsx:
 
 ```jsx
 import {
@@ -1239,7 +1239,7 @@ export default App;
 
 refer: https://v2.chakra-ui.com/docs/components/wrap/usage
 
-update App.jsx:
+update Customer.jsx:
 
 ```jsx
 import {
@@ -1325,7 +1325,7 @@ export default App;
 
 ### step 355
 
-update App.jsx:
+update Customer.jsx:
 
 ```jsx
 import {
@@ -3312,7 +3312,7 @@ export default function CardWithImage({id, email, image, age, name, gender, imag
 
 ```
 
-update App.jsx:
+update Customer.jsx:
 
 ```jsx
 import {
@@ -3736,7 +3736,7 @@ const CreateCustomerDrawer = () => {
 export default CreateCustomerDrawer;
 ```
 
-add this in the App.jsx
+add this in the Customer.jsx
 
 ### step 370:
 
@@ -4887,7 +4887,7 @@ main.jsx:
 import {StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'
 import {ChakraProvider} from '@chakra-ui/react'
-import App from './App.jsx'
+import App from './Customer.jsx'
 import {createStandaloneToast} from '@chakra-ui/react'
 
 const {ToastContainer} = createStandaloneToast()
@@ -4942,7 +4942,7 @@ export const errorNotification = (title, description) => {
 ### step 380
 
 added the notification when customer saved and close the form automatically and refresh the page
-App.jsx
+Customer.jsx
 
 ```jsx
 import {
@@ -5227,7 +5227,7 @@ exercise add a delete button to delete the cutsomer
 ### step 382:
 
 add delete button in card.jsx and pass the fetch customers from APp.jsx
-App.jsx:
+Customer.jsx:
 
 ```jsx
 import {

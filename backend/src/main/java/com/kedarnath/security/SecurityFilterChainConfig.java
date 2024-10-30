@@ -42,6 +42,10 @@ public class SecurityFilterChainConfig {
                         .requestMatchers(HttpMethod.GET,
                                 "/ping"
                         )
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/actuator/**"
+                        )
                         .permitAll()  // Allow unauthenticated access to this endpoint
                         .anyRequest().authenticated()  // All other requests require authentication
                 )

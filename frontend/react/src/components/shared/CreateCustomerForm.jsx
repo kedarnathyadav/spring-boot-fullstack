@@ -40,7 +40,7 @@ const MySelect = ({label, ...props}) => {
 };
 
 // And now we can use these
-const CreateCustomerForm = ({fetchCustomers, onClose}) => {
+const CreateCustomerForm = ({onSuccess}) => {
     return (
         <>
             <Formik
@@ -79,8 +79,7 @@ const CreateCustomerForm = ({fetchCustomers, onClose}) => {
                                 "Customer Saved",
                                 `${customer.name} was successfully saved`
                             );
-                            fetchCustomers(); // Refresh customer list
-                            onClose(); // Close the drawer upon success
+                            onSuccess(res.headers["authorization"]);
                         })
                         .catch(err => {
                             errorNotification(
