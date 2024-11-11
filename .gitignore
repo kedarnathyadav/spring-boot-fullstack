@@ -3,6 +3,9 @@
 */.DS_Store
 /.idea/
 /README1.md
+/Step401.md
+/step326ReactCOntinution.md
+/README.md
 /backend/kedarnath-api.iml
 /backend/src/main/resources/static/images/
 
@@ -40,3 +43,6 @@ dist-ssr
 /libpeerconnection.log
 testem.log
 /typings
+
+
+
