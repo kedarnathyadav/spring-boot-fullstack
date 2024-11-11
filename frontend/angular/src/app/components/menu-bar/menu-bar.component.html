@@ -1,0 +1,15 @@
+<h4 class="text-center mt-0">Dashboard</h4>
+<div class="text-center">
+  <p-avatar
+    image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+    styleClass="mr-2"
+    size="xlarge"
+    shape="circle"/>
+</div>
+<div>
+  <app-menu-item *ngFor="let item of menu" class="mr-2"
+                 [menuItem]="item"
+  >
+  </app-menu-item>
+
+</div>

@@ -1,0 +1,99 @@
+<div class="flex" style="height: 100vh">
+  <div class="col-6 m-3 flex flex-column justify-content-center">
+    <div class="m-auto">
+
+      <div class="text-center">
+        <p-avatar
+          image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+          styleClass="mr-2"
+          size="xlarge"
+          shape="circle"/>
+        <h1>Signup for a account.</h1>
+      </div>
+      <div>
+        <p-message *ngIf="errorMsg" severity="error" [text]="errorMsg" styleClass="mb-3"></p-message>
+      </div>
+      <div class="field">
+        <label for="name">Name</label>
+        <input
+          [(ngModel)]="customer.name"
+          id="name"
+          pInputText
+          placeholder="Mary Jane"
+          type="text"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          [(ngModel)]="customer.email"
+          id="email"
+          pInputText
+          placeholder="MaryJane@gmail.com"
+          type="email"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input
+          [(ngModel)]="customer.password"
+          id="password"
+          pInputText
+          placeholder=""
+          type="password"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="age">Age</label>
+        <input
+          [(ngModel)]="customer.age"
+          id="age"
+          pInputText
+          placeholder="16"
+          type="number"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="gender">Gender</label>
+        <select
+          [(ngModel)]="customer.gender"
+          id="gender"
+          class="p-dropdown w-full custom-select"
+        >
+          <option value="">Select Option</option>
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+        </select>
+      </div>
+      <button
+        (click)="createAccount()"
+        pButton
+        label="Create an Account"
+        class="w-full"
+      >
+      </button>
+      <button
+        (click)="login()"
+        pButton
+        label="Have an account? Login now!"
+        class="w-full p-button-link pl-0"
+
+      >
+      </button>
+    </div>
+  </div>
+  <div class="col-6 flex flex-column justify-content-center align-items-center right-container">
+    <h1>
+      <a href="#" target="_blank">Enroll now</a>
+    </h1>
+    <img
+      class="background p-6 pt-0"
+      src="https://user-images.githubusercontent.com/40702606/215539167-d7006790-b880-4929-83fb-c43fa74f429e.png"
+      alt="Nothing here :-))">
+
+  </div>
+</div>

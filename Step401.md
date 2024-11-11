@@ -4040,7 +4040,7 @@ Update the Webmvcconfig.java to CorsConfig.java
 
 move the CorsConfig.java to security package and delete the config folder and update the code
 
-```java
+```text
 package com.kedarnath.security;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -4296,7 +4296,7 @@ now post request to http://localhost:8080/api/v1/auth/login using the registered
 
 now you get token and customerDto
 
-now try with wrong password you get 500 error which is wrong as it has be unauthorized
+now try with wrong password you get 500 error which is wrong as it has been unauthorized
 
 update exception handler
 
@@ -4567,8 +4567,8 @@ not removing now as we need to fix tests and implementions of this method.
 
 commit and push the files to github
 
-as i am not doing the cloud stuff because i am on free tier and it takes alot time so i skip it.
-any way the deploy workaction will fail as in the ec2 instance got rds which has 3 versions of flyway while
+as I am not doing the cloud stuff because i am on free tier and it takes alot time so i skip it.
+any way the deployment work action will fail as in the ec2 instance got rds which has 3 versions of flyway while
 we deleted the two and made it in one
 
 if you are creating a new one no issues
@@ -7107,7 +7107,7 @@ public class JWTUtil {
                 .builder()
                 .subject(subject)
                 .issuedAt(Date.from(now))
-                .issuer("http://kedarnath.com")
+                .issuer("https://kedarnath.com")
                 .expiration(Date.from(now.plus(30, ChronoUnit.SECONDS)))
                 .claims(claims) // Keep claims map
                 .signWith(SignatureAlgorithm.HS256, getSigningKey())
@@ -7250,7 +7250,7 @@ public class JWTUtil {
                 .builder()
                 .subject(subject)
                 .issuedAt(Date.from(now))
-                .issuer("http://kedarnath.com")
+                .issuer("https://kedarnath.com")
                 .expiration(Date.from(now.plus(15, ChronoUnit.DAYS)))
                 .claims(claims) // Keep claims map
                 .signWith(SignatureAlgorithm.HS256, getSigningKey())
@@ -8071,8 +8071,8 @@ Instance settings:
 Database Settings:
 
 1. Database subnets
-1. eu-west-1a
-2. eu-west-1b
+    1. eu-west-1a
+    2. eu-west-1b
 
 In Database:
 
@@ -8099,10 +8099,10 @@ wait it gets finished building.
     2. Go to Dockerrun.aws.json--> update the rds url.
 3. refer https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.managing.db.html
 
-```text
-          "value": "jdbc:postgresql://awseb-e-nskvm2faru-stack-awsebrdsdatabase-xn3ngsekufx0.c1qawm2oqlx3.us-east-1.rds.amazonaws.com:5432/ebdb"
-
-```
+    ```text
+              "value": "jdbc:postgresql://awseb-e-nskvm2faru-stack-awsebrdsdatabase-xn3ngsekufx0.c1qawm2oqlx3.us-east-1.rds.amazonaws.com:5432/ebdb"
+    
+    ```
 
 4. The default db given by ELB is ebdb. let use it for now.
 
@@ -8147,110 +8147,111 @@ wait it gets finished building.
    ```text
         package com.kedarnath.security;
 
-import com.kedarnath.jwt.JWTAuthenticationFilter;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-@Configuration
-@EnableWebSecurity
-public class SecurityFilterChainConfig {
-
-    private final AuthenticationProvider authenticationProvider;
-    private final JWTAuthenticationFilter jwtAuthenticationFilter;
-    private final AuthenticationEntryPoint authenticationEntryPoint;
-
-    public SecurityFilterChainConfig(AuthenticationProvider authenticationProvider, JWTAuthenticationFilter jwtAuthenticationFilter, AuthenticationEntryPoint authenticationEntryPoint) {
-        this.authenticationProvider = authenticationProvider;
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.authenticationEntryPoint = authenticationEntryPoint;
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF for stateless APIs
-                .authorizeHttpRequests(authorization -> authorization
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/v1/customers",
-                                "api/v1/auth/login"
-                        )
-                        .permitAll()
-                        .requestMatchers(HttpMethod.GET,
-                                "/ping"
-                        )
-                        .permitAll()
-                        .requestMatchers(HttpMethod.GET,
-                                "/actuator/**"
-                        )
-                        .permitAll()  // Allow unauthenticated access to this endpoint
-                        .anyRequest().authenticated()  // All other requests require authentication
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Use stateless session management
-                )
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)// Add JWT filter
-                .exceptionHandling(exceptionHandling ->
-                        exceptionHandling.authenticationEntryPoint(authenticationEntryPoint)
-                );
-
-           return http.build();
+    import com.kedarnath.jwt.JWTAuthenticationFilter;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.http.HttpMethod;
+    import org.springframework.security.authentication.AuthenticationProvider;
+    import org.springframework.security.config.Customizer;
+    import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+    import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+    import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+    import org.springframework.security.config.http.SessionCreationPolicy;
+    import org.springframework.security.web.AuthenticationEntryPoint;
+    import org.springframework.security.web.SecurityFilterChain;
+    import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+    
+    @Configuration
+    @EnableWebSecurity
+    public class SecurityFilterChainConfig {
+    
+        private final AuthenticationProvider authenticationProvider;
+        private final JWTAuthenticationFilter jwtAuthenticationFilter;
+        private final AuthenticationEntryPoint authenticationEntryPoint;
+    
+        public SecurityFilterChainConfig(AuthenticationProvider authenticationProvider, JWTAuthenticationFilter jwtAuthenticationFilter, AuthenticationEntryPoint authenticationEntryPoint) {
+            this.authenticationProvider = authenticationProvider;
+            this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+            this.authenticationEntryPoint = authenticationEntryPoint;
         }
-    }
+    
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+            http
+                    .cors(Customizer.withDefaults())
+                    .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF for stateless APIs
+                    .authorizeHttpRequests(authorization -> authorization
+                            .requestMatchers(HttpMethod.POST,
+                                    "/api/v1/customers",
+                                    "api/v1/auth/login"
+                            )
+                            .permitAll()
+                            .requestMatchers(HttpMethod.GET,
+                                    "/ping"
+                            )
+                            .permitAll()
+                            .requestMatchers(HttpMethod.GET,
+                                    "/actuator/**"
+                            )
+                            .permitAll()  // Allow unauthenticated access to this endpoint
+                            .anyRequest().authenticated()  // All other requests require authentication
+                    )
+                    .sessionManagement(session -> session
+                            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Use stateless session management
+                    )
+                    .authenticationProvider(authenticationProvider)
+                    .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)// Add JWT filter
+                    .exceptionHandling(exceptionHandling ->
+                            exceptionHandling.authenticationEntryPoint(authenticationEntryPoint)
+                    );
+    
+               return http.build();
+            }
+        }
 
     ```
 
 6. Test ```http://localhost:8080/actuator```. You will see only few.
 7. update the application.yml
 
-```yaml
-server:
-  port: 8080
-  error:
-    include-message: always
+    ```yaml
+    server:
+      port: 8080
+      error:
+        include-message: always
+    
+    cors:
+      allowed-origins: "*"
+      allowed-methods: "*"
+      allowed-headers: "*"
+      exposed-headers: "*"
+    
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: "health,info"
+    
+    spring:
+      datasource:
+        url: jdbc:postgresql://localhost:5432/customer
+        username: kedarnath
+        password: password
+      jpa:
+        hibernate:
+          ddl-auto: validate
+        properties:
+          hibernate:
+            dialect: org.hibernate.dialect.PostgreSQLDialect
+            format_sql: true
+        show_sql: true
+      main:
+        web-application-type: servlet
+    ```
 
-cors:
-  allowed-origins: "*"
-  allowed-methods: "*"
-  allowed-headers: "*"
-  exposed-headers: "*"
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health,info"
-
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/customer
-    username: kedarnath
-    password: password
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-    show_sql: true
-  main:
-    web-application-type: servlet
-```
-
-```include: "health,info"``` in here instead of health, info you can use * to get all the endpoints.which is not good as
-someone can even shutdown as there is a endpoint shutdown.
+   ```include: "health,info"``` in here instead of health, info you can use * to get all the endpoints.which is not good
+   as
+   someone can even shutdown as there is a endpoint shutdown.
 
 ### step 496: 29th oct 2024 11:02 AM
 
@@ -8264,7 +8265,7 @@ FINISHED AT 11:14 aM
 ### STEP 497: 29TH OCT 11:14 AM
 
 1. you can remove the below code fromDockerrun.aws.json and add it to application.yml.
-    ```json  
+    ```text  
         "environment": [
             {
               "name": "SPRING_DATASOURCE_URL",
@@ -8517,30 +8518,30 @@ FINISHED AT 3:24 pm
 1. Go to aws Amplify
 2. click on edit build and test settings
 
-```yaml
-version: 1
-applications:
-  -frontend:
-    phases:
-      preBuild:
-        commands:
-          - npm use ${VERSION_NODE_17}
-          - npm ci
-        build:
-          commands:
-            - npm use ${VERSION_NODE_17}
-            - echo 'VITE_API_BASE_URL=$VITE_API_BASE_UR' > .env.production
-            - npm run build
-      artifacts:
-        baseDirectory: /dist
-        files:
-          - '**/*'
-      cache:
-        paths:
-          - node_modules/**/**
-    appRoot: frontend/react
-
-```
+    ```yaml
+    version: 1
+    applications:
+      -frontend:
+        phases:
+          preBuild:
+            commands:
+              - npm use ${VERSION_NODE_17}
+              - npm ci
+            build:
+              commands:
+                - npm use ${VERSION_NODE_17}
+                - echo 'VITE_API_BASE_URL=$VITE_API_BASE_UR' > .env.production
+                - npm run build
+          artifacts:
+            baseDirectory: /dist
+            files:
+              - '**/*'
+          cache:
+            paths:
+              - node_modules/**/**
+        appRoot: frontend/react
+    
+    ```
 
 3. click on save
 4. click on advanced setting
@@ -9385,30 +9386,8503 @@ FINISHED AT 10:10 AM
 
 1. Rebase and merge
 2. Delete the branch
-3.
+3. Now if you go to the aws amplify you will automaticalky deploy to environment. Awesome right?
+4. Successfully deployed the new version. Hooo!
 
-FINISHED AT 30TH OCT : AM
+FINISHED AT 30TH OCT 10:29 AM
 
-### STEP 518 30TH OCT : AM
+### STEP 518- 524 30TH OCT 10:29 AM
 
-FINISHED AT 30TH OCT : AM
+1. Before you learn angular you should know typescript
+2. open visual studio code and create a folder TsTutorial
+3. Install the below softwares
+    1. nodejs
+    2. npm install npm@latest
+    3. npm install -g ts-code
+    4. npm install -g typescript
+4. worst explanation so far its not going to work and is clear at step 525
+5. create file name hello.ts and add text in it "console.log('Hello Typescript');"
+6. run now you get some error to fix it you need to add tsconfig file
 
-### STEP 519 30TH OCT : AM
+FINISHED AT 30TH OCT 1:52 PM
 
-FINISHED AT 30TH OCT : AM
+### STEP 525 30TH OCT 1:52 PM
 
-### STEP 520 30TH OCT : AM
+1. open terminal type
+   ```
+   tsc -init
+   ```
+2. no run the code you get output.
+3. create file comments.ts
 
-FINISHED AT 30TH OCT : AM
+    ```text
+    //This is sinle line comment
+    
+    /**
+     * This is a multi line comment
+     * 
+     */
+    
+    console.log('Hello World');
+    ```
+4. create a file declare-variables.ts
 
-### STEP 520 30TH OCT : AM
+```text
+let company = 'Google';
+let isMale = true;
+let lotteryNumber = 777;
 
-FINISHED AT 30TH OCT : AM
+let person = {
+    name: 'junior',
+    location: 'Philadelphia'
+};
 
-### STEP 520 30TH OCT : AM
+console.log(company);
+console.log(isMale);
+console.log(lotteryNumber);
+console.log(person);
+console.log("Person Name: "+person.name);
 
-FINISHED AT 30TH OCT : AM
+//once const s assigned you cant resign like let 
+const PI = 3.14;
 
-### STEP 520 30TH OCT : AM
+console.log(PI);
 
-FINISHED AT 30TH OCT : AM
+var homeTown = 'Nagaram';
+
+console.log(homeTown);
+//var is not recommended as it has a global scope
+```
+
+Function Scoping: var is function-scoped, not block-scoped. This means that if you declare a var inside a block (e.g.,
+an if statement), it’s still accessible outside that block. This can lead to unintended behavior, whereas let and const
+are block-scoped, limiting variables to the enclosing block:
+
+typescript
+Copy code
+if (true) {
+var x = 5;
+}
+console.log(x); // 5 (accessible outside the block)
+
+if (true) {
+let y = 10;
+}
+console.log(y); // Error: y is not defined
+Hoisting: Variables declared with var are hoisted to the top of their function or global scope and initialized with
+undefined, leading to potential confusion:
+
+typescript
+Copy code
+console.log(z); // undefined (due to hoisting)
+var z = 10;
+
+// Using let or const
+console.log(a); // Error: Cannot access 'a' before initialization
+let a = 10;
+No Temporal Dead Zone (TDZ): With var, there’s no temporal dead zone, so you can reference a var variable before its
+declaration, which can lead to unexpected bugs. let and const prevent this by throwing an error if accessed before
+declaration.
+
+Inconsistent Behavior: var can lead to odd and inconsistent behaviors, especially when dealing with loops and closures.
+For instance, variables declared with var in a for loop share the same function scope, which can lead to incorrect
+values when used within closures:
+
+typescript
+Copy code
+for (var i = 0; i < 3; i++) {
+setTimeout(() => console.log(i), 1000); // Outputs 3, 3, 3
+}
+
+for (let j = 0; j < 3; j++) {
+setTimeout(() => console.log(j), 1000); // Outputs 0, 1, 2
+}
+const for Constants: In TypeScript, const is available and better suited for declaring constants since it ensures that
+the variable’s value cannot be reassigned. var does not offer this immutability.
+
+FINISHED AT 30TH OCT 2:07 PM
+
+### STEP 526 30TH OCT 2:08 PM
+
+1. we can infer type on variables
+2. create a file String-type.ts
+    ```text
+    let myName: string = 'Junior';
+    
+    myName  = "Junior";
+    myName  = `Junior`;
+    
+    //function
+    function sayHello(name: string): void {
+        console.log(`Hello ${name}`);
+    }
+    
+    sayHello("king");
+    
+    function sayHelloToany(name: any): void {
+        console.log(`Hello ${name}`);
+    }
+    
+    sayHelloToany("king");
+    sayHelloToany(99);
+    ```
+
+FINISHED AT 30TH OCT 2:18 PM
+
+### STEP 527 30TH OCT 2:18 PM
+
+1. create a file number-type.ts
+
+```text
+let age: number = -4;
+
+let decimalnumber = 90.85;
+
+let change: number = 0.0043;
+
+age = 31;
+
+console.log(age);
+console.log(decimalnumber);
+console.log(change);
+
+```
+
+FINISHED AT 30TH OCT 2:23 PM
+
+### STEP 528 30TH OCT : PM
+
+1. create a file boolean-type.ts
+
+```text
+let isLoggedIn: boolean;
+
+isLoggedIn =true;
+
+let isAdmin = false;
+
+console.log(isLoggedIn, isAdmin);
+
+//string, number, boolean
+```
+
+FINISHED AT 30TH OCT 2:25 PM
+
+### STEP 529 30TH OCT : PM
+
+1. create a file array-type.ts
+    ```text
+    //asigning arrays
+    let names: string[] = [];
+    //or you can write them like below
+    let names1: Array<string> = [];
+    //or
+    let names2: string[] = ['king','queen'];
+    //for numbers
+    let numbers: number[] = [1,2];
+    
+    //pushing values
+    names.push('Apple');
+    names1.push('Mango');
+    names2.push('slave');
+    numbers.push(7);
+    
+    //printing the arrays
+    console.log("Names:",names);
+    console.log("Names1:", names1);
+    console.log("Names2:", names2);
+    console.log("Numbers:", numbers);
+    ```
+
+FINISHED AT 30TH OCT 2:37 PM
+
+### STEP 530 30TH OCT 2:37 PM
+
+1. create a file object-type.ts
+
+```text
+let dog: { name: string, age: number, favplace: string[]};
+
+dog  = {name:'blacky',age:3, favplace:['bridge','beach']};
+
+console.log(dog);
+
+```
+
+FINISHED AT 30TH OCT 2:41 PM
+
+### STEP 531 31TH OCT 10:10 AM
+
+1. create a file any-type.ts
+
+```text
+let stuff : any;
+
+stuff = 'junior';
+
+stuff = 888;
+
+stuff = true;
+
+stuff = { name: 'junior', hobbies: ['junior1','junior2']}
+
+stuff = [2,3,4,5];
+
+console.log(stuff);
+
+// This is not recommended
+```
+
+FINISHED AT 31TH OCT 10:24 PM
+
+### STEP 532 31TH OCT 10:25 AM
+
+1. create a file union-type.ts
+
+```
+let userId: number | string | boolean | {name: string};
+
+userId = 90;
+
+userId = 'king';
+
+console.log(userId);
+
+let customers: (number | string)[] = [];
+
+customers.push(10);
+customers.push('king');
+
+console.log(customers);
+
+
+
+
+```
+
+FINISHED AT 30TH OCT 10:39 AM
+
+### STEP 533 31TH OCT 10:40 AM
+
+1. create a file type-allias.ts
+
+```text
+type ID = number | string;
+
+let customerId: ID;
+
+customerId = 99;
+
+type Rectangle = { length: number, name: string};
+
+let myRoom: Rectangle;
+
+myRoom = { length: 88, name: 'room name'};
+
+console.log(myRoom);
+
+```
+
+FINISHED AT 31TH OCT 10:50 AM
+
+### STEP 534 31TH OCT 10:50 AM
+
+1. create a file tuples.ts
+
+```text
+let country: [name: string, area: number];
+
+country =['uk',600];
+
+let modernCity: [Population: number, area: number, name: string];
+
+modernCity = [8,12,'New York'];
+
+console.log(modernCity);
+```
+
+FINISHED AT 31TH OCT 10:55 AM
+
+### STEP 535 31TH OCT 10:55 AM
+
+1. create a file enum.ts
+
+```text
+enum Role {
+ROLE_USER,
+ROLE_ADMIN,
+ROLE_SYSADMIN,
+}
+enum Role1 {
+ROLE_USER = 5,
+ROLE_ADMIN= 6,
+ROLE_SYSADMIN,   // by default will be 7 as continution
+}
+
+enum Role2 {
+ROLE_USER = 'user',
+ROLE_ADMIN= 'admin',
+ROLE_SYSADMIN='sys admin',   
+}
+enum Role3 {
+ROLE_USER = 'user',
+ROLE_ADMIN= 1,
+ROLE_SYSADMIN='sys admin',   
+}
+
+
+let user: { name: string, role: Role};
+
+user = {name: 'junior', role:Role.ROLE_ADMIN};
+
+console.log(user);
+
+let user1: { name: string, role: Role1};
+user1 = {name: 'junior', role:Role1.ROLE_ADMIN};
+
+console.log(user1);
+
+let user2: { name: string, role: Role2};
+user2 = {name: 'junior', role:Role2.ROLE_ADMIN};
+
+console.log(user2);
+```
+
+FINISHED AT 31TH OCT 11:09 AM
+
+### STEP 535 31TH OCT 11:10 AM
+
+1. create a file never-type.ts
+   What is the never Type?
+   The never type in TypeScript is a special type that represents values that should never occur. It signifies the
+   absence of a value and is used when a function or code block is expected to never complete normally. Essentially,
+   it’s a type for cases where a function either throws an error or doesn’t return a result.
+
+When to Use never
+Functions That Always Throw Errors
+
+If a function throws an error and doesn’t return a value, TypeScript infers its return type as never. This way,
+TypeScript knows that the function execution stops there.
+
+typescript
+Copy code
+function throwError(message: string): never {
+throw new Error(message);
+}
+Functions with Infinite Loops
+
+A function that runs infinitely without completing also has a never return type since it technically never returns.
+
+typescript
+Copy code
+function infiniteLoop(): never {
+while (true) {
+// Infinite loop
+}
+}
+Exhaustiveness Checking in Type Guards or Switch Statements
+
+The never type is also used in type-checking scenarios where all possible cases of a union type are handled. If a value
+of never type is reached, it indicates a mistake (like an unhandled case).
+
+typescript
+Copy code
+type Shape = "circle" | "square";
+
+function handleShape(shape: Shape) {
+switch (shape) {
+case "circle":
+console.log("Circle");
+break;
+case "square":
+console.log("Square");
+break;
+default:
+const _exhaustiveCheck: never = shape; // Error if a new shape type is added but not handled
+return _exhaustiveCheck;
+}
+}
+Here, if a new shape is added to Shape, TypeScript will throw an error in the default case, making sure all cases are
+explicitly handled.
+
+Summary
+The never type is useful in TypeScript for catching unexpected or impossible situations, enforcing exhaustive type
+checks, and for functions that are expected to not return any value.
+FINISHED AT 31TH OCT 11:18 AM
+
+### STEP 537 31TH OCT : AM
+
+1. create a file name unknown-type.ts
+
+```text
+let customerInput: unknown;
+
+customerInput = 10;
+
+customerInput='age value';
+
+console.log(customerInput);
+
+let customerAge: string;
+
+// assertion
+customerAge = customerInput as string;
+
+//control flow
+if(typeof customerInput === 'string'){
+    customerAge = customerInput;
+}
+```
+
+FINISHED AT 31TH OCT 11:23 AM
+
+### STEP 538 31TH OCT 11:24 AM
+
+1. create a file name literal-type.ts
+
+```
+let userType: "USER" | "ADMIN";
+
+userType = "ADMIN";
+
+function saveUser(userId: number, type: "USER" | "ADMIN"): void {
+  if (type === "USER") {
+    console.log(`Saving new User: \n ${userId}. ${type}`)
+  } else {
+    console.log(`Saving new Admin: \n ${userId}. ${type}`)
+  }
+}
+
+
+saveUser(10,'USER');
+saveUser(20,'ADMIN');
+
+type BINARY =  0 | 1;
+
+let clientId: BINARY;
+
+clientId=0;
+```
+
+FINISHED AT 31TH OCT 11:45 AM
+
+### STEP 539 31TH OCT 11:45 AM
+
+1. create a file name function.ts
+
+```text
+function add(a: number, b: number): number{
+    return a+ b;
+}
+
+let multiply = (a: number, b: number) => a*b;
+//or
+let multiply1 = (a: number, b: number) => {
+    return a*b;
+}
+
+console.log(add(5,9));
+console.log(multiply(5,9));
+
+//function with optional parameter "lastName?: string" you can send this or not do this by adding ?
+function formatName(firstName: string, lastName?: string):string{
+    return `${firstName} ${lastName}`;
+};
+
+console.log("\nFunction with optional parameters: \n"+formatName('junior','smith'));
+console.log(formatName('junior'));
+
+//function with default parameters
+//default parameters should always come at the end
+
+function formatNameWithDefaultParams(firstName: string, lastName =  'king'):string{
+    return `${firstName} ${lastName}`;
+};
+
+console.log("\nFunction with default parameters: \n"+formatNameWithDefaultParams('junior'));
+
+//rest parameters is always going to be some array type
+function printNames(firstName: string, ...allTherest: string[]){
+    return firstName +" "+ allTherest.join(' ');
+};
+
+console.log(printNames("\nFunction with rest parameters: \n"+'junior','John','Idiot'));
+
+
+function addValues(val1: number, val2: number): number;
+function addValues(val1: string, val2: string): string;
+function addValues(a: any, b: any) {
+    return a + b;
+};
+
+
+console.log(addValues(5,8));
+console.log(addValues('18','26'));
+
+```
+
+FINISHED AT 31TH OCT 12:15 PM
+
+### STEP 540 31TH OCT 12:15 PM
+
+1. create a file name class.ts
+
+```text
+class Person{
+    firstName: string;
+    age: number;
+
+    constructor(name: string, something: number){
+        this.firstName = name;
+        this.age =something;
+    }
+
+    printName() {
+        console.log(`Your name is ${this.firstName} and  Your age is ${this.age}` );
+    }
+}
+
+const junior = new Person('Junior',30);
+junior.printName();
+```
+
+FINISHED AT 31TH OCT 12:21 PM
+
+### STEP 541 31TH OCT 12:21 PM
+
+1. we got a major problem as veariables are accessed directly outside the class
+2. we can fix them by making it private
+
+```text
+class Person{
+    private firstName: string;
+    private age: number;
+
+    constructor(name: string, something: number){
+        this.firstName = name;
+        this.age =something;
+    }
+
+    printName() {
+        console.log(`Your name is ${this.firstName} and  Your age is ${this.age}` );
+    }
+}
+
+const junior = new Person('Junior',30);
+junior.printName();
+```
+
+3. we might have many variable we cant add them individually to contructor. so we can do like below
+
+    ```text
+    class Person{
+        // private firstName: string;
+        // private age: number;
+    
+        constructor(private firstName: string,
+            private age: number
+        ){
+          
+        }
+    
+        printName() {
+            // console.log(`Your name is ${this.firstName} and  Your age is ${this.age}` );
+        }
+    }
+    
+    const junior = new Person('Junior',30);
+    // junior.printName();
+    
+    console.log(junior);
+    ```
+
+FINISHED AT 31TH OCT 12:34 pM
+
+### STEP 542 31TH OCT 1234 pM
+
+1. you can make variables read only
+2. update the class as below
+
+```text
+class Person{
+    // private firstName: string;
+    // private age: number;
+
+    constructor(private readonly firstName: string,
+        private age: number
+    ){
+      
+    }
+
+    printName() {
+        console.log(`Your name is ${this.firstName} and  Your age is ${this.age}` );
+    }
+}
+
+const junior = new Person('Junior',30);
+// junior.printName();
+
+console.log(junior);
+```
+
+FINISHED AT 31TH OCT 12:37 AM
+
+### STEP 543 31TH OCT 12:37 AM
+
+1. create another class Uscitizen extends person. so Uscitizen inherits all person details.
+2. you have to use super keyword to send the data to person
+
+```text
+class Person{
+    constructor(private readonly name: string,
+        private id: number
+    ){
+      
+    }
+
+    
+}
+
+class Uscitizen extends Person{
+    constructor(name: string, id: number, private ssn: string){
+        super(name,id);
+        this.ssn=ssn;
+    }
+};
+
+const john = new Uscitizen("king",7,'dvghj');
+
+console.log(john);
+```
+
+FINISHED AT 31TH OCT 12: 55 PM
+
+### STEP 544  1st NOV 09:03 AM
+
+1. Topic getters and setters
+2. Update the class.ts
+
+```text
+class Car{
+    constructor(private make: string, private model: string){
+
+    }
+
+    set carMake(value: string){
+        this.make = value;
+    }
+    get carMakeg(){
+        return this.make;
+    }
+};
+
+const acura  = new Car('Acura','TL');
+
+console.log(acura.carMakeg);
+
+acura.carMake='Honda';
+
+console.log(acura.carMakeg);
+
+```
+
+FINISHED AT 1st NOV 09:59 AM
+
+### STEP 545  1st NOV 10:00 AM
+
+1. defining static properties or static functions
+2. static vaVariables can be accessed only using class name . This can't be addressed using this keyword unless it's a
+   static block.
+
+```text
+class Car{
+
+    static MAX_NUM_OF_WHEELS = 4;
+
+    constructor(private make: string, private model: string){
+
+    }
+
+    set carMake(value: string){
+        this.make = value;
+    }
+    get carMakeg(){
+        return this.make;
+    }
+
+    static carStats(mile: number){
+        console.log(this.MAX_NUM_OF_WHEELS);
+        return {mileage: mile, type: 'Hybrid'}
+    };
+};
+
+const acura  = new Car('Acura','TL');
+
+console.log(acura.carMakeg);
+
+acura.carMake='Honda';
+
+console.log(acura.carMakeg);
+console.log(Car.MAX_NUM_OF_WHEELS);
+console.log(Car.carStats(10));
+
+
+
+```
+
+FINISHED AT 1st NOV 10:14 AM
+
+### STEP 544  1st NOV 10:14 AM
+
+1. abstract class
+2. you cant create a instance of abstract class
+
+```text
+abstract class Animal{
+
+    constructor(private name: string){}
+
+    abstract printSound(sound:string): void;
+}
+
+class Dog extends Animal {
+
+    printSound(sound: string): void {
+       console.log(`${sound}`);
+    }
+
+}
+
+const blaki = new Dog(`blaki`);
+blaki.printSound("Bark...")
+console.log(blaki);
+```
+
+FINISHED AT 1st NOV 10:22 AM
+
+### STEP 547  1st NOV 10:22 AM
+
+1. Interface - used to give structure and shape
+2. create a file interface.ts
+
+```text
+interface Computer{
+    name: string;
+    ram: string;
+    size: number;
+
+    connect(adapter: string): void;
+
+}
+
+let lattitude: Computer;
+
+lattitude = {
+    name: 'Latitude',
+    ram: '32gb',
+    size:15,
+
+    connect(adapter: string): void{
+        console.log(`Power on. Connected to adapter ${adapter}`);
+    }
+}
+
+lattitude.connect('Adapter 1');
+
+console.log(lattitude);
+
+```
+
+FINISHED AT 1st NOV 10:30 AM
+
+### STEP 548  1st NOV  10:30 AM
+
+1. Interface are alot used with class. we will see the example in this step.
+
+```text
+
+interface HttpConnection {
+    createConnection(url: string): void;
+
+}
+
+class MakeConnection implements HttpConnection{
+    private headers: string[];
+    private body: string;
+    constructor(headers: string[], body: string){
+        this.headers=headers;
+        this.body=body;
+    }
+    createConnection(url: string): void {
+        console.log(`Connection created to ${url}`);
+    }
+    
+}
+```
+
+FINISHED AT 1st NOV 10:42 AM
+
+### STEP 549  1st NOV 10:42 AM
+
+1. we can one interface extends another interface
+2. interface can extend any number of interfaces
+3. class can also extend any number of interfaces
+
+```text
+interface patient {
+    name: string;
+}
+interface Client extends patient{
+    rating: number;
+}
+
+class Tenant implements Client {
+    rating: number;
+    name: string;
+
+    constructor(rating: number,name: string){
+        this.rating = rating;
+        this.name =name;
+    }
+    
+}
+```
+
+FINISHED AT 1st NOV 10:49 AM
+
+### STEP 550  1st NOV 10:50 AM
+
+1. Really cool thing that we can do interfaces is we can define them as type of function.
+
+```text
+
+interface Calculate {
+    (number1: number, number2: number): number;
+}
+
+let cal: Calculate;
+
+cal =(a: number,b: number) => {
+    return a+b;
+}
+
+console.log(cal(10,5));
+```
+
+FINISHED AT 1st NOV 10:58 AM
+
+### STEP 551  1st NOV 11:00 AM
+
+1. you can have optional properties in interface using ?
+2. you cant have private or public variables
+
+```text
+interface Calculate {
+    (number1?: number, readonly number2: number): number;
+}
+
+let cal: Calculate;
+
+cal =(a: number,b: number) => {
+    return a+b;
+}
+
+console.log(cal(10,5));
+```
+
+FINISHED AT 1st NOV 11:02 AM
+
+### STEP 552  1st NOV 11:02 AM
+
+1. genrics- one class withdifferent type of data
+
+```text
+// function updateUser(oldUser: any, newUser: any):any{
+//     return {...oldUser, ...newUser};
+// }
+
+// any is not sugessted as you know so we use the generics
+
+function updateUser<T,V>(oldUser: T, newUser: V): T & V{
+    return {...oldUser, ...newUser};
+}
+function makeAdmin<T>(user: T): T {
+    return {...user, admin: true};
+}
+
+let user11 = {name: 'junior'};
+let user22 = { age: 25, gender:'M'};
+
+console.log(updateUser(user11,user22));
+
+console.log(makeAdmin(user11));
+
+
+
+```
+
+FINISHED AT 1st NOV 11:17 AM
+
+### STEP 553  1st NOV 11:17 AM
+
+1. we can use generics with class as well
+
+```text
+
+class Planet<A>{
+    private closestStar: A;
+
+    constructor(closestStar: A){
+        this.closestStar = closestStar;
+    }
+}
+
+const earth = new Planet<string>('Sun');
+
+const planetX = new Planet<{name: string, distance: number}>({name:'Xorox', distance:10});
+
+interface UserData {
+    size: number;
+    data:string[]
+}
+
+const planetZ = new Planet<UserData>({data:['Xorox'], size:10});
+
+interface CustomerData<K>{
+    size: number;
+    data: K[];
+}
+
+let newUser1 : CustomerData<number>;
+
+newUser1 = {size: 77, data: [6,8,9]};
+
+console.log(newUser1);
+```
+
+FINISHED AT 1st NOV 11:33 AM
+
+### STEP 554  1st NOV 11:33 AM
+
+1. we are going to start angular from next section
+   FINISHED AT 1st NOV 11:34 AM
+
+### STEP 555  1st NOV 11:34 AM
+
+1. we are going build the same application we build using react earlier
+   FINISHED AT 1st NOV 11:35 AM
+
+### STEP 556  1st NOV 11:35 AM
+
+1. what is angular
+2. it is framework build by google and using typescript
+3. two way binding
+4. small components
+   FINISHED AT 1st NOV 11:37 AM
+
+### STEP 557  1st NOV 11:37 AM
+
+1. what is module in angular
+2. ![](backend/src/main/resources/static/images/img_11.png)
+3. it is a container for above
+4. easier to manage components
+5. it has atleast one root module
+
+FINISHED AT 1st NOV 11:4 AM
+
+### STEP 558  1st NOV 11:4 AM
+
+1. ![](backend/src/main/resources/static/images/img_12.png)
+2. directives are used to manipulate the html css pages and also data binding.
+3. these html css are called dom- data object models
+4. we can achieve it using the ngIf, ngFor and custom dirctives
+
+FINISHED AT 1st NOV 11:52 AM
+
+### STEP 559  1st NOV 11:52 AM
+
+1. install angular cli
+
+```text
+npm install @angular/cli
+```
+
+FINISHED AT 1st NOV 11:57 AM
+
+### STEP 560  1st NOV 11:4 AM
+
+1. navigate to frontend in terminal
+
+    ```text
+    ng new angular --routing --strict --no-standalone
+    ```
+2. In the older versions it used to ask for do you want routing but it wont in 18. so we add --routing.
+3. In 18 it will ask you do you want the server side rendering you can select no for now. In the future we might need
+   performance then we go for it.
+4. Recnt version standalone components but now as we are learning stage we stick to old version and upgrade to new soon.
+
+FINISHED AT 2nd NOV 11:00 AM
+
+### STEP 561  2nd NOV 11:00 AM.
+
+1. Intro to structure
+   FINISHED AT 1st NOV 11:06 AM
+
+### STEP 562  2nd NOV 11:06 AM
+
+1. package.json
+2. you can change version and add dependencies with scope like devlopment then they wont be included during package.
+3. you can do adding dependencies manually and also using commands we will seee in next steps
+   FINISHED AT 2nd NOV 11:17 AM
+
+### STEP 563  2nd NOV 11:20 AM
+
+1. angular.json is similar to application.properties or application.yml in spring boot
+
+FINISHED AT 2nd NOV 11:30 AM
+
+### STEP 564  2nd NOV 11:30 AM
+
+1. clear the content in app.component.html except the <router-outlet/>
+2. add <h1>Hello Angular</h1>
+3. you can see it reflects immediately on your browser
+4. i for got to tell to run your angular project. navigate to project folder on terminal.
+5. enter
+   ```text
+        ng serve 
+    ```
+
+FINISHED AT 2nd NOV 11:45 AM
+
+### STEP 565  2nd NOV 11:45 AM
+
+1. how to create a new component in angular
+2. you can use angular cli
+    1. make sure you are in project folder path:
+       ```text
+             cd frontend/angular/src/app
+       ```
+    2. ```ng g c my-first```
+    3. four files will be created.
+    4. component will be added automatically
+
+   FINISHED AT 2nd NOV 12:10 AM
+
+### step 566 2nd Nov 12.10 Pm
+
+1. how to include our new component in another component.
+2. update app.component.html
+    ```text
+    <h1>Hello Angular</h1>
+    <div>
+      <app-my-first></app-my-first>
+    </div>
+    <router-outlet></router-outlet>
+    
+    ```
+3. <app-my-first></app-my-first> - this is how you can do it.
+
+Finishied at 12:20 pm 2nd nov
+
+### step 567 2nd nov 12:20 pm
+
+1. In my-first.component.html
+
+```text
+<input type = "text">
+<button> click me </button>
+<p> Your name is : </p>
+```
+
+Finished at 12:34 pm
+
+### step 568 2nd nov 12:34 pm
+
+1. getting values from ts file to the html file
+2. update my-first.component.ts
+
+```text
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'app-my-first',
+  templateUrl: './my-first.component.html',
+  styleUrl: './my-first.component.scss'
+})
+export class MyFirstComponent {
+  inputValue: string = 'Hello from kedarnath';
+
+}
+
+```
+
+3. update my-first.component.html
+
+    ```text
+    <input type="text" [value]='inputValue'>
+    <button> click me</button>
+    <p> Your name is : {{inputValue}}</p>
+    
+    ```
+
+4. {{}} this is called interpolation. we use [value] instead of value for anglar to get the value
+5. in order to perform two way binding.
+
+    ```text
+    <input type="text" [(ngModel)]='inputValue'>
+    <button> click me</button>
+    <p> Your name is : {{inputValue}}</p>
+    ```
+
+6. make sure to import formsmodule in app.module.ts
+
+    ```
+    import {NgModule} from '@angular/core';
+    import {BrowserModule} from '@angular/platform-browser';
+    
+    import {AppRoutingModule} from './app-routing.module';
+    import {AppComponent} from './app.component';
+    import {MyFirstComponent} from './my-first-component/my-first.component';
+    import {FormsModule} from "@angular/forms";
+    
+    @NgModule({
+      declarations: [
+        AppComponent,
+        MyFirstComponent
+      ],
+      imports: [
+        BrowserModule,
+        AppRoutingModule,
+        FormsModule
+      ],
+      providers: [],
+      bootstrap: [AppComponent]
+    })
+    export class AppModule {
+    }
+    
+    ```
+
+finishied at 12:57 pm
+
+### step 569 2nd nov 1:00 pm
+
+1. Event binding like clicking on button for example
+2. update my-first.component.ts
+
+    ```text
+    import {Component} from '@angular/core';
+    
+    @Component({
+      selector: 'app-my-first',
+      templateUrl: './my-first.component.html',
+      styleUrl: './my-first.component.scss'
+    })
+    export class MyFirstComponent {
+      inputValue: string = 'Hello from kedarnath';
+    
+      clickMe(): void {
+        alert(this.inputValue);
+      }
+    }
+    
+    ```
+
+3. update my-first.component.html
+
+    ```text
+    <input type="text" [(ngModel)]='inputValue'>
+    <button (click)="clickMe()"> click me</button>
+    <p> Your name is : {{inputValue}}</p>
+    
+    ```
+
+Finished at 1:07 pm
+
+### step 570 2nd nov  1:07 pm
+
+1. what about adding some behaviour like condition.
+2. update my-first.component.ts
+
+    ```text
+    import {Component} from '@angular/core';
+    
+    @Component({
+      selector: 'app-my-first',
+      templateUrl: './my-first.component.html',
+      styleUrl: './my-first.component.scss'
+    })
+    export class MyFirstComponent {
+      inputValue: string = 'Hello from kedarnath';
+      displayMsg = false;
+    
+      clickMe(): void {
+        this.displayMsg = !this.displayMsg;
+      }
+    }
+    
+    ```
+
+3. update my-first.component.html
+
+    ```text
+    <input type="text" [(ngModel)]='inputValue'>
+    <button (click)="clickMe()"> click me</button>
+    <p *ngIf="displayMsg"> Your name is : {{inputValue}}</p>
+    
+    ```
+
+4. one more like if your input is greater than 8 then only display message we can do that.
+
+    ```text
+    <input type="text" [(ngModel)]='inputValue'>
+    <button (click)="clickMe()"> click me</button>
+    <p *ngIf="inputValue.length>=8"> Your name is : {{inputValue}}</p>
+    ```
+
+Finished at 7:26 pm
+
+### step 571 2nd nov 7:26 pm
+
+1. let see some more actions using cick
+2. update my-first.component.ts
+
+    ```text
+    import {Component} from '@angular/core';
+    
+    @Component({
+      selector: 'app-my-first',
+      templateUrl: './my-first.component.html',
+      styleUrl: './my-first.component.scss'
+    })
+    export class MyFirstComponent {
+      inputValue: string = 'Hello from kedarnath';
+      displayMsg = false;
+      msgList: string[] = [];
+    
+      clickMe(): void {
+        this.msgList.push(this.inputValue);
+        this.inputValue = ''; // Clear the input field
+      }
+    }
+    
+    ```
+
+3. what happens is when ever you clikc the input will be added to the array.
+4. update my-first.component.html
+
+    ```text
+    <input type="text" [(ngModel)]='inputValue'>
+    <button (click)="clickMe()"> click me</button>
+    <p *ngIf="inputValue.length>=8"> Your name is : {{inputValue}}</p>
+    
+    
+    <p *ngFor="let elem of msgList">{{elem}}</p>
+    
+    ```
+
+5. when ever you click the input data will be displayed below by clearing the given input for next input.
+6. lets see more functionalities like handlig json object
+7. update my-first.component.ts
+
+    ```text
+    import {Component} from '@angular/core';
+    
+    @Component({
+      selector: 'app-my-first',
+      templateUrl: './my-first.component.html',
+      styleUrl: './my-first.component.scss'
+    })
+    export class MyFirstComponent {
+      inputValue: string = 'Hello from kedarnath';
+      displayMsg = false;
+      // msgList: string[] = [];
+      //or
+    
+      msgList: Array<string> = [];
+    
+      msgListComposed: any[] = [];
+    
+    
+      clickMe(): void {
+        this.msgList.push(this.inputValue);
+        this.msgListComposed.push({
+          name: this.inputValue,
+          visible: true
+        });
+        this.inputValue = '';// Clear the input field
+        console.log(this.msgList);
+      }
+    }
+    
+    ```
+
+8. update my-first.component.html
+
+    ```text
+    <input type="text" [(ngModel)]='inputValue'>
+    <button (click)="clickMe()"> click me</button>
+    <p *ngIf="inputValue.length>=8"> Your name is : {{inputValue}}</p>
+    
+    
+    <p *ngFor="let elem of msgList">{{elem}}</p>
+    <p *ngFor="let elem of msgListComposed">{{elem.name + '-' + elem.visible}}</p>
+    
+    ``` 
+
+9. we are accessing the json object in here.
+   Finished at 7:46 pm
+
+### step 572 3rd nov 11:37 AM
+
+1. how to pass input from parent to child
+2. make inputValue as Input
+
+    ```text
+    import {Component, Input} from '@angular/core';
+    
+    @Component({
+      selector: 'app-my-first',
+      templateUrl: './my-first.component.html',
+      styleUrls: ['./my-first.component.scss']
+    })
+    export class MyFirstComponent {
+    
+      @Input()
+      inputValue: string = 'Hello from kedarnath';
+    
+      displayMsg = false;
+      // msgList: string[] = [];
+      //or
+    
+      msgList: Array<string> = [];
+    
+      msgListComposed: any[] = [];
+    
+    
+      clickMe(): void {
+        this.msgList.push(this.inputValue);
+        this.msgListComposed.push({
+          name: this.inputValue,
+          visible: true
+        });
+        this.inputValue = '';// Clear the input field
+        console.log(this.msgList);
+      }
+    }
+    
+    ```
+
+3. you can send it to child as below
+
+    ```text
+    <h1>Hello Angular</h1>
+    <app-my-first
+      [inputValue]="'angular-hello'">
+    </app-my-first>
+    <app-my-first
+      [inputValue]="'king-hello'">
+    </app-my-first>
+    <router-outlet></router-outlet>
+    
+    ```
+   Finished at 1:38 pm
+
+### step 573 3rd nov 1:38 pm
+
+1. what if we want input from child to parent.
+2. we are going to create a counter next hello angular text
+3. update app.component.html
+    ```text
+    <h1>Hello Angular {{ clickCount }}</h1>
+    <app-my-first
+      [inputValue]="'angular-hello'"
+      (childClicked)="handleChildClick()"
+    >
+    </app-my-first>
+    <app-my-first
+      [inputValue]="'king-hello'"
+      (childClicked)="handleChildClick()"
+    >
+    </app-my-first>
+    <router-outlet></router-outlet>
+    
+    ```
+4. add a output value in my-first.component.ts
+    ```text
+    import {Component, EventEmitter, Input, Output} from '@angular/core';
+    
+    @Component({
+      selector: 'app-my-first',
+      templateUrl: './my-first.component.html',
+      styleUrls: ['./my-first.component.scss']
+    })
+    export class MyFirstComponent {
+    
+      @Input()
+      inputValue: string = 'Hello from kedarnath';
+    
+      @Output()
+      childClicked: EventEmitter<void> = new EventEmitter<void>();
+    
+      displayMsg = false;
+    
+      // msgList: string[] = [];
+      //or
+      msgList: Array<string> = [];
+    
+      clickMe(): void {
+        this.msgList.push(this.inputValue);
+        this.inputValue = '';// Clear the input field
+        this.childClicked.emit();
+        console.log(this.msgList);
+      }
+    }
+    
+    ```
+5. app.component.ts - handle the click event
+    ```text
+    import {Component} from '@angular/core';
+    
+    @Component({
+      selector: 'app-root',
+      templateUrl: './app.component.html',
+      styleUrl: './app.component.scss'
+    })
+    export class AppComponent {
+      title = 'angular';
+      clickCount = 0;
+    
+      handleChildClick() {
+        this.clickCount++;
+      }
+    }
+    
+    ```
+
+Finished at 2:17 pm
+
+### step 574 3rd nov 2:17 pm
+
+1. add h3 with last created element in app.component.html
+2. to achieve this update app.component.html
+    ```text
+    <h1>Hello Angular {{ clickCount }}</h1>
+    <h3>Last created element: {{ lastCreatedElement }}</h3>
+    
+    <app-my-first
+      [inputValue]="'angular-hello'"
+      (childClicked)="handleChildClick()"
+      (elementCreated)="displayLastCreatedElement($event)"
+    >
+    </app-my-first>
+    <app-my-first
+      [inputValue]="'king-hello'"
+      (childClicked)="handleChildClick()"
+      (elementCreated)="displayLastCreatedElement($event)"
+    
+    >
+    </app-my-first>
+    <router-outlet></router-outlet>
+    
+    ```
+3. update app.component.ts
+    ```
+    import {Component} from '@angular/core';
+    
+    @Component({
+      selector: 'app-root',
+      templateUrl: './app.component.html',
+      styleUrl: './app.component.scss'
+    })
+    export class AppComponent {
+      title = 'angular';
+      clickCount = 0;
+      lastCreatedElement: any;
+    
+      handleChildClick() {
+        this.clickCount++;
+      }
+    
+      displayLastCreatedElement(element: string) {
+        this.lastCreatedElement = element;
+    
+      }
+    }
+    
+    ```
+4. update my-first.component.ts
+    ```text
+    import {Component, EventEmitter, Input, Output} from '@angular/core';
+    
+    @Component({
+      selector: 'app-my-first',
+      templateUrl: './my-first.component.html',
+      styleUrls: ['./my-first.component.scss']
+    })
+    export class MyFirstComponent {
+    
+      @Input()
+      inputValue: string = 'Hello from kedarnath';
+    
+      @Output()
+      childClicked: EventEmitter<void> = new EventEmitter<void>();
+    
+      @Output()
+      elementCreated: EventEmitter<string> = new EventEmitter<string>();
+    
+    
+      displayMsg = false;
+    
+      // msgList: string[] = [];
+      //or
+      msgList: Array<string> = [];
+    
+      clickMe(): void {
+        this.msgList.push(this.inputValue);
+        this.childClicked.emit();
+        this.elementCreated.emit(this.inputValue);
+        this.inputValue = '';// Clear the input field
+        console.log(this.msgList);
+      }
+    }
+    
+    ```
+
+Finished at 2:35 pm
+
+### step 575 3rd nov 2:35 pm
+
+1. let clear the old code and start fresh to perform calculations using button and display output
+2. update app.component.html
+    ```text
+    <h1>Hello Angular</h1>
+    <app-my-first></app-my-first>
+    <router-outlet></router-outlet>
+    
+    ```
+3. my-first.component.html
+    ```text
+    <input type="text" [(ngModel)]='value1'>
+    <input type="text" [(ngModel)]='value2'>
+    <br>
+    <p>Result : {{ result }}</p>
+    <button (click)="sum()">+</button>
+    <button (click)="sub()">-</button>
+    <button (click)="multiply()">*</button>
+    <button (click)="divide()">/</button>
+    
+    
+    
+    ```
+4. my-first.component.ts
+    ```text
+    import {Component, EventEmitter, Input, Output} from '@angular/core';
+    
+    @Component({
+      selector: 'app-my-first',
+      templateUrl: './my-first.component.html',
+      styleUrls: ['./my-first.component.scss']
+    })
+    export class MyFirstComponent {
+      value1 = 0;
+      value2 = 0;
+      result = 0;
+    
+      sum() {
+        this.result = +this.value1 + +this.value2
+      }
+    
+      sub() {
+        this.result = this.value1 - this.value2
+      }
+    
+      multiply() {
+        this.result = this.value1 * this.value2
+      }
+    
+      divide() {
+        this.result = this.value1 / this.value2
+      }
+    }
+    
+    ```
+5. here we are writing the business logic in the component which is not the write way.
+6. component has to be used to display data or information.
+7. we need service class to write business logic
+8. let's create one
+9. navigate src/app using terminal ```cd src/app```
+10. create a directory ```mkdir services```
+11. create a service ```ng g c MyCalculator```
+
+#### FINISHED at 4 NOVEMBER 2024 10:14 AM
+
+### **STEP 576 4 NOVEMBER 2024 10:14 AM**
+
+1. What makes a service different from other classes
+2. We got Injectible element to inject this service and it got provideIn root. This means
+   the service will be initialized by angular in the starting of the project.
+3. Update my-calculator.service.ts
+    ```text
+    import {Injectable} from '@angular/core';
+    
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class MyCalculatorService {
+    
+      constructor() {
+      }
+    
+      sum(value1: number, value2: number) {
+        return +value1 + +value2
+      }
+    
+      sub(value1: number, value2: number) {
+        return +value1 - +value2
+      }
+    
+      multiply(value1: number, value2: number) {
+        return +value1 * +value2
+      }
+    
+      divide(value1: number, value2: number) {
+        return +value1 / +value2
+      }
+    }
+    
+    ```
+4. update my-first.component.ts
+    ```text
+    import {Component, EventEmitter, Input, Output} from '@angular/core';
+    import {MyCalculatorService} from "../services/my-calculator.service";
+    
+    @Component({
+      selector: 'app-my-first',
+      templateUrl: './my-first.component.html',
+      styleUrls: ['./my-first.component.scss']
+    })
+    export class MyFirstComponent {
+      value1 = 0;
+      value2 = 0;
+      result = 0;
+    
+    
+      constructor(private readonly calculator: MyCalculatorService) {
+    
+      }
+    
+      sum() {
+        this.result = this.calculator.sum(+this.value1, +this.value2);
+      }
+    
+      sub() {
+        this.result = this.calculator.sub(+this.value1, +this.value2);
+      }
+    
+      multiply() {
+        this.result = this.calculator.multiply(+this.value1, +this.value2);
+      }
+    
+      divide() {
+        this.result = this.calculator.divide(+this.value1, +this.value2);
+      }
+    }
+    
+    ```
+5. you can remove the provideIN root from the service and add in the app.module.ts
+6. Update my-calculator.service.ts
+    ```text
+    import {Injectable} from '@angular/core';
+    
+    @Injectable()
+    export class MyCalculatorService {
+    
+      constructor() {
+      }
+    
+      sum(value1: number, value2: number) {
+        return +value1 + +value2
+      }
+    
+      sub(value1: number, value2: number) {
+        return +value1 - +value2
+      }
+    
+      multiply(value1: number, value2: number) {
+        return +value1 * +value2
+      }
+    
+      divide(value1: number, value2: number) {
+        return +value1 / +value2
+      }
+    }
+    
+    ```
+7. update the app.module.ts
+    ```text
+    import {NgModule} from '@angular/core';
+    import {BrowserModule} from '@angular/platform-browser';
+    
+    import {AppRoutingModule} from './app-routing.module';
+    import {AppComponent} from './app.component';
+    import {MyFirstComponent} from './my-first-component/my-first.component';
+    import {FormsModule} from "@angular/forms";
+    import {CommonModule} from "@angular/common";
+    import {MyCalculatorService} from "./services/my-calculator.service";
+    
+    @NgModule({
+      declarations: [
+        AppComponent,
+        MyFirstComponent
+      ],
+      imports: [
+        BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        CommonModule
+      ],
+      providers: [
+        MyCalculatorService
+      ],
+      bootstrap: [AppComponent]
+    })
+    export class AppModule {
+    }
+    
+    ```
+
+#### FINISHED at 4 NOVEMBER 2024 10:45 AM
+
+### **STEP 577 4 NOVEMBER 2024 10:45 AM**
+
+1. we will add a menu to go to different pages
+2. update app.component.html
+    ```
+    <div>
+      <a href="#">Page 1</a>&nbsp;|&nbsp;
+      <a href="#">Page 2</a>&nbsp;|&nbsp;
+      <a href="#">Page 3</a>
+    </div>
+    <h1>Hello Angular</h1>
+    <app-my-first></app-my-first>
+    <router-outlet></router-outlet>
+    
+    ```
+3. lets generate those page
+4. create a directory under src/app -> ```mkdir pages```
+5. create three page components after ```cd pages```
+    ```text
+    ng g c page1
+    ng g c page2
+    ng g c page3
+    ```
+
+#### FINISHED at 4 NOVEMBER 2024 10:54 AM
+
+### **STEP 578 4 NOVEMBER 2024 10:54 AM**
+
+1. for implementing the route on the page links we learn some things then we come back to it.
+2. We use angular routing to perform these
+3. <router-outlet></router-outlet> - this plays very important role in routing.
+4. we will use it next step
+
+#### FINISHED at 4 NOVEMBER 2024 11:04 AM
+
+### **STEP 579 4 NOVEMBER 2024 11:10AM**
+
+1. we will see how to do routes
+2. Go to app-routing.module.ts
+    ```
+    import {NgModule} from '@angular/core';
+    import {RouterModule, Routes} from '@angular/router';
+    import {Page1Component} from "./pages/page1/page1.component";
+    import {Page2Component} from "./pages/page2/page2.component";
+    import {Page3Component} from "./pages/page3/page3.component";
+    
+    
+    const routes: Routes = [
+      {
+        path: 'page-1',
+        component: Page1Component
+      },
+      {
+        path: 'page-2',
+        component: Page2Component
+      },
+      {
+        path: 'page-3',
+        component: Page3Component
+      },
+    ]
+    
+    @NgModule({
+      imports: [RouterModule.forRoot(routes)],
+      exports: [RouterModule]
+    })
+    export class AppRoutingModule {
+    }
+    
+    ```
+3. update app.component.html
+    ```text
+    <div>
+      <a href="/page-1">Page 1</a>&nbsp;|&nbsp;
+      <a href="/page-2">Page 2</a>&nbsp;|&nbsp;
+      <a href="/page-3">Page 3</a>
+    </div>
+    
+    <router-outlet></router-outlet>
+    
+    ```
+
+#### FINISHED at 4 NOVEMBER 2024 11:50 AM
+
+### **STEP 580 4 NOVEMBER 2024 11:50AM**
+
+1. if you remember the page was reloading but using the routerLink it wont reload
+2. if you want to load some data then want to redirected to page we use click event
+   with Router.navigate
+3. update app.component.html
+    ```text
+    <div>
+      <a routerLink="/page-1">Page 1</a>&nbsp;|&nbsp;
+      <a routerLink="/page-2">Page 2</a>&nbsp;|&nbsp;
+      <a (click)="navigateToPage3()" href="javascript:void(0);">Page 3</a>
+    </div>
+    
+    <router-outlet></router-outlet>
+    
+    ```
+4. update app.component.ts
+    ```text
+    import {Component} from '@angular/core';
+    import {Router} from "@angular/router";
+    
+    @Component({
+      selector: 'app-root',
+      templateUrl: './app.component.html',
+      styleUrl: './app.component.scss'
+    })
+    export class AppComponent {
+      title = 'angular';
+      clickCount = 0;
+      lastCreatedElement: any;
+    
+      constructor(private router: Router) {
+      }
+    
+      handleChildClick() {
+        this.clickCount++;
+      }
+    
+      displayLastCreatedElement(element: string) {
+        this.lastCreatedElement = element;
+    
+      }
+    
+      navigateToPage3() {
+        this.router.navigate(['page-3']);
+      }
+    
+    }
+    
+    ```
+
+#### FINISHED at 4 NOVEMBER 2024 12:12 PM
+
+### **STEP 581 4 NOVEMBER 2024 12:12 PM**
+
+1. we are going to use prime ng here https://primeng.org/
+2. Refer the website
+
+#### FINISHED at 4 NOVEMBER 2024 12:19 PM
+
+### **STEP 582 4 NOVEMBER 2024 12:36 PM**
+
+1. clean all the code let get some thing real
+2. delete my-first component, services complete folder, Complete Pages fodler
+3. Clean the import and usage of these components in app.module.ts and routing.ts, app.component.html,app.component.ts
+4. make sure the page is fine without errors
+
+#### FINISHED at 4 NOVEMBER 2024 12:43 PM
+
+### **STEP 583 4 NOVEMBER 2024 12:43 PM**
+
+1. install primeng, prime icons, prime flex
+2. ```npm install primeng```
+3. ```npm install primeng```
+4. ```npm i primeflex```
+
+#### FINISHED at 4 NOVEMBER 2024 12:50 PM
+
+### **STEP 584 4 NOVEMBER 2024 12:50 PM**
+
+1. update the angular.json by adding all the css files url to it of the ones installed above
+    ```text
+    {
+      "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+      "version": 1,
+      "newProjectRoot": "projects",
+      "projects": {
+        "angular": {
+          "projectType": "application",
+          "schematics": {
+            "@schematics/angular:component": {
+              "style": "scss",
+              "standalone": false
+            },
+            "@schematics/angular:directive": {
+              "standalone": false
+            },
+            "@schematics/angular:pipe": {
+              "standalone": false
+            }
+          },
+          "root": "",
+          "sourceRoot": "src",
+          "prefix": "app",
+          "architect": {
+            "build": {
+              "builder": "@angular-devkit/build-angular:application",
+              "options": {
+                "outputPath": "dist/angular",
+                "index": "src/index.html",
+                "browser": "src/main.ts",
+                "polyfills": [
+                  "zone.js"
+                ],
+                "tsConfig": "tsconfig.app.json",
+                "inlineStyleLanguage": "scss",
+                "assets": [
+                  {
+                    "glob": "**/*",
+                    "input": "public"
+                  }
+                ],
+                "styles": [
+                  "src/styles.scss",
+                  "node_modules/primeng/resources/primeng.min.css",
+                  "node_modules/primeng/resources/themes/lara-light-blue/theme.css",
+                  "node_modules/primeicons/primeicons.css",
+                  "node_modules/primeflex/primeflex.min.css"
+                ],
+                "scripts": []
+              },
+              "configurations": {
+                "production": {
+                  "budgets": [
+                    {
+                      "type": "initial",
+                      "maximumWarning": "500kB",
+                      "maximumError": "1MB"
+                    },
+                    {
+                      "type": "anyComponentStyle",
+                      "maximumWarning": "2kB",
+                      "maximumError": "4kB"
+                    }
+                  ],
+                  "outputHashing": "all"
+                },
+                "development": {
+                  "optimization": false,
+                  "extractLicenses": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production"
+            },
+            "serve": {
+              "builder": "@angular-devkit/build-angular:dev-server",
+              "configurations": {
+                "production": {
+                  "buildTarget": "angular:build:production"
+                },
+                "development": {
+                  "buildTarget": "angular:build:development"
+                }
+              },
+              "defaultConfiguration": "development"
+            },
+            "extract-i18n": {
+              "builder": "@angular-devkit/build-angular:extract-i18n"
+            },
+            "test": {
+              "builder": "@angular-devkit/build-angular:karma",
+              "options": {
+                "polyfills": [
+                  "zone.js",
+                  "zone.js/testing"
+                ],
+                "tsConfig": "tsconfig.spec.json",
+                "inlineStyleLanguage": "scss",
+                "assets": [
+                  {
+                    "glob": "**/*",
+                    "input": "public"
+                  }
+                ],
+                "styles": [
+                  "src/styles.scss"
+                ],
+                "scripts": []
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    ```
+
+#### FINISHED at 4 NOVEMBER 2024 01:01 PM
+
+### **STEP 585 4 NOVEMBER 2024 02:35 PM**
+
+1. lets test it whether they are working
+2. we got issue here use primeng@17.8.9 instead of 11 as its giving issues
+3. ```npm instal primeng@17.8.9```
+4. just for reference you can use the following codes as well to clean and install again
+
+    ```text
+    rm -rf dist node_modules
+    npm install
+    ```
+5. let continue update app.component.html
+    ```
+    <input type="text" pInputText/>
+    <router-outlet></router-outlet>
+    
+    ```
+6. Add InputTextModule to app.module.ts
+
+```text
+import {NgModule} from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
+
+import {InputTextModule} from 'primeng/inputtext';
+import {AppRoutingModule} from './app-routing.module';
+import {AppComponent} from './app.component';
+import {FormsModule} from "@angular/forms";
+import {CommonModule} from "@angular/common";
+
+
+@NgModule({
+  declarations: [
+    AppComponent,
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
+    CommonModule,
+    InputTextModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule {
+}
+
+```
+
+#### FINISHED at 4 NOVEMBER 2024 02:40 PM PM
+
+### **STEP 586 4 NOVEMBER 2024 02:45 PM**
+
+1. plan for login page, register page
+2. just showed how it looks like
+
+#### FINISHED at 4 NOVEMBER 2024 02:40 PM PM
+
+### **STEP 587 4 NOVEMBER 2024 02:48 PM**
+
+1. how the final application looks like
+2. just showing how it looks like
+
+#### FINISHED at 4 NOVEMBER 2024 02:52 PM
+
+### **STEP 588 4 NOVEMBER 2024 02:52 PM**
+
+1. angular is a component based framework
+2. we split into parts like side bar with menu card, customer card, header bar.
+
+#### FINISHED at 4 NOVEMBER 2024 02:54 PM
+
+### **STEP 589 4 NOVEMBER 2024 02:54 PM**
+
+1. lets create one page which holds all these parts
+2. go to terminal navigate to src/app ```cd src/app```
+3. ```mkdir components```
+4. ```cd components```
+5. ```ng g c Customer```
+6. we should divide the page into multiple parts as we planned earlier. we got base now lets build skeleton.
+7. update customer.component.html
+    ```text
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        app-Menu
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          Header
+        </div>
+        <div class="main-container p-3">
+          Button here
+          <div>
+            customers will be displayed here
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    ```
+8. update customer.component.scss
+    ```text
+    .main-container {
+      background-color: #edf2f7;
+      height: 100%;
+    }
+    
+    ```
+9. make sure you have added the route for this component
+10. Update app-routing.module.ts
+    ```
+    import {NgModule} from '@angular/core';
+    import {RouterModule, Routes} from '@angular/router';
+    import {CustomerComponent} from "./components/customer/customer.component";
+    
+    
+    const routes: Routes = [
+      {
+        path: 'customers',
+        component: CustomerComponent
+      }
+    ]
+    
+    @NgModule({
+      imports: [RouterModule.forRoot(routes)],
+      exports: [RouterModule]
+    })
+    export class AppRoutingModule {
+    }
+    
+    ```
+
+#### FINISHED at 4 NOVEMBER 2024 04:06 PM
+
+### **STEP 590 4 NOVEMBER 2024 04:06 PM**
+
+1. Let create app-menu now
+2. open terminal navigate to src/app/components
+3. ```ng g c menu-bar```
+4. update menu-bar.component.html
+    ```text
+    <h4 class="text-center mt-0">Dashboard</h4>
+    <div class="text-center">
+      <p-avatar
+        image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+        styleClass="mr-2"
+        size="xlarge"
+        shape="circle"/>
+    <div>
+      <p *ngFor="let item of menu">
+        {{ item.label }}
+      </p>
+    </div>
+    ```
+5. update menu-bar.component.ts
+    ```text
+    import {Component, OnInit} from '@angular/core';
+    import {MenuItem} from "primeng/api";
+    
+    @Component({
+      selector: 'app-menu-bar',
+      templateUrl: './menu-bar.component.html',
+      styleUrl: './menu-bar.component.scss',
+    })
+    export class MenuBarComponent {
+      menu: Array<MenuItem> = [
+        {label: 'Home', icon: 'pi pi-home'},
+        {label: 'Customers', icon: 'pi pi-user'},
+        {label: 'Settings', icon: 'pi pi-cog'}
+      ];
+    }
+    
+    ```
+
+6. skip the below one those are updated i just tried and wasted a lot time
+7. update menu-bar.component.html
+    ```text
+    <h4 class="text-center mt-0">Dashboard</h4>
+    <div class="text-center">
+      <p-avatar
+        image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+        styleClass="mr-2"
+        size="xlarge"
+        shape="circle"/>
+    </div>
+    <div class="card flex justify-content-center">
+      <p-menu [model]="items" class="mr-2"/>
+    </div>
+    
+    ```
+8. update menu-bar.component.ts
+    ```text
+    import {Component, OnInit} from '@angular/core';
+    import {MenuItem} from "primeng/api";
+    
+    @Component({
+      selector: 'app-menu-bar',
+      templateUrl: './menu-bar.component.html',
+      styleUrl: './menu-bar.component.scss',
+    })
+    export class MenuBarComponent implements OnInit {
+    
+    
+      items: MenuItem[] | undefined;
+    
+      ngOnInit() {
+        this.items = [
+          {label: 'Home', icon: 'pi pi-home'},
+          {label: 'Customers', icon: 'pi pi-user'},
+          {label: 'Settings', icon: 'pi pi-cog'}
+        ];
+      }
+    
+    }
+    
+    ```
+
+#### FINISHED at 4 NOVEMBER 2024 05:50 PM
+
+### **STEP 591 4 NOVEMBER 2024 05:50 PM**
+
+1. ```ng g c MenuItem```
+2. update menu-bar.component.html
+    ```text
+    <h4 class="text-center mt-0">Dashboard</h4>
+    <div class="text-center">
+      <p-avatar
+        image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+        styleClass="mr-2"
+        size="xlarge"
+        shape="circle"/>
+    </div>
+    <div>
+      <app-menu-item *ngFor="let item of menu" class="mr-2"
+                     [menuItem]="item"
+      >
+      </app-menu-item>
+    
+    </div>
+    
+    ```
+3. update menu-item.component.ts
+    ```text
+    import {Component, Input} from '@angular/core';
+    import {MenuItem} from "primeng/api";
+    
+    @Component({
+      selector: 'app-menu-item',
+      templateUrl: './menu-item.component.html',
+      styleUrl: './menu-item.component.scss'
+    })
+    export class MenuItemComponent {
+    
+      @Input()
+      menuItem: MenuItem = {}
+    }
+    
+    ```
+4. update menu-item.component.html
+    ```text
+    <div>
+      <i [class]="menuItem.icon">
+        {{ menuItem.label }}
+      </i>
+    </div>
+    
+    ```
+5. add some styling like hoover color blue in menu-item.component.scss
+    ```text
+    div {
+      padding: 1rem;
+      border-radius: 0.5rem;
+      width: 100%;
+    
+      &:hover {
+        background-color: #4299e1;
+        color: #fff;
+        cursor: pointer;
+      }
+    
+      i {
+        padding-right: 10px;
+      }
+    }
+    
+    ```
+
+#### FINISHED at 4 NOVEMBER 2024 06:34 PM
+
+### **STEP 592 4 NOVEMBER 2024 06:34 PM**
+
+1. let's implement header now
+2. ```ng g c HeaderBar```
+3. update header-bar.component.html
+    ```text
+    <div class="flex flex-column align-items-end border-bottom-1 border-gray-200 pt-3 pb-3">
+      <div class="flex flex-row align-items-center">
+        <button
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-bell"
+          class="p-button-rounded p-button-secondary p-button-text mr-3"
+        >
+        </button>
+        <p-avatar
+          image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+          size="normal"
+          shape="circle"
+          class="mr-2"
+    
+        ></p-avatar>
+        <div>
+          <p class="text-base mb-0 mt-1 text-gray-700">King&#64;kingdoms.com</p>
+          <p class="text-sm mb-1 mt-0 text-gray-500">ROLE_ADMIN</p>
+        </div>
+        <div>
+          <button
+            (click)="menu.toggle($event)"
+            class="p-button-secondary p-button-text"
+            icon="pi pi-angle-down"
+            pButton
+            pRipple
+            type="button"
+          ></button>
+          <p-menu #menu [model]="items" [popup]="true"/>
+        </div>
+      </div>
+    </div>
+    
+    ```
+4. update header-bar.components.ts
+    ```text
+    import {Component} from '@angular/core';
+    import {MenuItem} from "primeng/api";
+    
+    @Component({
+      selector: 'app-header-bar',
+      templateUrl: './header-bar.component.html',
+      styleUrl: './header-bar.component.scss'
+    })
+    export class HeaderBarComponent {
+      items: MenuItem[] = [
+        {label: 'Profile', icon: 'pi pi-user'},
+        {label: 'Settings', icon: 'pi pi-cog'},
+        {separator: true},
+        {label: 'Sign out', icon: 'pi pi-sign-out'}
+      ];
+    
+    }
+    
+    ```
+
+#### FINISHED at 4 NOVEMBER 2024 08:35 PM
+
+### **STEP 593 5 NOVEMBER 2024 11:56 AM**
+
+1. just add a button
+2. update customer.component.html
+    ```text
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+          >
+          </button>
+          <div>
+            customers will be displayed here
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    ```
+
+#### FINISHED at 5 NOVEMBER 2024 12:00 PM
+
+### **STEP 594 5 NOVEMBER 2024 12:00 PM**
+
+1. creating the sidebar on right we clikc create customer
+2. update customer.components.ts
+    ```text
+    import {Component} from '@angular/core';
+    
+    @Component({
+      selector: 'app-customer',
+      templateUrl: './customer.component.html',
+      styleUrl: './customer.component.scss'
+    })
+    export class CustomerComponent {
+      display: boolean = false;
+    
+    }
+    
+    ```
+3. update customer.components.html
+    ```text
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >Content
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="display = true"
+          >
+          </button>
+          <div>
+            customers will be displayed here
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    ```
+4. make sure you add required imports in app.module.ts
+
+#### FINISHED at 5 NOVEMBER 2024 12:38 PM
+
+### **STEP 595 5 NOVEMBER 2024 12:38 AM**
+
+1. create a new component ``` ng g c MangeCustomer```
+2. update the customer.component.html
+    ```text
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >
+      <app-mange-customer></app-mange-customer>
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="display = true"
+          >
+          </button>
+          <div>
+            customers will be displayed here
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    ```
+3. update the mange-customer.component.html
+    ```text
+    <div>
+      <h2>Title here</h2>
+      <div class="field">
+        <label for="firstname">Name</label>
+        <input
+          id="firstname"
+          pInputText
+          placeholder="Mary Jane"
+          type="text"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          pInputText
+          placeholder="MaryJane@gmail.com"
+          type="email"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="age">Age</label>
+        <input
+          id="age"
+          pInputText
+          placeholder="16"
+          type="number"
+          class="w-full"
+        >
+      </div>
+    </div>
+    
+    ```
+
+#### FINISHED at 5 NOVEMBER 2024 12:51 PM
+
+### **STEP 596 5 NOVEMBER 2024 12:51 AM**
+
+1. let's add gender and some other options like submit and cancel button
+2. update the mange-customer.component.html
+    ```text
+    <div>
+      <h2>Title here</h2>
+      <div class="field">
+        <label for="firstname">Name</label>
+        <input
+          id="firstname"
+          pInputText
+          placeholder="Mary Jane"
+          type="text"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          pInputText
+          placeholder="MaryJane@gmail.com"
+          type="email"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="age">Age</label>
+        <input
+          id="age"
+          pInputText
+          placeholder="16"
+          type="number"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="gender">Gender</label>
+        <select
+          id="gender"
+          class="p-dropdown w-full custom-select"
+        >
+          <option>Select Option</option>
+          <option>Male</option>
+          <option>Female</option>
+        </select>
+      </div>
+      <button
+        pButton
+        label="submit"
+        class="w-full"
+      >
+      </button>
+      <button
+        pButton
+        label="cancel"
+        class="w-full p-button-outlined p-button-danger mt-2"
+      >
+      </button>
+    </div>
+    
+    ```
+3. Update the mange-customer.component.scss
+    ```text
+    .custom-select {
+      padding: 0.75rem 0.75rem;
+      border: 1px solid #ced4da;
+      
+    }
+    
+    ```
+
+#### FINISHED at 5 NOVEMBER 2024 1:05 PM
+
+### **STEP 597 5 NOVEMBER 2024 1:05 PM**
+
+1. create a login page
+2. ```ng g c Login```
+3. exercise /login - only login page nothing else
+4. update routing
+
+```text
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import {CustomerComponent} from "./components/customer/customer.component";
+import {LoginComponent} from "./components/login/login.component";
+
+
+const routes: Routes = [
+  {
+    path: 'customers',
+    component: CustomerComponent
+  },
+  {
+    path: 'login',
+    component: LoginComponent
+  }
+]
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {
+}
+
+```
+
+#### FINISHED at 5 NOVEMBER 2024 1:09 PM
+
+### **STEP 598 5 NOVEMBER 2024 1:09 PM**
+
+1. exercise solution
+
+#### FINISHED at 5 NOVEMBER 2024 1:09 PM
+
+### **STEP 599 5 NOVEMBER 2024 1:09 PM**
+
+1. divide page into two
+2. create a login form
+3. update login.component.html
+    ```text
+    <div class="flex" style="height: 100vh">
+      <div class="col-6">
+        <div class="text-center">
+          <p-avatar
+            image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+            styleClass="mr-2"
+            size="xlarge"
+            shape="circle"/>
+          <h1>Sign in into your Account.</h1>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            pInputText
+            placeholder="MaryJane@gmail.com"
+            type="email"
+            class="w-full"
+          >
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            pInputText
+            placeholder=""
+            type="password"
+            class="w-full"
+          >
+        </div>
+        <button
+          pButton
+          label="submit"
+          class="w-full"
+        >
+        </button>
+        <button
+          pButton
+          label="Don't have an account? Signup now!"
+          class="w-full p-button-link"
+        >
+        </button>
+      </div>
+      <div class="col-6"></div>
+    </div>
+    
+    ```
+
+#### FINISHED at 5 NOVEMBER 2024 1:24 PM
+
+### **STEP 600 and 601 5 NOVEMBER 2024 1:24 PM**
+
+1. let's add a image on the right and add some styling to fit the image
+2. update login.component.html
+    ```text
+    <div class="flex" style="height: 100vh">
+      <div class="col-6 m-3 flex flex-column justify-content-center">
+        <div class="m-auto">
+    
+          <div class="text-center">
+            <p-avatar
+              image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+              styleClass="mr-2"
+              size="xlarge"
+              shape="circle"/>
+            <h1>Sign in into your Account.</h1>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input
+              id="email"
+              pInputText
+              placeholder="MaryJane@gmail.com"
+              type="email"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input
+              id="password"
+              pInputText
+              placeholder=""
+              type="password"
+              class="w-full"
+            >
+          </div>
+          <button
+            pButton
+            label="submit"
+            class="w-full"
+          >
+          </button>
+          <button
+            pButton
+            label="Don't have an account? Signup now!"
+            class="w-full p-button-link pl-0"
+          >
+          </button>
+    
+        </div>
+      </div>
+      <div class="col-6 flex flex-column justify-content-center align-items-center right-container">
+        <h1>
+          <a href="#" target="_blank">Enroll now</a>
+        </h1>
+        <img
+          class="background p-6 pt-0"
+          src="https://user-images.githubusercontent.com/40702606/215539167-d7006790-b880-4929-83fb-c43fa74f429e.png"
+          alt="Nothing here :-))">
+    
+      </div>
+    </div>
+    
+    ```
+3. update login.component.scss
+    ```text
+    .right-container {
+      background-image: linear-gradient(to right, #2b6cb0, #6b46c1);
+    
+      .background {
+        object-fit: scale-down;
+        height: auto;
+        max-width: 100%;
+      }
+    
+      a {
+        text-decoration: none;
+        color: #ffffff;
+      }
+    }
+    
+    ```
+
+#### FINISHED at 5 NOVEMBER 2024 1:45 PM
+
+### **STEP 602 5 NOVEMBER 2024 1:45 PM**
+
+1. we will connect the frontend to backend
+2. we need service to do that
+3. under src/app '''mkdir services'''
+4. ```cd services ```
+5. ```mkdir authentication ```
+6. ```cd authentication ```
+7. ```ng g s Authentication```
+
+#### FINISHED at 5 NOVEMBER 2024 1:48 PM
+
+### **STEP 603 5 NOVEMBER 2024 1:53 PM**
+
+1. create a new directory under src/app
+2. ```mkdir models```
+3. create a new file name authentication-request.ts
+
+````
+export interface AuthenticationRequest {
+  username?: string;
+  password?: string;
+}
+````
+
+#### FINISHED at 5 NOVEMBER 2024 2:00 PM
+
+### **STEP 604 5 NOVEMBER 2024 2:00 PM**
+
+1. Task bind the username and password to login form
+
+#### FINISHED at 5 NOVEMBER 2024 2:01 PM
+
+### **STEP 605 5 NOVEMBER 2024 2:01 PM**
+
+1. open login.component.ts
+    ```text
+    import {Component} from '@angular/core';
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    
+    @Component({
+      selector: 'app-login',
+      templateUrl: './login.component.html',
+      styleUrl: './login.component.scss'
+    })
+    export class LoginComponent {
+      authenticationRequest: AuthenticationRequest = {};
+    
+    
+    }
+    
+    ```
+2. update login.component.html
+    ```text
+    <div class="flex" style="height: 100vh">
+      <div class="col-6 m-3 flex flex-column justify-content-center">
+        <div class="m-auto">
+    
+          <div class="text-center">
+            <p-avatar
+              image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+              styleClass="mr-2"
+              size="xlarge"
+              shape="circle"/>
+            <h1>Sign in into your Account.</h1>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input
+              [(ngModel)]="authenticationRequest.username"
+              id="email"
+              pInputText
+              placeholder="MaryJane@gmail.com"
+              type="email"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input
+              [(ngModel)]="authenticationRequest.password"
+              id="password"
+              pInputText
+              placeholder=""
+              type="password"
+              class="w-full"
+            >
+          </div>
+          <button
+            pButton
+            label="submit"
+            class="w-full"
+          >
+          </button>
+          <button
+            pButton
+            label="Don't have an account? Signup now!"
+            class="w-full p-button-link pl-0"
+          >
+          </button>
+    
+        </div>
+      </div>
+      <div class="col-6 flex flex-column justify-content-center align-items-center right-container">
+        <h1>
+          <a href="#" target="_blank">Enroll now</a>
+        </h1>
+        <img
+          class="background p-6 pt-0"
+          src="https://user-images.githubusercontent.com/40702606/215539167-d7006790-b880-4929-83fb-c43fa74f429e.png"
+          alt="Nothing here :-))">
+    
+      </div>
+    </div>
+    
+    ```
+
+#### FINISHED at 5 NOVEMBER 2024 2:05 PM
+
+### **STEP 606 5 NOVEMBER 2024 2:05 PM**
+
+1. open authentication.service.ts
+    ```text
+    import {Injectable} from '@angular/core';
+    import {HttpClient} from "@angular/common/http";
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {Observable} from "rxjs";
+    
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class AuthenticationService {
+    
+      constructor(
+        private http: HttpClient
+      ) {  }
+      
+      login(authRequest: AuthenticationRequest): Observable<any> {
+        return this.http.post('http://localhost:8080/api/v1/auth/login',authRequest);
+      }
+    }
+    
+    ```
+
+#### FINISHED at 5 NOVEMBER 2024 2:17 PM
+
+### **STEP 607 5 NOVEMBER 2024 2:17 PM**
+
+1. let use the application service now in login component
+2. update the login.component.html
+    ```text
+    <div class="flex" style="height: 100vh">
+      <div class="col-6 m-3 flex flex-column justify-content-center">
+        <div class="m-auto">
+    
+          <div class="text-center">
+            <p-avatar
+              image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+              styleClass="mr-2"
+              size="xlarge"
+              shape="circle"/>
+            <h1>Sign in into your Account.</h1>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input
+              [(ngModel)]="authenticationRequest.username"
+              id="email"
+              pInputText
+              placeholder="MaryJane@gmail.com"
+              type="email"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input
+              [(ngModel)]="authenticationRequest.password"
+              id="password"
+              pInputText
+              placeholder=""
+              type="password"
+              class="w-full"
+            >
+          </div>
+          <button
+            pButton
+            label="Login"
+            class="w-full"
+            (click)="login()"
+          >
+          </button>
+          <button
+            pButton
+            label="Don't have an account? Signup now!"
+            class="w-full p-button-link pl-0"
+          >
+          </button>
+    
+        </div>
+      </div>
+      <div class="col-6 flex flex-column justify-content-center align-items-center right-container">
+        <h1>
+          <a href="#" target="_blank">Enroll now</a>
+        </h1>
+        <img
+          class="background p-6 pt-0"
+          src="https://user-images.githubusercontent.com/40702606/215539167-d7006790-b880-4929-83fb-c43fa74f429e.png"
+          alt="Nothing here :-))">
+    
+      </div>
+    </div>
+    
+    ```
+3. update the login.component.ts
+    ```text
+    import {Component} from '@angular/core';
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {AuthenticationService} from "../../services/authentication/authentication.service";
+    
+    @Component({
+      selector: 'app-login',
+      templateUrl: './login.component.html',
+      styleUrl: './login.component.scss'
+    })
+    export class LoginComponent {
+      authenticationRequest: AuthenticationRequest = {};
+    
+      constructor(private authenticationService: AuthenticationService) {
+      }
+    
+    
+      login() {
+        this.authenticationService.login(this.authenticationRequest)
+          .subscribe({
+            next: (authenticationResponse) => {
+              console.log(authenticationResponse);
+            }
+          });
+      }
+    }
+    
+    ```
+
+#### FINISHED at 5 NOVEMBER 2024 6:15 PM
+
+### **STEP 608 5 NOVEMBER 2024 6:15 PM**
+
+1. your login wont load giving some issue in console
+2. you have add HttpClient module but there is one more problem its deprecated from angular 16
+
+#### FINISHED at 5 NOVEMBER 2024 6:15 PM
+
+### **STEP 609 5 NOVEMBER 2024 6:16 PM**
+
+1. but i have fixed it
+    ```
+    import {NgModule} from '@angular/core';
+    import {BrowserModule} from '@angular/platform-browser';
+    
+    import {InputTextModule} from 'primeng/inputtext';
+    import {AppRoutingModule} from './app-routing.module';
+    import {AppComponent} from './app.component';
+    import {FormsModule} from "@angular/forms";
+    import {CommonModule} from "@angular/common";
+    import {CustomerComponent} from './components/customer/customer.component';
+    import {MenuBarComponent} from './components/menu-bar/menu-bar.component';
+    import {AvatarModule} from 'primeng/avatar';
+    import {AvatarGroupModule} from 'primeng/avatargroup';
+    import {MenuModule} from "primeng/menu";
+    import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+    import {MenuItemComponent} from './components/menu-item/menu-item.component';
+    import {HeaderBarComponent} from './components/header-bar/header-bar.component';
+    import {Button, ButtonDirective} from "primeng/button";
+    import {Ripple} from "primeng/ripple";
+    import {SidebarModule} from "primeng/sidebar";
+    import {ManageCustomerComponent} from './components/mange-customer/mange-customer.component';
+    import {LoginComponent} from './components/login/login.component';
+    import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+    import {AuthenticationService} from "./services/authentication/authentication.service";
+    
+    @NgModule({
+      declarations: [
+        AppComponent,
+        CustomerComponent,
+        MenuBarComponent,
+        MenuItemComponent,
+        HeaderBarComponent,
+        ManageCustomerComponent,
+        LoginComponent,
+      ],
+      imports: [
+        BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        CommonModule,
+        InputTextModule,
+        AvatarModule,
+        AvatarGroupModule,
+        MenuModule,
+        BrowserAnimationsModule,
+        Button,
+        ButtonDirective,
+        Ripple,
+        SidebarModule
+      ],
+      providers: [
+        AuthenticationService,
+        provideHttpClient(withInterceptorsFromDi())
+      ],
+      bootstrap: [AppComponent]
+    })
+    export class AppModule {
+    }
+    
+    ```
+2. update the app.module.ts like above
+3. now it works i mean page loads
+4. make sure your backend is running
+5. try to login with new credentials inserted
+6. you get token back in console
+
+#### FINISHED at 5 NOVEMBER 2024 08:00 PM
+
+### **STEP 610 6 NOVEMBER 2024 11:44 AM**
+
+1. in order to match any data of backend here we create model similar to backend and usethem to match the data and
+   process
+2. under models create two more files
+3. create file authentication-response.ts
+    ```text
+    import {CustomerDTO} from "./customer-dto";
+    
+    export interface AuthenticationResponse {
+      token?: string;
+      customerDTO?: CustomerDTO;
+    }
+    
+    ```
+4. create file customer-dto.ts
+    ```text
+    export interface CustomerDTO {
+      id?: number,
+    
+      name?: string,
+    
+      email?: string,
+    
+      gender?: 'MALE' | 'FEMALE',
+    
+      age?: number,
+    
+      roles: string[],
+    
+      username?: string
+    }
+    
+    ```
+
+#### FINISHED at 6 NOVEMBER 2024 11:48 PM
+
+### **STEP 611 6 NOVEMBER 2024 11:48 AM**
+
+1. In authentication service lets use this response
+2. update authentication-service.ts
+    ```text
+    import {Injectable} from '@angular/core';
+    import {HttpClient} from "@angular/common/http";
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {Observable} from "rxjs";
+    import {AuthenticationResponse} from "../../models/authentication-response";
+    
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class AuthenticationService {
+    
+      constructor(private http: HttpClient) {
+      }
+    
+      login(authRequest: AuthenticationRequest): Observable<AuthenticationResponse> {
+        return this.http.post<AuthenticationResponse>('http://localhost:8080/api/v1/auth/login', authRequest);
+      }
+    }
+    
+    
+    ```
+
+#### FINISHED at 6 NOVEMBER 2024 11:51 PM
+
+### **STEP 612 6 NOVEMBER 2024 11:51 AM**
+
+1. update the login component to check credentials and show wrong credentials with nice looking
+   message
+2. update login.component.ts
+    ```text
+    import {Component} from '@angular/core';
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {AuthenticationService} from "../../services/authentication/authentication.service";
+    
+    @Component({
+      selector: 'app-login',
+      templateUrl: './login.component.html',
+      styleUrl: './login.component.scss'
+    })
+    export class LoginComponent {
+      authenticationRequest: AuthenticationRequest = {};
+      errorMsg: string = '';
+    
+      constructor(private authenticationService: AuthenticationService) {
+      }
+    
+    
+      login() {
+        this.errorMsg = '';
+        this.authenticationService.login(this.authenticationRequest)
+          .subscribe({
+            next: (authenticationResponse) => {
+              console.log(authenticationResponse);
+            },
+            error: (error) => {
+              if (error.error.statusCode === 401) {
+                this.errorMsg = 'Login and / or pass is incorrect';
+    
+              }
+            }
+          });
+      }
+    }
+    
+    ```
+3. update login.component.html
+    ```text
+    <div class="flex" style="height: 100vh">
+      <div class="col-6 m-3 flex flex-column justify-content-center">
+        <div class="m-auto">
+    
+          <div class="text-center">
+            <p-avatar
+              image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+              styleClass="mr-2"
+              size="xlarge"
+              shape="circle"/>
+            <h1>Sign in into your Account.</h1>
+          </div>
+          <div>
+            <p-message *ngIf="errorMsg" severity="error" [text]="errorMsg" styleClass="mb-3"></p-message>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input
+              [(ngModel)]="authenticationRequest.username"
+              id="email"
+              pInputText
+              placeholder="MaryJane@gmail.com"
+              type="email"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input
+              [(ngModel)]="authenticationRequest.password"
+              id="password"
+              pInputText
+              placeholder=""
+              type="password"
+              class="w-full"
+            >
+          </div>
+          <button
+            pButton
+            label="Login"
+            class="w-full"
+            (click)="login()"
+          >
+          </button>
+          <button
+            pButton
+            label="Don't have an account? Signup now!"
+            class="w-full p-button-link pl-0"
+          >
+          </button>
+    
+        </div>
+      </div>
+      <div class="col-6 flex flex-column justify-content-center align-items-center right-container">
+        <h1>
+          <a href="#" target="_blank">Enroll now</a>
+        </h1>
+        <img
+          class="background p-6 pt-0"
+          src="https://user-images.githubusercontent.com/40702606/215539167-d7006790-b880-4929-83fb-c43fa74f429e.png"
+          alt="Nothing here :-))">
+    
+      </div>
+    </div>
+    
+    ```
+
+#### FINISHED at 6 NOVEMBER 2024 12:29 PM
+
+### **STEP 613 6 NOVEMBER 2024 12:29 PM**
+
+1. lets store the response in local storage of browser
+2. update login.component.ts
+    ```text
+    import {Component} from '@angular/core';
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {AuthenticationService} from "../../services/authentication/authentication.service";
+    import {Router} from "@angular/router";
+    
+    @Component({
+      selector: 'app-login',
+      templateUrl: './login.component.html',
+      styleUrl: './login.component.scss'
+    })
+    export class LoginComponent {
+      authenticationRequest: AuthenticationRequest = {};
+      errorMsg: string = '';
+    
+      constructor(
+        private authenticationService: AuthenticationService,
+        private router: Router
+      ) {
+      }
+    
+    
+      login() {
+        this.errorMsg = '';
+        this.authenticationService.login(this.authenticationRequest)
+          .subscribe({
+            next: (authenticationResponse) => {
+              // console.log(authenticationResponse);
+              localStorage.setItem('authenticationRequest', JSON.stringify(authenticationResponse));
+              this.router.navigate(['customers']);
+            },
+            error: (error) => {
+              if (error.error.statusCode === 401) {
+                this.errorMsg = 'Login and / or pass is incorrect';
+    
+              }
+            }
+          });
+      }
+    }
+    
+    ```
+
+#### FINISHED at 6 NOVEMBER 2024 12:39 PM
+
+### **STEP 614 6 NOVEMBER 2024 12:39 PM**
+
+1. we need to secure our routes
+
+#### FINISHED at 6 NOVEMBER 2024 12:40 PM
+
+### **STEP 615 6 NOVEMBER 2024 12:40 PM**
+
+1. route guard will be provided by angular for this purpose
+2. it is a interface
+3. like canactivate, can deactivate and some others
+
+#### FINISHED at 6 NOVEMBER 2024 12:43 PM
+
+### **STEP 616 6 NOVEMBER 2024 12:43 PM**
+
+1. lets create our route guard
+2. navigate to services on terminal
+3. ```mkdir guard```
+4. ```cd guard```
+5. ```ng g s AccessGuard```
+6. update access-guard.service.ts
+
+#### FINISHED at 6 NOVEMBER 2024 12:49 PM
+
+### **STEP 617 6 NOVEMBER 2024 12:49 PM**
+
+1. update app-routing.module.ts
+    ```text
+    import {NgModule} from '@angular/core';
+    import {RouterModule, Routes} from '@angular/router';
+    import {CustomerComponent} from "./components/customer/customer.component";
+    import {LoginComponent} from "./components/login/login.component";
+    import {AccessGuardService} from "./services/guard/access-guard.service";
+    
+    
+    const routes: Routes = [
+      {
+        path: 'customers',
+        component: CustomerComponent,
+        canActivate: [AccessGuardService]
+      },
+      {
+        path: 'login',
+        component: LoginComponent
+      }
+    ]
+    
+    @NgModule({
+      imports: [RouterModule.forRoot(routes)],
+      exports: [RouterModule]
+    })
+    export class AppRoutingModule {
+    }
+    
+    ```
+2. now if you try to access the /customers you cant as we set it to false
+
+#### FINISHED at 6 NOVEMBER 2024 12:55 PM
+
+### **STEP 618 6 NOVEMBER 2024 12:55 PM**
+
+1. we need to implement logic in the guard now
+2. we need to check whether a token is stored in the local storage and validate and checl not expired.
+3. we need some services to do it.
+4. ```npm i @auth0/angular-jwt``` in the main frontend/angular
+
+#### FINISHED at 6 NOVEMBER 2024 1:01 PM
+
+### **STEP 619 6 NOVEMBER 2024 1:02 PM**
+
+1. set the token in storage using login.component.ts
+    ```text
+    import {Component} from '@angular/core';
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {AuthenticationService} from "../../services/authentication/authentication.service";
+    import {Router} from "@angular/router";
+    
+    @Component({
+      selector: 'app-login',
+      templateUrl: './login.component.html',
+      styleUrl: './login.component.scss'
+    })
+    export class LoginComponent {
+      authenticationRequest: AuthenticationRequest = {};
+      errorMsg: string = '';
+    
+      constructor(
+        private authenticationService: AuthenticationService,
+        private router: Router
+      ) {
+      }
+    
+    
+      login() {
+        this.errorMsg = '';
+        this.authenticationService.login(this.authenticationRequest)
+          .subscribe({
+            next: (authenticationResponse) => {
+              // console.log(authenticationResponse);
+              localStorage.setItem('user', JSON.stringify(authenticationResponse));
+              this.router.navigate(['customers']);
+            },
+            error: (error) => {
+              if (error.error.statusCode === 401) {
+                this.errorMsg = 'Login and / or pass is incorrect';
+    
+              }
+            }
+          });
+      }
+    }
+    
+    ```
+2. update the access-guard.service.ts. we are going take token and verify
+    ```text
+    import {Injectable} from '@angular/core';
+    import {
+      ActivatedRouteSnapshot,
+      CanActivate,
+      Router,
+      RouterStateSnapshot,
+      UrlTree
+    } from '@angular/router';
+    import {AuthenticationResponse} from '../../models/authentication-response';
+    import {JwtHelperService} from '@auth0/angular-jwt';
+    
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class AccessGuardService implements CanActivate {
+    
+      constructor(
+        private router: Router,
+        private jwtHelper: JwtHelperService
+      ) {
+      }
+    
+      canActivate(
+        route: ActivatedRouteSnapshot,
+        state: RouterStateSnapshot
+      ): boolean | UrlTree {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const authResponse: AuthenticationResponse = JSON.parse(storedUser);
+          const token = authResponse.token;
+          if (token) {
+            const isTokenNonExpired = !this.jwtHelper.isTokenExpired(token);
+            if (isTokenNonExpired) {
+              return true;
+            }
+          }
+        }
+        return this.router.createUrlTree(['login']);
+      }
+    }
+    
+    ```
+3. now it should working great
+
+#### FINISHED at 6 NOVEMBER 2024 2:28 PM
+
+### **STEP 620 6 NOVEMBER 2024 2:28 PM**
+
+1. lets get customers now
+2. go to src/app/services on terminal
+3. ```mkdir customer```
+4. ```cd customer```
+5. ```ng g s CustomerService```
+
+#### FINISHED at 6 NOVEMBER 2024 2:32 PM
+
+### **STEP 621 6 NOVEMBER 2024 2:32 PM**
+
+1. Exercise: implement a method that implements to receive all customers
+
+#### FINISHED at 6 NOVEMBER 2024 2:35 PM
+
+### **STEP 622 6 NOVEMBER 2024 2:35 PM**
+
+1. update customer-service.service.ts
+    ```text
+    import {Injectable} from '@angular/core';
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {Observable} from "rxjs";
+    import {AuthenticationResponse} from "../../models/authentication-response";
+    import {HttpClient} from "@angular/common/http";
+    import {CustomerDTO} from "../../models/customer-dto";
+    
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class CustomerServiceService {
+    
+      constructor(private http: HttpClient) {
+      }
+    
+      findAll(): Observable<Array<CustomerDTO>> {
+        return this.http.get<Array<CustomerDTO>>('http://localhost:8080/api/v1/customers');
+      }
+    }
+    
+    ```
+
+#### FINISHED at 6 NOVEMBER 2024 2:44 PM
+
+### **STEP 623 6 NOVEMBER 2024 2:44 PM**
+
+1. let use it in customer.component.ts
+    ```text
+    import {Component, OnInit} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {CustomerServiceService} from "../../services/customer/customer-service.service";
+    
+    @Component({
+      selector: 'app-customer',
+      templateUrl: './customer.component.html',
+      styleUrl: './customer.component.scss'
+    })
+    export class CustomerComponent implements OnInit {
+      display: boolean = false;
+    
+    
+      customers: CustomerDTO[] = [];
+    
+      constructor(
+        private customerService: CustomerServiceService
+      ) {
+      }
+    
+      ngOnInit(): void {
+        this.findAllCustomers();
+      }
+    
+      private findAllCustomers() {
+        this.customerService.findAll()
+          .subscribe(
+            {
+              next: (data: CustomerDTO[]) => {
+                this.customers = data;
+                console.log(this.customers);
+              }
+            }
+          )
+      }
+    }
+    
+    ```
+2. if you try now you get 403 error as we have not passed any token
+
+#### FINISHED at 6 NOVEMBER 2024 2:53 PM
+
+### **STEP 624 6 NOVEMBER 2024 2:53 PM**
+
+1. send the headers with token but this is manual
+2. After Bearer replace it with your token
+    ```text
+    import {Injectable} from '@angular/core';
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {Observable} from "rxjs";
+    import {AuthenticationResponse} from "../../models/authentication-response";
+    import {HttpClient, HttpHeaders} from "@angular/common/http";
+    import {CustomerDTO} from "../../models/customer-dto";
+    
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class CustomerServiceService {
+    
+      constructor(private http: HttpClient) {
+      }
+    
+      findAll(): Observable<Array<CustomerDTO>> {
+        let headers: HttpHeaders = new HttpHeaders();
+        headers = headers.set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjaGVsc2llLnp1bGF1ZkBrZWRhcm5hdGguY29tIiwiaWF0IjoxNzMwOTA0OTY3LCJpc3MiOiJodHRwOi8va2VkYXJuYXRoLmNvbSIsImV4cCI6MTczMjIwMDk2Nywic2NvcGVzIjpbIlJPTEVfVVNFUiJdfQ.Mqqkt4bvBsKZYvoTbH2fP1Yfc3DimeQ9DKeEekeDQRg')
+        return this.http.get<Array<CustomerDTO>>('http://localhost:8080/api/v1/customers',
+          {
+            headers: headers,
+          }
+        );
+      }
+    }
+    
+    ```
+
+#### FINISHED at 6 NOVEMBER 2024 3:02 PM
+
+### **STEP 625 6 NOVEMBER 2024 3:03 PM**
+
+1. let display it just to test
+2. update customer.component.html
+    ```text
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >
+      <app-mange-customer></app-mange-customer>
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="display = true"
+          >
+          </button>
+          <div>
+            <div *ngFor="let customer of customers">
+              {{ customer.name + ' ' + customer.age }}
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    ```
+
+#### FINISHED at 6 NOVEMBER 2024 3:06 PM
+
+### **STEP 626 6 NOVEMBER 2024 3:06 PM**
+
+1. if you both the services got some same url
+2. if you wan to change port then we need to go to all files and do it
+3. To fix this we use properties file
+4. open terminal
+5. navigate src/app
+6. ```ng g environments```
+7. two files will be generated environ.ts is where we write these links. we see .development but for production it will
+   be like .prod.
+
+#### FINISHED at 6 NOVEMBER 2024 3:13 PM
+
+### **STEP 627 6 NOVEMBER 2024 3:13 PM**
+
+1. add those url in this environment files
+2. two file one is environment.ts which is used for production
+3. second file is environment.developement.ts which is used for development that is now.
+4. you might think how this is configured in angular.json. you will see when developement use this file.
+5. for now add the same code on both files
+
+```text
+export const environment = {
+  api: {
+    baseUrl: 'http://localhost:8080',
+    authUrl: '/api/v1/auth/login',
+    customerUrl: '/api/v1/customers',
+  }
+};
+
+
+```
+
+#### FINISHED at 6 NOVEMBER 2024 4:10 PM
+
+### **STEP 628 6 NOVEMBER 2024 4:11 PM**
+
+1. update authentication.service.ts
+    ```text
+    import {Injectable} from '@angular/core';
+    import {HttpClient} from "@angular/common/http";
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {Observable} from "rxjs";
+    import {AuthenticationResponse} from "../../models/authentication-response";
+    import {environment} from '../../../environments/environment.development';
+    
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class AuthenticationService {
+      private readonly authUrl = `${environment.api.baseUrl}/${environment.api.authUrl}`;
+    
+      constructor(private http: HttpClient) {
+      }
+    
+      login(authRequest: AuthenticationRequest): Observable<AuthenticationResponse> {
+        return this.http.post<AuthenticationResponse>(this.authUrl, authRequest);
+      }
+    }
+    
+    
+    ```
+2. update customer-service.service.ts
+    ```text
+    import {Injectable} from '@angular/core';
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {Observable} from "rxjs";
+    import {AuthenticationResponse} from "../../models/authentication-response";
+    import {HttpClient, HttpHeaders} from "@angular/common/http";
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {environment} from "../../../environments/environment.development";
+    
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class CustomerServiceService {
+    
+      private readonly customerUrl = `${environment.api.baseUrl}/${environment.api.customerUrl}`;
+    
+    
+      constructor(private http: HttpClient) {
+      }
+    
+      findAll(): Observable<Array<CustomerDTO>> {
+        let headers: HttpHeaders = new HttpHeaders();
+        headers = headers.set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjaGVsc2llLnp1bGF1ZkBrZWRhcm5hdGguY29tIiwiaWF0IjoxNzMwOTA0OTY3LCJpc3MiOiJodHRwOi8va2VkYXJuYXRoLmNvbSIsImV4cCI6MTczMjIwMDk2Nywic2NvcGVzIjpbIlJPTEVfVVNFUiJdfQ.Mqqkt4bvBsKZYvoTbH2fP1Yfc3DimeQ9DKeEekeDQRg')
+        return this.http.get<Array<CustomerDTO>>(this.customerUrl,
+          {
+            headers: headers,
+          }
+        );
+      }
+    }
+    
+    ```
+
+#### FINISHED at 6 NOVEMBER 2024 4:32 PM
+
+### **STEP 629 6 NOVEMBER 2024 4:11 PM**
+
+1. you remember manual token. we need to make it automatically
+2. you can check the below code of customer-service.service.ts
+    ```text
+    import {Injectable} from '@angular/core';
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {Observable} from "rxjs";
+    import {AuthenticationResponse} from "../../models/authentication-response";
+    import {HttpClient, HttpHeaders} from "@angular/common/http";
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {environment} from "../../../environments/environment.development";
+    
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class CustomerServiceService {
+      
+      private readonly customerUrl = `${environment.api.baseUrl}/${environment.api.customerUrl}`;
+    
+    
+      constructor(private http: HttpClient) {
+      }
+    
+      findAll(): Observable<Array<CustomerDTO>> {
+        const jwtToken = ' extract token from storage';
+        let headers: HttpHeaders = new HttpHeaders();
+        headers = headers.set('Authorization', 'Bearer '+jwtToken)
+        return this.http.get<Array<CustomerDTO>>(this.customerUrl,
+          {
+            headers: headers,
+          }
+        );
+      }
+    }
+    
+    ```
+3. The problem in here is its redundant. some code of lines are repeating.
+4. look for better olution in next step
+
+#### FINISHED at 6 NOVEMBER 2024 4:42 PM
+
+### **STEP 630 6 NOVEMBER 2024 4:11 PM**
+
+1. we need to intercept the request and attach the token automatically
+2. go to src/app/services on terminal
+3. ```mkdir interceptor```
+4. ```cd interceptor```
+5. ```ng g s  interceptor```
+6. add the below code to http-interceptor.service.ts
+    ```text
+    import { Injectable } from '@angular/core';
+    import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
+    import {Observable} from "rxjs";
+    
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class HttpInterceptorService implements HttpInterceptor {
+    
+      constructor() { }
+    
+      intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        return next.handle(req);
+      }
+    }
+    
+    ```
+
+#### FINISHED at 6 NOVEMBER 2024 4:50 PM
+
+### **STEP 631 6 NOVEMBER 2024 4:50 PM**
+
+1. angular is not using the Interceptor we should tell to you use it.
+2. go to app.module.ts
+3. update the code
+    ```
+    import {NgModule} from '@angular/core';
+    import {BrowserModule} from '@angular/platform-browser';
+    
+    import {InputTextModule} from 'primeng/inputtext';
+    import {AppRoutingModule} from './app-routing.module';
+    import {AppComponent} from './app.component';
+    import {FormsModule} from "@angular/forms";
+    import {CommonModule} from "@angular/common";
+    import {CustomerComponent} from './components/customer/customer.component';
+    import {MenuBarComponent} from './components/menu-bar/menu-bar.component';
+    import {AvatarModule} from 'primeng/avatar';
+    import {AvatarGroupModule} from 'primeng/avatargroup';
+    import {MenuModule} from "primeng/menu";
+    import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+    import {MenuItemComponent} from './components/menu-item/menu-item.component';
+    import {HeaderBarComponent} from './components/header-bar/header-bar.component';
+    import {Button, ButtonDirective} from "primeng/button";
+    import {Ripple} from "primeng/ripple";
+    import {SidebarModule} from "primeng/sidebar";
+    import {ManageCustomerComponent} from './components/mange-customer/mange-customer.component';
+    import {LoginComponent} from './components/login/login.component';
+    import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+    import {AuthenticationService} from "./services/authentication/authentication.service";
+    import {MessageModule} from "primeng/message";
+    import {JwtHelperService, JWT_OPTIONS} from '@auth0/angular-jwt';
+    import {HttpInterceptorService} from "./services/interceptor/http-interceptor.service";
+    
+    @NgModule({
+      declarations: [
+        AppComponent,
+        CustomerComponent,
+        MenuBarComponent,
+        MenuItemComponent,
+        HeaderBarComponent,
+        ManageCustomerComponent,
+        LoginComponent,
+      ],
+      imports: [
+        BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        CommonModule,
+        InputTextModule,
+        AvatarModule,
+        AvatarGroupModule,
+        MenuModule,
+        BrowserAnimationsModule,
+        Button,
+        ButtonDirective,
+        Ripple,
+        SidebarModule,
+        MessageModule
+      ],
+      providers: [
+        AuthenticationService,
+        provideHttpClient(withInterceptorsFromDi()),
+        {provide: JWT_OPTIONS, useValue: JWT_OPTIONS},
+        JwtHelperService,
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: HttpInterceptorService,
+          multi: true,
+        }
+      ],
+      bootstrap: [AppComponent]
+    })
+    export class AppModule {
+    }
+    
+    ```
+4. The code added was
+    ```
+     {
+          provide: HTTP_INTERCEPTORS,
+          useClass: HttpInterceptorService,
+          multi: true,
+        }
+    ```
+
+#### FINISHED at 7 NOVEMBER 2024 11:25 PM
+
+### **STEP 632 7 NOVEMBER 2024 11:26 PM**
+
+1. lets implement our interceptor
+    ```text
+    import {Injectable} from '@angular/core';
+    import {HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest} from "@angular/common/http";
+    import {Observable} from "rxjs";
+    import {AuthenticationResponse} from "../../models/authentication-response";
+    
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class HttpInterceptorService implements HttpInterceptor {
+    
+      constructor() {
+      }
+    
+      intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const authResponse: AuthenticationResponse = JSON.parse(storedUser);
+          const token = authResponse.token;
+          if (token) {
+            const authReq = req.clone({
+              headers: new HttpHeaders({
+                Authorization: `Bearer ${token}`
+              })
+            });
+            return next.handle(authReq);
+          }
+        }
+        return next.handle(req);
+      }
+    }
+    
+    ```
+2. Now the customers will be loaded on to page
+
+#### FINISHED at 7 NOVEMBER 2024 1:21 PM
+
+### **STEP 633 7 NOVEMBER 2024 1:21 PM**
+
+1. lets create customer card component
+2. go to components on terminal
+3. ```ng g c CustomerCard```
+4. add this to customer.component.html
+
+    ```text
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >
+      <app-mange-customer></app-mange-customer>
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="display = true"
+          >
+          </button>
+          <div>
+            <div>
+              <app-customer-card *ngFor="let customer of customers"></app-customer-card>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    ```
+
+#### FINISHED at 7 NOVEMBER 2024 1:28 PM
+
+### **STEP 634 7 NOVEMBER 2024 1:28 PM**
+
+1. update customer-card.component.html
+    ```text
+    <p-card [style]="{width: '316px' }" styleClass="p-card-shadow text-center">
+      <ng-template pTemplate="header">
+        <div>
+          <img class="border-round-top cover"
+               height="120"
+               alt="card"
+               src="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png">
+        </div>
+        <div class="flex justify-content-center" style="margin-top: -50px">
+          <img
+            class="customer-avatar"
+            src="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+          >
+        </div>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <p-badge [value]="'1'"></p-badge>
+        <h2>Customer Name</h2>
+        <p class="text-gray-600">email</p>
+        <p class="text-gray-600">22 | MALE</p>
+      </ng-template>
+      <ng-template
+        pTemplate="footer"
+      >
+        <button
+          pButton
+          label="Update"
+          class="p-button-secondary p-button-outlined p-button-rounded"
+        ></button>
+        <button
+          pButton
+          label="Delete"
+          class="p-button-danger p-button-outlined p-button-rounded ml-3"
+        ></button>
+    
+      </ng-template>
+    </p-card>
+    
+    ```
+2. update customer-card.component.scss
+    ```text
+    .customer-avatar {
+      width: 92px !important;
+      height: 92px !important;
+      border-radius: 50% !important;
+      border: solid 2px white;
+    }
+    
+    img.cover {
+      object-fit: cover;
+    }
+    
+    ```
+
+#### FINISHED at 7 NOVEMBER 2024 1:56 PM
+
+### **STEP 635 7 NOVEMBER 2024 1:56 PM**
+
+1. exercise to display the user data in place of dummy data.
+
+#### FINISHED at 7 NOVEMBER 2024 1:58 PM
+
+### **STEP 636 7 NOVEMBER 2024 1:58 PM**
+
+1. update customer-dto.ts by making role optional
+    ```text
+    export interface CustomerDTO {
+      id?: number,
+    
+      name?: string,
+    
+      email?: string,
+    
+      gender?: 'MALE' | 'FEMALE',
+    
+      age?: number,
+    
+      roles?: string[],
+    
+      username?: string
+    }
+    
+    ```
+2. update customer-card.component.ts
+    ```text
+    import {Component, Input} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    
+    @Component({
+      selector: 'app-customer-card',
+      templateUrl: './customer-card.component.html',
+      styleUrl: './customer-card.component.scss'
+    })
+    export class CustomerCardComponent {
+    
+      @Input()
+      customer: CustomerDTO = {};
+    
+      @Input()
+      customerIndex: number = 0;
+    
+    
+    }
+    
+    ```
+3. update customer-card.component.html
+    ```text
+    <p-card [style]="{width: '316px' }" styleClass="p-card-shadow text-center">
+      <ng-template pTemplate="header">
+        <div>
+          <img class="border-round-top cover"
+               height="120"
+               alt="card"
+               src="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png">
+        </div>
+        <div class="flex justify-content-center" style="margin-top: -50px">
+          <img
+            class="customer-avatar"
+            src="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+          >
+        </div>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <p-badge [value]="''+(customerIndex+1)"></p-badge>
+        <h2>{{ customer.name }}</h2>
+        <p class="text-gray-600">{{ customer.email }}</p>
+        <p class="text-gray-600">{{ customer.age }} | {{ customer.gender }}</p>
+      </ng-template>
+      <ng-template
+        pTemplate="footer"
+      >
+        <button
+          pButton
+          label="Update"
+          class="p-button-secondary p-button-outlined p-button-rounded"
+        ></button>
+        <button
+          pButton
+          label="Delete"
+          class="p-button-danger p-button-outlined p-button-rounded ml-3"
+        ></button>
+    
+      </ng-template>
+    </p-card>
+    
+    ```
+4. update customer.component.html to pass customer and index as input
+    ```text
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >
+      <app-mange-customer></app-mange-customer>
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="display = true"
+          >
+          </button>
+          <div>
+            <div>
+              <app-customer-card
+                *ngFor="let customer of customers; let index=index"
+                [customer]="customer"
+                [customerIndex]="index"
+              ></app-customer-card>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    ```
+
+#### FINISHED at 7 NOVEMBER 2024 2:19 PM
+
+### **STEP 637 7 NOVEMBER 2024 2:19 PM**
+
+1. we are going to register the customer using frontend and the point in here is
+   this side bar has to be generic so that we could use this for update as well.
+2. In manage-customer.component.ts add a variable of type CustomerRegistrationRequest
+    ```text
+    import {Component, Input} from '@angular/core';
+    
+    
+    @Component({
+      selector: 'app-mange-customer',
+      templateUrl: './mange-customer.component.html',
+      styleUrl: './mange-customer.component.scss'
+    })
+    export class ManageCustomerComponent {
+    
+      @Input()
+      customer: CustomerRegistrationRequest = {};
+    }
+    
+    ```
+
+#### FINISHED at 8 NOVEMBER 2024 9:49 AM
+
+### **STEP 638 8 NOVEMBER 2024 9:49 AM**
+
+1. create a file named customer-registration-request.ts under models
+    ```text
+    export interface CustomerRegistrationRequest {
+      name?: string;
+      email?: string;
+      password?:string;
+      age?: number;
+      gender?: 'MALE' | 'FEMALE';
+    }
+    ```
+2. add the import to manage-customer.component.ts
+    ```text
+    import {Component, Input} from '@angular/core';
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    
+    
+    @Component({
+      selector: 'app-mange-customer',
+      templateUrl: './mange-customer.component.html',
+      styleUrl: './mange-customer.component.scss'
+    })
+    export class ManageCustomerComponent {
+    
+      @Input()
+      customer: CustomerRegistrationRequest = {};
+    }
+    
+    ```
+
+#### FINISHED at 8 NOVEMBER 2024 9:55 AM
+
+### **STEP 639 8 NOVEMBER 2024 9:56 AM**
+
+1. Bind the customer to manage-customer.component.html
+    ```text
+    <div>
+      <h2>Title here</h2>
+      <div class="field">
+        <label for="firstname">Name</label>
+        <input
+          [(ngModel)]="customer.name"
+          id="firstname"
+          pInputText
+          placeholder="Mary Jane"
+          type="text"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          [(ngModel)]="customer.email"
+          id="email"
+          pInputText
+          placeholder="MaryJane@gmail.com"
+          type="email"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input
+          [(ngModel)]="customer.password"
+          id="password"
+          pInputText
+          placeholder=""
+          type="password"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="age">Age</label>
+        <input
+          [(ngModel)]="customer.age"
+          id="age"
+          pInputText
+          placeholder="16"
+          type="number"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="gender">Gender</label>
+        <select
+          [(ngModel)]="customer.gender"
+          id="gender"
+          class="p-dropdown w-full custom-select"
+        >
+          <option value="">Select Option</option>
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+        </select>
+      </div>
+      <button
+        pButton
+        label="submit"
+        class="w-full"
+      >
+      </button>
+      <button
+        pButton
+        label="cancel"
+        class="w-full p-button-outlined p-button-danger mt-2"
+      >
+      </button>
+    </div>
+    
+    ```
+
+#### FINISHED at 8 NOVEMBER 2024 10:01 AM
+
+### **STEP 640 8 NOVEMBER 2024 10:01 AM**
+
+1. exercise to disable submit button until the customer data is valid
+
+#### FINISHED at 8 NOVEMBER 2024 10:02 AM
+
+### **STEP 641 8 NOVEMBER 2024 10:02 AM**
+
+1. update manage-customer.component.ts
+    ```text
+    import {Component, Input} from '@angular/core';
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    
+    
+    @Component({
+      selector: 'app-mange-customer',
+      templateUrl: './mange-customer.component.html',
+      styleUrl: './mange-customer.component.scss'
+    })
+    export class ManageCustomerComponent {
+    
+      @Input()
+      customer: CustomerRegistrationRequest = {};
+    
+    
+      get isCustomerValid(): boolean {
+        return this.hasLength(this.customer.name) &&
+          this.hasLength(this.customer.email) &&
+          this.hasLength(this.customer.password) &&
+          this.hasLength(this.customer.gender) &&
+          this.customer.age !== undefined &&
+          this.customer.age > 0;
+      }
+    
+      private hasLength(input: string | undefined): boolean {
+        return input !== null && input !== undefined && input.length > 3;
+    
+      }
+    }
+    
+    ```
+2. update manage-customer.component.html
+   ```text
+   <div>
+     <h2>Title here</h2>
+     <div class="field">
+       <label for="firstname">Name</label>
+       <input
+         [(ngModel)]="customer.name"
+         id="firstname"
+         pInputText
+         placeholder="Mary Jane"
+         type="text"
+         class="w-full"
+       >
+     </div>
+     <div class="field">
+       <label for="email">Email</label>
+       <input
+         [(ngModel)]="customer.email"
+         id="email"
+         pInputText
+         placeholder="MaryJane@gmail.com"
+         type="email"
+         class="w-full"
+       >
+     </div>
+     <div class="field">
+       <label for="password">Password</label>
+       <input
+         [(ngModel)]="customer.password"
+         id="password"
+         pInputText
+         placeholder=""
+         type="password"
+         class="w-full"
+       >
+     </div>
+     <div class="field">
+       <label for="age">Age</label>
+       <input
+         [(ngModel)]="customer.age"
+         id="age"
+         pInputText
+         placeholder="16"
+         type="number"
+         class="w-full"
+       >
+     </div>
+     <div class="field">
+       <label for="gender">Gender</label>
+       <select
+         [(ngModel)]="customer.gender"
+         id="gender"
+         class="p-dropdown w-full custom-select"
+       >
+         <option value="">Select Option</option>
+         <option value="MALE">Male</option>
+         <option value="FEMALE">Female</option>
+       </select>
+     </div>
+     <button
+       [disabled]="!isCustomerValid"
+       pButton
+       label="submit"
+       class="w-full"
+     >
+     </button>
+     <button
+       pButton
+       label="cancel"
+       class="w-full p-button-outlined p-button-danger mt-2"
+     >
+     </button>
+   </div>
+   
+   ```
+
+#### FINISHED at 8 NOVEMBER 2024 10:16 AM
+
+### **STEP 642 8 NOVEMBER 2024 10:16 AM**
+
+1. exercise delegate the operation to parent compoenent
+
+#### FINISHED at 8 NOVEMBER 2024 10:17 AM
+
+### **STEP 643 8 NOVEMBER 2024 10:17 AM**
+
+1. delegate the operation between parent and child
+2. update manage-customer.component.ts
+    ```text
+    import {Component, EventEmitter, Input, Output} from '@angular/core';
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    
+    
+    @Component({
+      selector: 'app-mange-customer',
+      templateUrl: './mange-customer.component.html',
+      styleUrl: './mange-customer.component.scss'
+    })
+    export class ManageCustomerComponent {
+    
+      @Input()
+      customer: CustomerRegistrationRequest = {};
+      
+      @Output()
+      submit: EventEmitter<CustomerRegistrationRequest> = new EventEmitter<CustomerRegistrationRequest>;
+      
+      get isCustomerValid(): boolean {
+        return this.hasLength(this.customer.name) &&
+          this.hasLength(this.customer.email) &&
+          this.hasLength(this.customer.password) &&
+          this.hasLength(this.customer.gender) &&
+          this.customer.age !== undefined &&
+          this.customer.age > 0;
+      }
+    
+      private hasLength(input: string | undefined): boolean {
+        return input !== null && input !== undefined && input.length > 3;
+    
+      }
+    
+      onSubmit() {
+        this.submit.emit(this.customer);
+      }
+    }
+    
+    ```
+3. update manage-customer.component.html
+    ```
+    <div>
+      <h2>Title here</h2>
+      <div class="field">
+        <label for="firstname">Name</label>
+        <input
+          [(ngModel)]="customer.name"
+          id="firstname"
+          pInputText
+          placeholder="Mary Jane"
+          type="text"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          [(ngModel)]="customer.email"
+          id="email"
+          pInputText
+          placeholder="MaryJane@gmail.com"
+          type="email"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input
+          [(ngModel)]="customer.password"
+          id="password"
+          pInputText
+          placeholder=""
+          type="password"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="age">Age</label>
+        <input
+          [(ngModel)]="customer.age"
+          id="age"
+          pInputText
+          placeholder="16"
+          type="number"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="gender">Gender</label>
+        <select
+          [(ngModel)]="customer.gender"
+          id="gender"
+          class="p-dropdown w-full custom-select"
+        >
+          <option value="">Select Option</option>
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+        </select>
+      </div>
+      <button
+        [disabled]="!isCustomerValid"
+        (click)="onSubmit()"
+        pButton
+        label="submit"
+        class="w-full"
+      >
+      </button>
+      <button
+        pButton
+        label="cancel"
+        class="w-full p-button-outlined p-button-danger mt-2"
+      >
+      </button>
+    </div>
+    
+    ```
+
+#### FINISHED at 8 NOVEMBER 2024 10:24 AM
+
+### **STEP 644 8 NOVEMBER 2024 10:24 AM**
+
+1. we are emiting the customer let's use in the customer component
+2. update customer.component.html
+    ```text
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >
+      <app-mange-customer
+        (submit)="save($event)"
+      ></app-mange-customer>
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="display = true"
+          >
+          </button>
+          <div>
+            <div>
+              <app-customer-card
+                *ngFor="let customer of customers; let index=index"
+                [customer]="customer"
+                [customerIndex]="index"
+              ></app-customer-card>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    ```
+3. update customer.component.ts
+    ```text
+    import {Component, OnInit} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {CustomerServiceService} from "../../services/customer/customer-service.service";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    
+    @Component({
+      selector: 'app-customer',
+      templateUrl: './customer.component.html',
+      styleUrl: './customer.component.scss'
+    })
+    export class CustomerComponent implements OnInit {
+      display: boolean = false;
+    
+    
+      customers: CustomerDTO[] = [];
+    
+      constructor(
+        private customerService: CustomerServiceService
+      ) {
+      }
+    
+      ngOnInit(): void {
+        this.findAllCustomers();
+      }
+    
+      private findAllCustomers() {
+        this.customerService.findAll()
+          .subscribe(
+            {
+              next: (data: CustomerDTO[]) => {
+                this.customers = data;
+                console.log(this.customers);
+              }
+            }
+          )
+      }
+    
+      save(customer: CustomerRegistrationRequest) {
+        console.log(customer);
+      }
+    }
+    
+    ```
+4. if you test it the customer data will be printed on to console
+
+#### FINISHED at 8 NOVEMBER 2024 10:37 AM
+
+### **STEP 645 8 NOVEMBER 2024 10:37 AM**
+
+1. update customer-service.service.ts
+    ```
+    
+    import {Injectable} from '@angular/core';
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {Observable} from "rxjs";
+    import {AuthenticationResponse} from "../../models/authentication-response";
+    import {HttpClient, HttpHeaders} from "@angular/common/http";
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {environment} from "../../../environments/environment.development";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class CustomerServiceService {
+    
+      private readonly customerUrl = `${environment.api.baseUrl}/${environment.api.customerUrl}`;
+    
+    
+      constructor(private http: HttpClient) {
+      }
+    
+      findAll(): Observable<Array<CustomerDTO>> {
+        return this.http.get<Array<CustomerDTO>>(this.customerUrl);
+      }
+      
+      registerCustomer(customer: CustomerRegistrationRequest): Observable<void> {
+        return this.http.post<void>(this.customerUrl, customer);
+        
+      }
+    }
+    
+    ```
+
+#### FINISHED at 8 NOVEMBER 2024 10:59 AM
+
+### **STEP 646 8 NOVEMBER 2024 10:59 AM**
+
+1. exercise after clicking on submit clear the input and close the side bar and refresh the customers
+
+#### FINISHED at 8 NOVEMBER 2024 11:00 AM
+
+### **STEP 647 8 NOVEMBER 2024 11:00 AM**
+
+1. update customer.component.ts
+    ```text
+    import {Component, OnInit} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {CustomerServiceService} from "../../services/customer/customer-service.service";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    
+    @Component({
+      selector: 'app-customer',
+      templateUrl: './customer.component.html',
+      styleUrl: './customer.component.scss'
+    })
+    export class CustomerComponent implements OnInit {
+      display: boolean = false;
+    
+    
+      customers: CustomerDTO[] = [];
+      customer: CustomerRegistrationRequest = {};
+    
+      constructor(
+        private customerService: CustomerServiceService
+      ) {
+      }
+    
+      ngOnInit(): void {
+        this.findAllCustomers();
+      }
+    
+      private findAllCustomers() {
+        this.customerService.findAll()
+          .subscribe(
+            {
+              next: (data: CustomerDTO[]) => {
+                this.customers = data;
+                console.log(this.customers);
+              }
+            }
+          )
+      }
+    
+      save(customer: CustomerRegistrationRequest) {
+        if (customer) {
+          this.customerService.registerCustomer(customer)
+            .subscribe(
+              {
+                next: () => {
+                  this.display = false;
+                  this.findAllCustomers();
+                  this.customer = {};
+                }
+              }
+            )
+        }
+      }
+    }
+    
+    ```
+2. update customer.component.html
+    ```text
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >
+      <app-mange-customer
+        [customer]="customer"
+        (submit)="save($event)"
+      ></app-mange-customer>
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="display = true"
+          >
+          </button>
+          <div>
+            <div>
+              <app-customer-card
+                *ngFor="let customer of customers; let index=index"
+                [customer]="customer"
+                [customerIndex]="index"
+              ></app-customer-card>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    ```
+
+#### FINISHED at 8 NOVEMBER 2024 11:16 AM
+
+### **STEP 648 8 NOVEMBER 2024 11:16 AM**
+
+1. styling the customer card
+2. update the customer.component.html
+    ```text
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >
+      <app-mange-customer
+        [customer]="customer"
+        (submit)="save($event)"
+      ></app-mange-customer>
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="display = true"
+          >
+          </button>
+          <div>
+            <div class="flex justify-content-center align-items-center flex-wrap gap-5 mt-4">
+              <app-customer-card
+                *ngFor="let customer of customers; let index=index"
+                [customer]="customer"
+                [customerIndex]="index"
+              ></app-customer-card>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    ```
+
+#### FINISHED at 8 NOVEMBER 2024 11:19 AM
+
+### **STEP 649 8 NOVEMBER 2024 11:19 AM**
+
+1. give notification that user creation success
+2. go to primeng search for toast
+3. <p-toast position="bottom-center"></p-toast>
+4. this is what we need but we also need to inject some services we will do in next step
+
+#### FINISHED at 8 NOVEMBER 2024 11:30 AM
+
+### **STEP 650 8 NOVEMBER 2024 11:30 AM**
+
+1. update app.module.ts
+    ```text
+    import {NgModule} from '@angular/core';
+    import {BrowserModule} from '@angular/platform-browser';
+    
+    import {InputTextModule} from 'primeng/inputtext';
+    import {AppRoutingModule} from './app-routing.module';
+    import {AppComponent} from './app.component';
+    import {FormsModule} from "@angular/forms";
+    import {CommonModule} from "@angular/common";
+    import {CustomerComponent} from './components/customer/customer.component';
+    import {MenuBarComponent} from './components/menu-bar/menu-bar.component';
+    import {AvatarModule} from 'primeng/avatar';
+    import {AvatarGroupModule} from 'primeng/avatargroup';
+    import {MenuModule} from "primeng/menu";
+    import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+    import {MenuItemComponent} from './components/menu-item/menu-item.component';
+    import {HeaderBarComponent} from './components/header-bar/header-bar.component';
+    import {Button, ButtonDirective} from "primeng/button";
+    import {Ripple} from "primeng/ripple";
+    import {SidebarModule} from "primeng/sidebar";
+    import {ManageCustomerComponent} from './components/mange-customer/mange-customer.component';
+    import {LoginComponent} from './components/login/login.component';
+    import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+    import {AuthenticationService} from "./services/authentication/authentication.service";
+    import {MessageModule} from "primeng/message";
+    import {JwtHelperService, JWT_OPTIONS} from '@auth0/angular-jwt';
+    import {HttpInterceptorService} from "./services/interceptor/http-interceptor.service";
+    import {CustomerCardComponent} from './components/customer-card/customer-card.component';
+    import {CardModule} from "primeng/card";
+    import {BadgeModule} from "primeng/badge";
+    import {ToastModule} from "primeng/toast";
+    import {MessageService} from "primeng/api";
+    
+    @NgModule({
+      declarations: [
+        AppComponent,
+        CustomerComponent,
+        MenuBarComponent,
+        MenuItemComponent,
+        HeaderBarComponent,
+        ManageCustomerComponent,
+        LoginComponent,
+        CustomerCardComponent,
+      ],
+      imports: [
+        BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        CommonModule,
+        InputTextModule,
+        AvatarModule,
+        AvatarGroupModule,
+        MenuModule,
+        BrowserAnimationsModule,
+        Button,
+        ButtonDirective,
+        Ripple,
+        SidebarModule,
+        MessageModule,
+        CardModule,
+        BadgeModule,
+        ToastModule
+      ],
+      providers: [
+        AuthenticationService,
+        provideHttpClient(withInterceptorsFromDi()),
+        {provide: JWT_OPTIONS, useValue: JWT_OPTIONS},
+        JwtHelperService,
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: HttpInterceptorService,
+          multi: true,
+        },
+        MessageService,
+      ],
+      bootstrap: [AppComponent]
+    })
+    export class AppModule {
+    }
+    
+    ```
+2. update customer.component.html
+    ```text
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >
+      <app-mange-customer
+        [customer]="customer"
+        (submit)="save($event)"
+      ></app-mange-customer>
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="display = true"
+          >
+          </button>
+          <div>
+            <div class="flex justify-content-center align-items-center flex-wrap gap-5 mt-4">
+              <app-customer-card
+                *ngFor="let customer of customers; let index=index"
+                [customer]="customer"
+                [customerIndex]="index"
+              ></app-customer-card>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    <p-toast position="bottom-center"></p-toast>
+    
+    ```
+3. update customer.component.ts
+    ```text
+    import {Component, OnInit} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {CustomerServiceService} from "../../services/customer/customer-service.service";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    import {MessageService} from "primeng/api";
+    
+    @Component({
+      selector: 'app-customer',
+      templateUrl: './customer.component.html',
+      styleUrl: './customer.component.scss'
+    })
+    export class CustomerComponent implements OnInit {
+      display: boolean = false;
+    
+    
+      customers: CustomerDTO[] = [];
+      customer: CustomerRegistrationRequest = {};
+    
+      constructor(
+        private customerService: CustomerServiceService,
+        private messageService: MessageService,
+      ) {
+      }
+    
+      ngOnInit(): void {
+        this.findAllCustomers();
+      }
+    
+      private findAllCustomers() {
+        this.customerService.findAll()
+          .subscribe(
+            {
+              next: (data: CustomerDTO[]) => {
+                this.customers = data;
+                console.log(this.customers);
+              }
+            }
+          )
+      }
+    
+      save(customer: CustomerRegistrationRequest) {
+        if (customer) {
+          this.customerService.registerCustomer(customer)
+            .subscribe(
+              {
+                next: () => {
+                  this.display = false;
+                  this.findAllCustomers();
+                  this.customer = {};
+                  this.messageService.add(
+                    {
+                      severity: 'success',
+                      summary: 'Success',
+                      detail: `Customer ${customer.name} has been successfully saved.`,
+                    });
+                }
+              }
+            )
+        }
+      }
+    }
+    
+    ```
+4. now when customer gets registered you get a beautiful toast.
+
+#### FINISHED at 8 NOVEMBER 2024 11:51 AM
+
+### **STEP 651 8 NOVEMBER 2024 11:51 AM**
+
+1. let give some more styling
+2. different profile image for each
+3. update customer-card.component.html
+    ```text
+    <p-card [style]="{width: '316px' }" styleClass="p-card-shadow text-center">
+      <ng-template pTemplate="header">
+        <div>
+          <img class="border-round-top cover"
+               height="120"
+               alt="card"
+               src="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png">
+        </div>
+        <div class="flex justify-content-center" style="margin-top: -50px">
+          <img
+            class="customer-avatar"
+            [src]="customerImage"
+          >
+        </div>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <p-badge [value]="''+(customerIndex+1)"></p-badge>
+        <h2>{{ customer.name }}</h2>
+        <p class="text-gray-600">{{ customer.email }}</p>
+        <p class="text-gray-600">{{ customer.age }} | {{ customer.gender }}</p>
+      </ng-template>
+      <ng-template
+        pTemplate="footer"
+      >
+        <button
+          pButton
+          label="Update"
+          class="p-button-secondary p-button-outlined p-button-rounded"
+        ></button>
+        <button
+          pButton
+          label="Delete"
+          class="p-button-danger p-button-outlined p-button-rounded ml-3"
+        ></button>
+    
+      </ng-template>
+    </p-card>
+    
+    ```
+4. update customer-card.component.ts
+    ```text
+    import {Component, Input} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    
+    @Component({
+      selector: 'app-customer-card',
+      templateUrl: './customer-card.component.html',
+      styleUrl: './customer-card.component.scss'
+    })
+    export class CustomerCardComponent {
+    
+      @Input()
+      customer: CustomerDTO = {};
+    
+      @Input()
+      customerIndex: number = 0;
+    
+      get customerImage(): string {
+        const gender = this.customer.gender === 'MALE' ? 'men' : 'women';
+    
+        return `https://randomuser.me/api/portraits/${gender}/${this.customerIndex}.jpg`;
+      }
+    }
+    
+    ```
+
+#### FINISHED at 8 NOVEMBER 2024 12:16 AM
+
+### **STEP 652 8 NOVEMBER 2024 12:16 AM**
+
+1. exercise implement delete functionality with popup to delete confirmation
+
+#### FINISHED at 8 NOVEMBER 2024 12:18 AM
+
+### **STEP 653 8 NOVEMBER 2024 12:18 AM**
+
+1. add click function to delete button in card
+2. update customer-card.component.html
+    ```text
+    <p-card [style]="{width: '316px' }" styleClass="p-card-shadow text-center">
+      <ng-template pTemplate="header">
+        <div>
+          <img class="border-round-top cover"
+               height="120"
+               alt="card"
+               src="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png">
+        </div>
+        <div class="flex justify-content-center" style="margin-top: -50px">
+          <img
+            class="customer-avatar"
+            [src]="customerImage"
+          >
+        </div>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <p-badge [value]="''+(customerIndex+1)"></p-badge>
+        <h2>{{ customer.name }}</h2>
+        <p class="text-gray-600">{{ customer.email }}</p>
+        <p class="text-gray-600">{{ customer.age }} | {{ customer.gender }}</p>
+      </ng-template>
+      <ng-template
+        pTemplate="footer"
+      >
+        <button
+          pButton
+          label="Update"
+          class="p-button-secondary p-button-outlined p-button-rounded"
+        ></button>
+        <button
+          pButton
+          label="Delete"
+          class="p-button-danger p-button-outlined p-button-rounded ml-3"
+          (click)="onDelete()"
+        ></button>
+    
+      </ng-template>
+    </p-card>
+    
+    ```
+3. add the delete emitter as output and emit through function
+4. update customer-card.component.ts
+    ```
+    import {Component, EventEmitter, Input, Output} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    
+    @Component({
+      selector: 'app-customer-card',
+      templateUrl: './customer-card.component.html',
+      styleUrl: './customer-card.component.scss'
+    })
+    export class CustomerCardComponent {
+    
+      @Input()
+      customer: CustomerDTO = {};
+    
+      @Input()
+      customerIndex: number = 0;
+    
+      @Output()
+      delete: EventEmitter<CustomerDTO> = new EventEmitter<CustomerDTO>();
+    
+      get customerImage(): string {
+        const gender = this.customer.gender === 'MALE' ? 'men' : 'women';
+    
+        return `https://randomuser.me/api/portraits/${gender}/${this.customerIndex}.jpg`;
+      }
+    
+      onDelete() {
+        this.delete.emit(this.customer);
+      }
+    }
+    
+    ```
+5. let use this delete function in parent customer component
+6. update customer.component.html
+    ```text
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >
+      <app-mange-customer
+        [customer]="customer"
+        (submit)="save($event)"
+      ></app-mange-customer>
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="display = true"
+          >
+          </button>
+          <div>
+            <div class="flex justify-content-center align-items-center flex-wrap gap-5 mt-4">
+              <app-customer-card
+                *ngFor="let customer of customers; let index=index"
+                [customer]="customer"
+                [customerIndex]="index"
+                (delete)="deleteCustomer($event)"
+              ></app-customer-card>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    <p-toast position="bottom-center"></p-toast>
+    
+    ```
+7. lets just print the output data we got passed from customer-card
+8. update customer.component.ts
+    ```text
+    import {Component, OnInit} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {CustomerServiceService} from "../../services/customer/customer-service.service";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    import {MessageService} from "primeng/api";
+    
+    @Component({
+      selector: 'app-customer',
+      templateUrl: './customer.component.html',
+      styleUrl: './customer.component.scss'
+    })
+    export class CustomerComponent implements OnInit {
+      display: boolean = false;
+    
+    
+      customers: CustomerDTO[] = [];
+      customer: CustomerRegistrationRequest = {};
+    
+      constructor(
+        private customerService: CustomerServiceService,
+        private messageService: MessageService,
+      ) {
+      }
+    
+      ngOnInit(): void {
+        this.findAllCustomers();
+      }
+    
+      private findAllCustomers() {
+        this.customerService.findAll()
+          .subscribe(
+            {
+              next: (data: CustomerDTO[]) => {
+                this.customers = data;
+                console.log(this.customers);
+              }
+            }
+          )
+      }
+    
+      save(customer: CustomerRegistrationRequest) {
+        if (customer) {
+          this.customerService.registerCustomer(customer)
+            .subscribe(
+              {
+                next: () => {
+                  this.display = false;
+                  this.findAllCustomers();
+                  this.customer = {};
+                  this.messageService.add(
+                    {
+                      severity: 'success',
+                      summary: 'Success',
+                      detail: `Customer ${customer.name} has been successfully saved.`,
+                    });
+                }
+              }
+            )
+        }
+      }
+    
+      deleteCustomer(customer: CustomerDTO) {
+        console.log(customer);
+      }
+    }
+    
+    ```
+
+#### FINISHED at 8 NOVEMBER 2024 1:01 AM
+
+### **STEP 654 8 NOVEMBER 2024 1:01 AM**
+
+1. lets add the notification pop
+2. update customer.component.html
+    ```text
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >
+      <app-mange-customer
+        [customer]="customer"
+        (submit)="save($event)"
+      ></app-mange-customer>
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="display = true"
+          >
+          </button>
+          <div>
+            <div class="flex justify-content-center align-items-center flex-wrap gap-5 mt-4">
+              <app-customer-card
+                *ngFor="let customer of customers; let index=index"
+                [customer]="customer"
+                [customerIndex]="index"
+                (delete)="deleteCustomer($event)"
+              ></app-customer-card>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    <p-confirmDialog
+      header="Confirmation"
+      icon="pi pi-exclamation-triangle"
+      acceptLabel="Delete"
+      acceptButtonStyleClass="p-button-danger"
+      acceptIcon="pi pi-trash"
+      rejectLabel="Cancel"
+    />
+    <p-toast position="bottom-center"></p-toast>
+    
+    ```
+3. let's use this in our ui in next step
+
+#### FINISHED at 8 NOVEMBER 2024 1:11 AM
+
+### **STEP 655 8 NOVEMBER 2024 1:11 AM**
+
+1. add confirmation service to app.module.ts
+    ```text
+    import {NgModule} from '@angular/core';
+    import {BrowserModule} from '@angular/platform-browser';
+    
+    import {InputTextModule} from 'primeng/inputtext';
+    import {AppRoutingModule} from './app-routing.module';
+    import {AppComponent} from './app.component';
+    import {FormsModule} from "@angular/forms";
+    import {CommonModule} from "@angular/common";
+    import {CustomerComponent} from './components/customer/customer.component';
+    import {MenuBarComponent} from './components/menu-bar/menu-bar.component';
+    import {AvatarModule} from 'primeng/avatar';
+    import {AvatarGroupModule} from 'primeng/avatargroup';
+    import {MenuModule} from "primeng/menu";
+    import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+    import {MenuItemComponent} from './components/menu-item/menu-item.component';
+    import {HeaderBarComponent} from './components/header-bar/header-bar.component';
+    import {Button, ButtonDirective} from "primeng/button";
+    import {Ripple} from "primeng/ripple";
+    import {SidebarModule} from "primeng/sidebar";
+    import {ManageCustomerComponent} from './components/mange-customer/mange-customer.component';
+    import {LoginComponent} from './components/login/login.component';
+    import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+    import {AuthenticationService} from "./services/authentication/authentication.service";
+    import {MessageModule} from "primeng/message";
+    import {JwtHelperService, JWT_OPTIONS} from '@auth0/angular-jwt';
+    import {HttpInterceptorService} from "./services/interceptor/http-interceptor.service";
+    import {CustomerCardComponent} from './components/customer-card/customer-card.component';
+    import {CardModule} from "primeng/card";
+    import {BadgeModule} from "primeng/badge";
+    import {ToastModule} from "primeng/toast";
+    import {ConfirmationService, MessageService} from "primeng/api";
+    import {ConfirmDialogModule} from "primeng/confirmdialog";
+    
+    @NgModule({
+      declarations: [
+        AppComponent,
+        CustomerComponent,
+        MenuBarComponent,
+        MenuItemComponent,
+        HeaderBarComponent,
+        ManageCustomerComponent,
+        LoginComponent,
+        CustomerCardComponent,
+      ],
+      imports: [
+        BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        CommonModule,
+        InputTextModule,
+        AvatarModule,
+        AvatarGroupModule,
+        MenuModule,
+        BrowserAnimationsModule,
+        Button,
+        ButtonDirective,
+        Ripple,
+        SidebarModule,
+        MessageModule,
+        CardModule,
+        BadgeModule,
+        ToastModule,
+        ConfirmDialogModule
+      ],
+      providers: [
+        AuthenticationService,
+        provideHttpClient(withInterceptorsFromDi()),
+        {provide: JWT_OPTIONS, useValue: JWT_OPTIONS},
+        JwtHelperService,
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: HttpInterceptorService,
+          multi: true,
+        },
+        MessageService,
+        ConfirmationService
+      ],
+      bootstrap: [AppComponent]
+    })
+    export class AppModule {
+    }
+    
+    ```
+2. update customer.component.ts
+    ```text
+    import {Component, OnInit} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {CustomerServiceService} from "../../services/customer/customer-service.service";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    import {ConfirmationService, MessageService} from "primeng/api";
+    
+    @Component({
+      selector: 'app-customer',
+      templateUrl: './customer.component.html',
+      styleUrl: './customer.component.scss'
+    })
+    export class CustomerComponent implements OnInit {
+      display: boolean = false;
+    
+    
+      customers: CustomerDTO[] = [];
+      customer: CustomerRegistrationRequest = {};
+    
+      constructor(
+        private customerService: CustomerServiceService,
+        private messageService: MessageService,
+        private confirmationService: ConfirmationService,
+      ) {
+      }
+    
+      ngOnInit(): void {
+        this.findAllCustomers();
+      }
+    
+      private findAllCustomers() {
+        this.customerService.findAll()
+          .subscribe(
+            {
+              next: (data: CustomerDTO[]) => {
+                this.customers = data;
+                console.log(this.customers);
+              }
+            }
+          )
+      }
+    
+      save(customer: CustomerRegistrationRequest) {
+        if (customer) {
+          this.customerService.registerCustomer(customer)
+            .subscribe(
+              {
+                next: () => {
+                  this.display = false;
+                  this.findAllCustomers();
+                  this.customer = {};
+                  this.messageService.add(
+                    {
+                      severity: 'success',
+                      summary: 'Success',
+                      detail: `Customer ${customer.name} has been successfully saved.`,
+                    });
+                }
+              }
+            )
+        }
+      }
+    
+      deleteCustomer(customer: CustomerDTO) {
+        this.confirmationService.confirm(
+          {
+            header: 'Delete Customer',
+            message: `Are you sure to delete ${customer.name}?`,
+            accept: () => {
+              console.log('Delete pressed');
+            }
+          }
+        )
+      }
+    }
+    
+    ```
+3. now you dialogbox will popup and if you press delete you get a console output for now.
+
+#### FINISHED at 8 NOVEMBER 2024 1:23 AM
+
+### **STEP 656 8 NOVEMBER 2024 1:23 AM**
+
+1. access the delete end point in customer service
+2. update customer-service.service.ts
+    ```text
+    import {Injectable} from '@angular/core';
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {Observable} from "rxjs";
+    import {AuthenticationResponse} from "../../models/authentication-response";
+    import {HttpClient, HttpHeaders} from "@angular/common/http";
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {environment} from "../../../environments/environment.development";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class CustomerServiceService {
+    
+      private readonly customerUrl = `${environment.api.baseUrl}/${environment.api.customerUrl}`;
+    
+    
+      constructor(private http: HttpClient) {
+      }
+    
+      findAll(): Observable<Array<CustomerDTO>> {
+        return this.http.get<Array<CustomerDTO>>(this.customerUrl);
+      }
+    
+      registerCustomer(customer: CustomerRegistrationRequest): Observable<void> {
+        return this.http.post<void>(this.customerUrl, customer);
+    
+      }  
+      
+      deleteCustomer(id: number | undefined): Observable<void> {
+        return this.http.delete<void>(`${this.customerUrl}/${id}` );
+      }
+      
+      
+    }
+    
+    ```
+
+#### FINISHED at 8 NOVEMBER 2024 1:27 AM
+
+### **STEP 657 8 NOVEMBER 2024 1:27 AM**
+
+1. update customer.component.ts
+    ```
+    import {Component, OnInit} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {CustomerServiceService} from "../../services/customer/customer-service.service";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    import {ConfirmationService, MessageService} from "primeng/api";
+    
+    @Component({
+      selector: 'app-customer',
+      templateUrl: './customer.component.html',
+      styleUrl: './customer.component.scss'
+    })
+    export class CustomerComponent implements OnInit {
+      display: boolean = false;
+    
+    
+      customers: CustomerDTO[] = [];
+      customer: CustomerRegistrationRequest = {};
+    
+      constructor(
+        private customerService: CustomerServiceService,
+        private messageService: MessageService,
+        private confirmationService: ConfirmationService,
+      ) {
+      }
+    
+      ngOnInit(): void {
+        this.findAllCustomers();
+      }
+    
+      private findAllCustomers() {
+        this.customerService.findAll()
+          .subscribe(
+            {
+              next: (data: CustomerDTO[]) => {
+                this.customers = data;
+                console.log(this.customers);
+              }
+            }
+          )
+      }
+    
+      save(customer: CustomerRegistrationRequest) {
+        if (customer) {
+          this.customerService.registerCustomer(customer)
+            .subscribe(
+              {
+                next: () => {
+                  this.display = false;
+                  this.findAllCustomers();
+                  this.customer = {};
+                  this.messageService.add(
+                    {
+                      severity: 'success',
+                      summary: 'Success',
+                      detail: `Customer ${customer.name} has been successfully saved.`,
+                    });
+                }
+              }
+            )
+        }
+      }
+    
+      deleteCustomer(customer: CustomerDTO) {
+        this.confirmationService.confirm(
+          {
+            header: 'Delete Customer',
+            message: `Are you sure to delete ${customer.name}?`,
+            accept: () => {
+              this.customerService.deleteCustomer(customer.id)
+                .subscribe(
+                  {
+                    next: () => {
+                      this.findAllCustomers();
+                      this.messageService.add(
+                        {
+                          severity: 'success',
+                          summary: 'Customer deleted',
+                          detail: `Customer ${customer.name} has been successfully deleted.`,
+                        }
+                      )
+                    }
+                  }
+                )
+            }
+          }
+        )
+      }
+    }
+    
+    ```
+2. test now it should be working fine
+
+#### FINISHED at 8 NOVEMBER 2024 1:46 AM
+
+### **STEP 658 8 NOVEMBER 2024 1:46 AM**
+
+1. we start implementing update customer
+2. we need a model of customer update request as we can update only 3 things
+
+#### FINISHED at 8 NOVEMBER 2024 1:48 AM
+
+### **STEP 659 8 NOVEMBER 2024 1:48 AM**
+
+1. create customer-update-request.ts file under the models folder
+
+```text
+export interface CustomerUpdateRequest {
+  name?: string;
+  age?: number;
+  email?: string;
+}
+
+```
+
+#### FINISHED at 8 NOVEMBER 2024 1:51 AM
+
+### **STEP 660 8 NOVEMBER 2024 1:51 AM**
+
+1. update customer-service.service.ts
+    ```text
+    import {Injectable} from '@angular/core';
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {Observable} from "rxjs";
+    import {AuthenticationResponse} from "../../models/authentication-response";
+    import {HttpClient, HttpHeaders} from "@angular/common/http";
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {environment} from "../../../environments/environment.development";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    import {CustomerUpdateRequest} from "../../models/customer-update-request";
+    
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class CustomerServiceService {
+    
+      private readonly customerUrl = `${environment.api.baseUrl}/${environment.api.customerUrl}`;
+    
+    
+      constructor(private http: HttpClient) {
+      }
+    
+      findAll(): Observable<Array<CustomerDTO>> {
+        return this.http.get<Array<CustomerDTO>>(this.customerUrl);
+      }
+    
+      registerCustomer(customer: CustomerRegistrationRequest): Observable<void> {
+        return this.http.post<void>(this.customerUrl, customer);
+    
+      }
+    
+      deleteCustomer(id: number | undefined): Observable<void> {
+        return this.http.delete<void>(`${this.customerUrl}/${id}`);
+      }
+      
+      updateCustomer(id: number | undefined, customer: CustomerUpdateRequest): Observable<void> {
+        return this.http.put<void>(`${this.customerUrl}/${id}`,customer);
+      }
+    
+    
+    }
+    
+    ```
+
+#### FINISHED at 8 NOVEMBER 2024 1:53 AM
+
+### **STEP 661 8 NOVEMBER 2024 1:53 AM**
+
+1. update manage-customer.component.ts by creating a input of operation
+    ```
+    import {Component, EventEmitter, Input, Output} from '@angular/core';
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    
+    
+    @Component({
+      selector: 'app-mange-customer',
+      templateUrl: './mange-customer.component.html',
+      styleUrl: './mange-customer.component.scss'
+    })
+    export class ManageCustomerComponent {
+    
+      @Input()
+      customer: CustomerRegistrationRequest = {};
+      @Input()
+      operation: 'create' | 'update' ='create';
+    
+      @Output()
+      submit: EventEmitter<CustomerRegistrationRequest> = new EventEmitter<CustomerRegistrationRequest>;
+    
+      get isCustomerValid(): boolean {
+        return this.hasLength(this.customer.name) &&
+          this.hasLength(this.customer.email) &&
+          this.hasLength(this.customer.password) &&
+          this.hasLength(this.customer.gender) &&
+          this.customer.age !== undefined &&
+          this.customer.age > 0;
+      }
+    
+      private hasLength(input: string | undefined): boolean {
+        return input !== null && input !== undefined && input.length > 3;
+    
+      }
+    
+      onSubmit() {
+        this.submit.emit(this.customer);
+      }
+    }
+    
+    ```
+2. bind it conditional in html
+    ```text
+    <div>
+      <h2>Title here</h2>
+      <div class="field">
+        <label for="firstname">Name</label>
+        <input
+          [(ngModel)]="customer.name"
+          id="firstname"
+          pInputText
+          placeholder="Mary Jane"
+          type="text"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          [(ngModel)]="customer.email"
+          id="email"
+          pInputText
+          placeholder="MaryJane@gmail.com"
+          type="email"
+          class="w-full"
+        >
+      </div>
+      <div class="field" *ngIf="operation === 'create'">
+        <label for="password">Password</label>
+        <input
+          [(ngModel)]="customer.password"
+          id="password"
+          pInputText
+          placeholder=""
+          type="password"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="age">Age</label>
+        <input
+          [(ngModel)]="customer.age"
+          id="age"
+          pInputText
+          placeholder="16"
+          type="number"
+          class="w-full"
+        >
+      </div>
+      <div class="field" *ngIf="operation === 'create'">
+        <label for="gender">Gender</label>
+        <select
+          [(ngModel)]="customer.gender"
+          id="gender"
+          class="p-dropdown w-full custom-select"
+        >
+          <option value="">Select Option</option>
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+        </select>
+      </div>
+      <button
+        [disabled]="!isCustomerValid"
+        (click)="onSubmit()"
+        pButton
+        label="submit"
+        class="w-full"
+      >
+      </button>
+      <button
+        pButton
+        label="cancel"
+        class="w-full p-button-outlined p-button-danger mt-2"
+      >
+      </button>
+    </div>
+    
+    ```
+3. update the customer.component.ts by adding operation variable in it
+    ```text
+    import {Component, OnInit} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {CustomerServiceService} from "../../services/customer/customer-service.service";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    import {ConfirmationService, MessageService} from "primeng/api";
+    
+    @Component({
+      selector: 'app-customer',
+      templateUrl: './customer.component.html',
+      styleUrl: './customer.component.scss'
+    })
+    export class CustomerComponent implements OnInit {
+      display: boolean = false;
+      
+      operation: 'create' | 'update' ='create';
+    
+    
+      customers: CustomerDTO[] = [];
+      customer: CustomerRegistrationRequest = {};
+    
+      constructor(
+        private customerService: CustomerServiceService,
+        private messageService: MessageService,
+        private confirmationService: ConfirmationService,
+      ) {
+      }
+    
+      ngOnInit(): void {
+        this.findAllCustomers();
+      }
+    
+      private findAllCustomers() {
+        this.customerService.findAll()
+          .subscribe(
+            {
+              next: (data: CustomerDTO[]) => {
+                this.customers = data;
+                console.log(this.customers);
+              }
+            }
+          )
+      }
+    
+      save(customer: CustomerRegistrationRequest) {
+        if (customer) {
+          this.customerService.registerCustomer(customer)
+            .subscribe(
+              {
+                next: () => {
+                  this.display = false;
+                  this.findAllCustomers();
+                  this.customer = {};
+                  this.messageService.add(
+                    {
+                      severity: 'success',
+                      summary: 'Success',
+                      detail: `Customer ${customer.name} has been successfully saved.`,
+                    });
+                }
+              }
+            )
+        }
+      }
+    
+      deleteCustomer(customer: CustomerDTO) {
+        this.confirmationService.confirm(
+          {
+            header: 'Delete Customer',
+            message: `Are you sure to delete ${customer.name}?`,
+            accept: () => {
+              this.customerService.deleteCustomer(customer.id)
+                .subscribe(
+                  {
+                    next: () => {
+                      this.findAllCustomers();
+                      this.messageService.add(
+                        {
+                          severity: 'success',
+                          summary: 'Customer deleted',
+                          detail: `Customer ${customer.name} has been successfully deleted.`,
+                        }
+                      )
+                    }
+                  }
+                )
+            }
+          }
+        )
+      }
+    }
+    
+    ```
+4. update customer.component.html
+    ```text
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >
+      <app-mange-customer
+        [customer]="customer"
+        (submit)="save($event)"
+        [operation]="operation"
+      ></app-mange-customer>
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="display = true"
+          >
+          </button>
+          <div>
+            <div class="flex justify-content-center align-items-center flex-wrap gap-5 mt-4">
+              <app-customer-card
+                *ngFor="let customer of customers; let index=index"
+                [customer]="customer"
+                [customerIndex]="index"
+                (delete)="deleteCustomer($event)"
+              ></app-customer-card>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    <p-confirmDialog
+      header="Confirmation"
+      icon="pi pi-exclamation-triangle"
+      acceptLabel="Delete"
+      acceptButtonStyleClass="p-button-danger"
+      acceptIcon="pi pi-trash"
+      rejectLabel="Cancel"
+    />
+    <p-toast position="bottom-center"></p-toast>
+    
+    ```
+
+#### FINISHED at 8 NOVEMBER 2024 2:06 AM
+
+### **STEP 662 8 NOVEMBER 2024 2:06 AM**
+
+1. when we click on create customer button we see title we will change according to operation we do
+2. update manage-customer.component.ts
+    ```text
+    import {Component, EventEmitter, input, Input, OnInit, Output} from '@angular/core';
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    
+    
+    @Component({
+      selector: 'app-mange-customer',
+      templateUrl: './mange-customer.component.html',
+      styleUrl: './mange-customer.component.scss'
+    })
+    export class ManageCustomerComponent implements OnInit {
+    
+      @Input()
+      customer: CustomerRegistrationRequest = {};
+      @Input()
+      operation: 'create' | 'update' = 'create';
+    
+      title = 'New Customer';
+    
+      @Output()
+      submit: EventEmitter<CustomerRegistrationRequest> = new EventEmitter<CustomerRegistrationRequest>;
+    
+      get isCustomerValid(): boolean {
+        return this.hasLength(this.customer.name) &&
+          this.hasLength(this.customer.email) &&
+          this.hasLength(this.customer.password) &&
+          this.hasLength(this.customer.gender) &&
+          this.customer.age !== undefined &&
+          this.customer.age > 0;
+      }
+    
+      private hasLength(input: string | undefined): boolean {
+        return input !== null && input !== undefined && input.length > 3;
+    
+      }
+    
+      onSubmit() {
+        this.submit.emit(this.customer);
+      }
+    
+      ngOnInit(): void {
+        if (this.operation === 'update') {
+          this.title = 'Update Customer';
+        }
+      }
+    }
+    
+    ```
+3. update mange-customer.component.html
+    ```
+    <div>
+      <h2>{{ title }}</h2>
+      <div class="field">
+        <label for="firstname">Name</label>
+        <input
+          [(ngModel)]="customer.name"
+          id="firstname"
+          pInputText
+          placeholder="Mary Jane"
+          type="text"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          [(ngModel)]="customer.email"
+          id="email"
+          pInputText
+          placeholder="MaryJane@gmail.com"
+          type="email"
+          class="w-full"
+        >
+      </div>
+      <div class="field" *ngIf="operation === 'create'">
+        <label for="password">Password</label>
+        <input
+          [(ngModel)]="customer.password"
+          id="password"
+          pInputText
+          placeholder=""
+          type="password"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="age">Age</label>
+        <input
+          [(ngModel)]="customer.age"
+          id="age"
+          pInputText
+          placeholder="16"
+          type="number"
+          class="w-full"
+        >
+      </div>
+      <div class="field" *ngIf="operation === 'create'">
+        <label for="gender">Gender</label>
+        <select
+          [(ngModel)]="customer.gender"
+          id="gender"
+          class="p-dropdown w-full custom-select"
+        >
+          <option value="">Select Option</option>
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+        </select>
+      </div>
+      <button
+        [disabled]="!isCustomerValid"
+        (click)="onSubmit()"
+        pButton
+        label="submit"
+        class="w-full"
+      >
+      </button>
+      <button
+        pButton
+        label="cancel"
+        class="w-full p-button-outlined p-button-danger mt-2"
+      >
+      </button>
+    </div>
+    
+    ```
+
+#### FINISHED at 8 NOVEMBER 2024 2:22 AM
+
+### **STEP 663 8 NOVEMBER 2024 2:22 AM**
+
+1. implementing the update button
+2. update customer-card.component.ts
+    ```
+    import {Component, EventEmitter, Input, Output} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {CustomerUpdateRequest} from "../../models/customer-update-request";
+    
+    @Component({
+      selector: 'app-customer-card',
+      templateUrl: './customer-card.component.html',
+      styleUrl: './customer-card.component.scss'
+    })
+    export class CustomerCardComponent {
+    
+      @Input()
+      customer: CustomerDTO = {};
+    
+      @Input()
+      customerIndex: number = 0;
+    
+      @Output()
+      delete: EventEmitter<CustomerDTO> = new EventEmitter<CustomerDTO>();
+    
+      @Output()
+      update: EventEmitter<CustomerDTO> = new EventEmitter<CustomerDTO>();
+    
+      get customerImage(): string {
+        const gender = this.customer.gender === 'MALE' ? 'men' : 'women';
+    
+        return `https://randomuser.me/api/portraits/${gender}/${this.customerIndex}.jpg`;
+      }
+    
+      onDelete() {
+        this.delete.emit(this.customer);
+      }
+    
+      onUpdate() {
+        this.update.emit(this.customer);
+      }
+    }
+    
+    ```
+3. update customer-card.component.html
+    ```text
+    <p-card [style]="{width: '316px' }" styleClass="p-card-shadow text-center">
+      <ng-template pTemplate="header">
+        <div>
+          <img class="border-round-top cover"
+               height="120"
+               alt="card"
+               src="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png">
+        </div>
+        <div class="flex justify-content-center" style="margin-top: -50px">
+          <img
+            class="customer-avatar"
+            [src]="customerImage"
+          >
+        </div>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <p-badge [value]="''+(customerIndex+1)"></p-badge>
+        <h2>{{ customer.name }}</h2>
+        <p class="text-gray-600">{{ customer.email }}</p>
+        <p class="text-gray-600">{{ customer.age }} | {{ customer.gender }}</p>
+      </ng-template>
+      <ng-template
+        pTemplate="footer"
+      >
+        <button
+          pButton
+          label="Update"
+          class="p-button-secondary p-button-outlined p-button-rounded"
+          (click)="onUpdate()"
+        ></button>
+        <button
+          pButton
+          label="Delete"
+          class="p-button-danger p-button-outlined p-button-rounded ml-3"
+          (click)="onDelete()"
+        ></button>
+    
+      </ng-template>
+    </p-card>
+    
+    ```
+4. update customer.component.html
+    ```
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >
+      <app-mange-customer
+        [customer]="customer"
+        (submit)="save($event)"
+        [operation]="operation"
+      ></app-mange-customer>
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="display = true"
+          >
+          </button>
+          <div>
+            <div class="flex justify-content-center align-items-center flex-wrap gap-5 mt-4">
+              <app-customer-card
+                *ngFor="let customer of customers; let index=index"
+                [customer]="customer"
+                [customerIndex]="index"
+                (delete)="deleteCustomer($event)"
+                (update)="updateCustomer($event)"
+              ></app-customer-card>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    <p-confirmDialog
+      header="Confirmation"
+      icon="pi pi-exclamation-triangle"
+      acceptLabel="Delete"
+      acceptButtonStyleClass="p-button-danger"
+      acceptIcon="pi pi-trash"
+      rejectLabel="Cancel"
+    />
+    <p-toast position="bottom-center"></p-toast>
+    
+    ```
+5. update customer.component.ts
+    ```
+    import {Component, OnInit} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {CustomerServiceService} from "../../services/customer/customer-service.service";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    import {ConfirmationService, MessageService} from "primeng/api";
+    
+    @Component({
+      selector: 'app-customer',
+      templateUrl: './customer.component.html',
+      styleUrl: './customer.component.scss'
+    })
+    export class CustomerComponent implements OnInit {
+      display: boolean = false;
+    
+      operation: 'create' | 'update' = 'create';
+    
+    
+      customers: CustomerDTO[] = [];
+      customer: CustomerRegistrationRequest = {};
+    
+      constructor(
+        private customerService: CustomerServiceService,
+        private messageService: MessageService,
+        private confirmationService: ConfirmationService,
+      ) {
+      }
+    
+      ngOnInit(): void {
+        this.findAllCustomers();
+      }
+    
+      private findAllCustomers() {
+        this.customerService.findAll()
+          .subscribe(
+            {
+              next: (data: CustomerDTO[]) => {
+                this.customers = data;
+                console.log(this.customers);
+              }
+            }
+          )
+      }
+    
+      save(customer: CustomerRegistrationRequest) {
+        if (customer) {
+          this.customerService.registerCustomer(customer)
+            .subscribe(
+              {
+                next: () => {
+                  this.display = false;
+                  this.findAllCustomers();
+                  this.customer = {};
+                  this.messageService.add(
+                    {
+                      severity: 'success',
+                      summary: 'Success',
+                      detail: `Customer ${customer.name} has been successfully saved.`,
+                    });
+                }
+              }
+            )
+        }
+      }
+    
+      deleteCustomer(customer: CustomerDTO) {
+        this.confirmationService.confirm(
+          {
+            header: 'Delete Customer',
+            message: `Are you sure to delete ${customer.name}?`,
+            accept: () => {
+              this.customerService.deleteCustomer(customer.id)
+                .subscribe(
+                  {
+                    next: () => {
+                      this.findAllCustomers();
+                      this.messageService.add(
+                        {
+                          severity: 'success',
+                          summary: 'Customer deleted',
+                          detail: `Customer ${customer.name} has been successfully deleted.`,
+                        }
+                      )
+                    }
+                  }
+                )
+            }
+          }
+        )
+      }
+    
+      updateCustomer(customerDTO: CustomerDTO) {
+        this.display = true;
+        this.customer = customerDTO;
+        this.operation = 'update';
+      }
+    }
+    
+    ```
+
+#### FINISHED at 9 NOVEMBER 2024 7:08 PM
+
+### **STEP 664 9 NOVEMBER 2024 7:09 PM**
+
+1. we got two bugs
+2. one - submit button in update is disabled
+3. two - once you click submit side bar stuck with update details even on clicking create
+4. lets fix bug two first
+5. update customer.component.html by adding a create customer function to create button
+    ```
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >
+      <app-mange-customer
+        [customer]="customer"
+        (submit)="save($event)"
+        [operation]="operation"
+      ></app-mange-customer>
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="createCustomer()"
+          >
+          </button>
+          <div>
+            <div class="flex justify-content-center align-items-center flex-wrap gap-5 mt-4">
+              <app-customer-card
+                *ngFor="let customer of customers; let index=index"
+                [customer]="customer"
+                [customerIndex]="index"
+                (delete)="deleteCustomer($event)"
+                (update)="updateCustomer($event)"
+              ></app-customer-card>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    <p-confirmDialog
+      header="Confirmation"
+      icon="pi pi-exclamation-triangle"
+      acceptLabel="Delete"
+      acceptButtonStyleClass="p-button-danger"
+      acceptIcon="pi pi-trash"
+      rejectLabel="Cancel"
+    />
+    <p-toast position="bottom-center"></p-toast>
+    
+    ```
+6. update customer.component.ts
+    ```text
+    import {Component, OnInit} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {CustomerServiceService} from "../../services/customer/customer-service.service";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    import {ConfirmationService, MessageService} from "primeng/api";
+    
+    @Component({
+      selector: 'app-customer',
+      templateUrl: './customer.component.html',
+      styleUrl: './customer.component.scss'
+    })
+    export class CustomerComponent implements OnInit {
+      display: boolean = false;
+    
+      operation: 'create' | 'update' = 'create';
+    
+    
+      customers: CustomerDTO[] = [];
+      customer: CustomerRegistrationRequest = {};
+    
+      constructor(
+        private customerService: CustomerServiceService,
+        private messageService: MessageService,
+        private confirmationService: ConfirmationService,
+      ) {
+      }
+    
+      ngOnInit(): void {
+        this.findAllCustomers();
+      }
+    
+      private findAllCustomers() {
+        this.customerService.findAll()
+          .subscribe(
+            {
+              next: (data: CustomerDTO[]) => {
+                this.customers = data;
+                console.log(this.customers);
+              }
+            }
+          )
+      }
+    
+      save(customer: CustomerRegistrationRequest) {
+    
+        if (customer) {
+          this.customerService.registerCustomer(customer)
+            .subscribe(
+              {
+                next: () => {
+                  this.display = false;
+                  this.findAllCustomers();
+                  this.customer = {};
+                  this.messageService.add(
+                    {
+                      severity: 'success',
+                      summary: 'Success',
+                      detail: `Customer ${customer.name} has been successfully saved.`,
+                    });
+                }
+              }
+            )
+        }
+      }
+    
+      deleteCustomer(customer: CustomerDTO) {
+        this.confirmationService.confirm(
+          {
+            header: 'Delete Customer',
+            message: `Are you sure to delete ${customer.name}?`,
+            accept: () => {
+              this.customerService.deleteCustomer(customer.id)
+                .subscribe(
+                  {
+                    next: () => {
+                      this.findAllCustomers();
+                      this.messageService.add(
+                        {
+                          severity: 'success',
+                          summary: 'Customer deleted',
+                          detail: `Customer ${customer.name} has been successfully deleted.`,
+                        }
+                      )
+                    }
+                  }
+                )
+            }
+          }
+        )
+      }
+    
+      updateCustomer(customerDTO: CustomerDTO) {
+        this.display = true;
+        this.customer = customerDTO;
+        this.operation = 'update';
+      }
+    
+      createCustomer() {
+        this.display = true;
+        this.customer = {};
+        this.operation = 'create';
+      }
+    }
+    
+    ```
+
+#### FINISHED at 9 NOVEMBER 2024 7:21 PM
+
+### **STEP 665 9 NOVEMBER 2024 7:21 PM**
+
+1. Fixing the submit button
+2. update manage-customer.component.ts
+    ```text
+    import {Component, EventEmitter, input, Input, OnInit, Output} from '@angular/core';
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    
+    
+    @Component({
+      selector: 'app-mange-customer',
+      templateUrl: './mange-customer.component.html',
+      styleUrl: './mange-customer.component.scss'
+    })
+    export class ManageCustomerComponent implements OnInit {
+    
+      @Input()
+      customer: CustomerRegistrationRequest = {};
+      @Input()
+      operation: 'create' | 'update' = 'create';
+    
+      title = 'New Customer';
+    
+      @Output()
+      submit: EventEmitter<CustomerRegistrationRequest> = new EventEmitter<CustomerRegistrationRequest>;
+    
+      get isCustomerValid(): boolean {
+        return this.hasLength(this.customer.name) &&
+          this.customer.age !== undefined && this.customer.age > 0 &&
+          this.hasLength(this.customer.email) &&
+    
+          (this.operation === 'update' ||
+            this.hasLength(this.customer.password) &&
+            this.hasLength(this.customer.gender));
+      }
+    
+      private hasLength(input: string | undefined): boolean {
+        return input !== null && input !== undefined && input.length > 3;
+    
+      }
+    
+      onSubmit() {
+        this.submit.emit(this.customer);
+      }
+    
+      ngOnInit(): void {
+        if (this.operation === 'update') {
+          this.title = 'Update Customer';
+        }
+      }
+    }
+    
+    ```
+
+#### FINISHED at 9 NOVEMBER 2024 7:30 PM
+
+### **STEP 666 10 NOVEMBER 2024 10:06 AM**
+
+1. task:- click on submit to update the customer in backend
+2. update customer.component.ts
+    ```text
+    import {Component, OnInit} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {CustomerServiceService} from "../../services/customer/customer-service.service";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    import {ConfirmationService, MessageService} from "primeng/api";
+    
+    @Component({
+      selector: 'app-customer',
+      templateUrl: './customer.component.html',
+      styleUrl: './customer.component.scss'
+    })
+    export class CustomerComponent implements OnInit {
+      display: boolean = false;
+    
+      operation: 'create' | 'update' = 'create';
+    
+    
+      customers: CustomerDTO[] = [];
+      customer: CustomerRegistrationRequest = {};
+    
+      constructor(
+        private customerService: CustomerServiceService,
+        private messageService: MessageService,
+        private confirmationService: ConfirmationService,
+      ) {
+      }
+    
+      ngOnInit(): void {
+        this.findAllCustomers();
+      }
+    
+      private findAllCustomers() {
+        this.customerService.findAll()
+          .subscribe(
+            {
+              next: (data: CustomerDTO[]) => {
+                this.customers = data;
+                console.log(this.customers);
+              }
+            }
+          )
+      }
+    
+      save(customer: CustomerRegistrationRequest) {
+    
+        if (customer) {
+          if(this.operation==="create"){
+            this.customerService.registerCustomer(customer)
+              .subscribe(
+                {
+                  next: () => {
+                    this.display = false;
+                    this.findAllCustomers();
+                    this.customer = {};
+                    this.messageService.add(
+                      {
+                        severity: 'success',
+                        summary: 'Success',
+                        detail: `Customer ${customer.name} has been successfully saved.`,
+                      });
+                  }
+                });
+          }else if(this.operation==="update"){
+            this.customerService.updateCustomer(1,customer)
+              .subscribe(
+                {
+                  next: () => {
+                    this.display = false;
+                    this.findAllCustomers();
+                    this.customer = {};
+                    this.messageService.add(
+                      {
+                        severity: 'success',
+                        summary: 'Customer Updated',
+                        detail: `Customer ${customer.name} has been successfully updated.`,
+                      });
+                  }
+                });
+          }
+          
+        } 
+      }
+    
+      deleteCustomer(customer: CustomerDTO) {
+        this.confirmationService.confirm(
+          {
+            header: 'Delete Customer',
+            message: `Are you sure to delete ${customer.name}?`,
+            accept: () => {
+              this.customerService.deleteCustomer(customer.id)
+                .subscribe(
+                  {
+                    next: () => {
+                      this.findAllCustomers();
+                      this.messageService.add(
+                        {
+                          severity: 'success',
+                          summary: 'Customer deleted',
+                          detail: `Customer ${customer.name} has been successfully deleted.`,
+                        }
+                      )
+                    }
+                  }
+                )
+            }
+          }
+        )
+      }
+    
+      updateCustomer(customerDTO: CustomerDTO) {
+        this.display = true;
+        this.customer = customerDTO;
+        this.operation = 'update';
+      }
+    
+      createCustomer() {
+        this.display = true;
+        this.customer = {};
+        this.operation = 'create';
+      }
+    }
+    
+    ```
+3. if you check in here we have hardcoded the id
+4. we will fix this in next step
+
+#### FINISHED at 10 NOVEMBER 2024 10:21 AM
+
+### **STEP 667 10 NOVEMBER 2024 10:21 AM**
+
+1. update customer-registration-request.ts
+    ```text
+    export interface CustomerRegistrationRequest {
+      id?: number;
+      name?: string;
+      email?: string;
+      password?: string;
+      age?: number;
+      gender?: 'MALE' | 'FEMALE';
+    }
+    
+    ```
+2. update customer.component.ts
+    ```text
+    import {Component, OnInit} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {CustomerServiceService} from "../../services/customer/customer-service.service";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    import {ConfirmationService, MessageService} from "primeng/api";
+    
+    @Component({
+      selector: 'app-customer',
+      templateUrl: './customer.component.html',
+      styleUrl: './customer.component.scss'
+    })
+    export class CustomerComponent implements OnInit {
+      display: boolean = false;
+    
+      operation: 'create' | 'update' = 'create';
+    
+    
+      customers: CustomerDTO[] = [];
+      customer: CustomerRegistrationRequest = {};
+    
+      constructor(
+        private customerService: CustomerServiceService,
+        private messageService: MessageService,
+        private confirmationService: ConfirmationService,
+      ) {
+      }
+    
+      ngOnInit(): void {
+        this.findAllCustomers();
+      }
+    
+      private findAllCustomers() {
+        this.customerService.findAll()
+          .subscribe(
+            {
+              next: (data: CustomerDTO[]) => {
+                this.customers = data;
+                console.log(this.customers);
+              }
+            }
+          )
+      }
+    
+      save(customer: CustomerRegistrationRequest) {
+    
+        if (customer) {
+          if (this.operation === "create") {
+            this.customerService.registerCustomer(customer)
+              .subscribe(
+                {
+                  next: () => {
+                    this.display = false;
+                    this.findAllCustomers();
+                    this.customer = {};
+                    this.messageService.add(
+                      {
+                        severity: 'success',
+                        summary: 'Success',
+                        detail: `Customer ${customer.name} has been successfully saved.`,
+                      });
+                  }
+                });
+          } else if (this.operation === "update") {
+            this.customerService.updateCustomer(customer.id, customer)
+              .subscribe(
+                {
+                  next: () => {
+                    this.display = false;
+                    this.findAllCustomers();
+                    this.customer = {};
+                    this.messageService.add(
+                      {
+                        severity: 'success',
+                        summary: 'Customer Updated',
+                        detail: `Customer ${customer.name} has been successfully updated.`,
+                      });
+                  }
+                });
+          }
+    
+        }
+      }
+    
+      deleteCustomer(customer: CustomerDTO) {
+        this.confirmationService.confirm(
+          {
+            header: 'Delete Customer',
+            message: `Are you sure to delete ${customer.name}?`,
+            accept: () => {
+              this.customerService.deleteCustomer(customer.id)
+                .subscribe(
+                  {
+                    next: () => {
+                      this.findAllCustomers();
+                      this.messageService.add(
+                        {
+                          severity: 'success',
+                          summary: 'Customer deleted',
+                          detail: `Customer ${customer.name} has been successfully deleted.`,
+                        }
+                      )
+                    }
+                  }
+                )
+            }
+          }
+        )
+      }
+    
+      updateCustomer(customerDTO: CustomerDTO) {
+        this.display = true;
+        this.customer = customerDTO;
+        this.operation = 'update';
+      }
+    
+      createCustomer() {
+        this.display = true;
+        this.customer = {};
+        this.operation = 'create';
+      }
+    }
+    
+    ```
+
+#### FINISHED at 10 NOVEMBER 2024 10:49 AM
+
+### **STEP 668 10 NOVEMBER 2024 10:49 AM**
+
+1. bug with the title fixed it in here
+2. update manage-custome.component.html
+    ```text
+    <div>
+      <h2>{{ operation === 'create' ? 'New Customer' : 'Update Customer' }}</h2>
+      <div class="field">
+        <label for="firstname">Name</label>
+        <input
+          [(ngModel)]="customer.name"
+          id="firstname"
+          pInputText
+          placeholder="Mary Jane"
+          type="text"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          [(ngModel)]="customer.email"
+          id="email"
+          pInputText
+          placeholder="MaryJane@gmail.com"
+          type="email"
+          class="w-full"
+        >
+      </div>
+      <div class="field" *ngIf="operation === 'create'">
+        <label for="password">Password</label>
+        <input
+          [(ngModel)]="customer.password"
+          id="password"
+          pInputText
+          placeholder=""
+          type="password"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="age">Age</label>
+        <input
+          [(ngModel)]="customer.age"
+          id="age"
+          pInputText
+          placeholder="16"
+          type="number"
+          class="w-full"
+        >
+      </div>
+      <div class="field" *ngIf="operation === 'create'">
+        <label for="gender">Gender</label>
+        <select
+          [(ngModel)]="customer.gender"
+          id="gender"
+          class="p-dropdown w-full custom-select"
+        >
+          <option value="">Select Option</option>
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+        </select>
+      </div>
+      <button
+        [disabled]="!isCustomerValid"
+        (click)="onSubmit()"
+        pButton
+        label="submit"
+        class="w-full"
+      >
+      </button>
+      <button
+        pButton
+        label="cancel"
+        class="w-full p-button-outlined p-button-danger mt-2"
+      >
+      </button>
+    </div>
+    
+    ```
+3. let clean it up in manage-customer.component.ts as we dont need onInit anymore
+    ```text
+    import {Component, EventEmitter, Input, Output} from '@angular/core';
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    
+    
+    @Component({
+      selector: 'app-manage-customer',
+      templateUrl: './manage-customer.component.html',
+      styleUrl: './manage-customer.component.scss'
+    })
+    export class ManageCustomerComponent {
+    
+      @Input()
+      customer: CustomerRegistrationRequest = {};
+      @Input()
+      operation: 'create' | 'update' = 'create';
+    
+      @Output()
+      submit: EventEmitter<CustomerRegistrationRequest> = new EventEmitter<CustomerRegistrationRequest>;
+    
+      get isCustomerValid(): boolean {
+        return this.hasLength(this.customer.name) &&
+          this.customer.age !== undefined && this.customer.age > 0 &&
+          this.hasLength(this.customer.email) &&
+    
+          (this.operation === 'update' ||
+            this.hasLength(this.customer.password) &&
+            this.hasLength(this.customer.gender));
+      }
+    
+      private hasLength(input: string | undefined): boolean {
+        return input !== null && input !== undefined && input.length > 3;
+    
+      }
+    
+      onSubmit() {
+        this.submit.emit(this.customer);
+      }
+    
+    
+    }
+    
+    ```
+
+#### FINISHED at 10 NOVEMBER 2024 11:19 AM
+
+### **STEP 669 10 NOVEMBER 2024 11:19 AM**
+
+1. task making cancel button work
+2. add click event on cancel button in manage-customer.component.html
+    ```text
+    <div>
+      <h2>{{ operation === 'create' ? 'New Customer' : 'Update Customer' }}</h2>
+      <div class="field">
+        <label for="firstname">Name</label>
+        <input
+          [(ngModel)]="customer.name"
+          id="firstname"
+          pInputText
+          placeholder="Mary Jane"
+          type="text"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          [(ngModel)]="customer.email"
+          id="email"
+          pInputText
+          placeholder="MaryJane@gmail.com"
+          type="email"
+          class="w-full"
+        >
+      </div>
+      <div class="field" *ngIf="operation === 'create'">
+        <label for="password">Password</label>
+        <input
+          [(ngModel)]="customer.password"
+          id="password"
+          pInputText
+          placeholder=""
+          type="password"
+          class="w-full"
+        >
+      </div>
+      <div class="field">
+        <label for="age">Age</label>
+        <input
+          [(ngModel)]="customer.age"
+          id="age"
+          pInputText
+          placeholder="16"
+          type="number"
+          class="w-full"
+        >
+      </div>
+      <div class="field" *ngIf="operation === 'create'">
+        <label for="gender">Gender</label>
+        <select
+          [(ngModel)]="customer.gender"
+          id="gender"
+          class="p-dropdown w-full custom-select"
+        >
+          <option value="">Select Option</option>
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+        </select>
+      </div>
+      <button
+        [disabled]="!isCustomerValid"
+        (click)="onSubmit()"
+        pButton
+        label="submit"
+        class="w-full"
+      >
+      </button>
+      <button
+        (click)="onCancel()"
+        pButton
+        label="cancel"
+        class="w-full p-button-outlined p-button-danger mt-2"
+      >
+      </button>
+    </div>
+    
+    ```
+3. create this cancel method in manage-customer.component.ts
+    ```text
+    import {Component, EventEmitter, Input, Output} from '@angular/core';
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    
+    
+    @Component({
+      selector: 'app-manage-customer',
+      templateUrl: './manage-customer.component.html',
+      styleUrl: './manage-customer.component.scss'
+    })
+    export class ManageCustomerComponent {
+    
+      @Input()
+      customer: CustomerRegistrationRequest = {};
+      @Input()
+      operation: 'create' | 'update' = 'create';
+    
+      @Output()
+      submit: EventEmitter<CustomerRegistrationRequest> = new EventEmitter<CustomerRegistrationRequest>;
+    
+      @Output()
+      cancel: EventEmitter<void> = new EventEmitter<void>();
+    
+      get isCustomerValid(): boolean {
+        return this.hasLength(this.customer.name) &&
+          this.customer.age !== undefined && this.customer.age > 0 &&
+          this.hasLength(this.customer.email) &&
+    
+          (this.operation === 'update' ||
+            this.hasLength(this.customer.password) &&
+            this.hasLength(this.customer.gender));
+      }
+    
+      private hasLength(input: string | undefined): boolean {
+        return input !== null && input !== undefined && input.length > 3;
+    
+      }
+    
+      onSubmit() {
+        this.submit.emit(this.customer);
+      }
+    
+    
+      protected readonly oncancel = oncancel;
+    
+      onCancel() {
+        this.cancel.emit();
+      }
+    }
+    
+    ```
+4. add this to customer.component.html
+    ```text
+    <p-sidebar
+      [(visible)]="display"
+      [position]="'right'"
+      styleClass="p-sidebar-lg"
+      [transitionOptions]="'300ms cubic-bezier(0,0, 0.2,1)'"
+    >
+      <app-manage-customer
+        [customer]="customer"
+        (submit)="save($event)"
+        [operation]="operation"
+        (cancel)="cancel()"
+      ></app-manage-customer>
+    </p-sidebar>
+    
+    <div class="flex align-items-stretch" style="height: 99vh;">
+      <div class="flex flex-column align-items-stretch border-right-1 col-2 border-gray-200">
+        <app-menu-bar/>
+      </div>
+      <div class="flex flex-column flex-grow-1">
+        <div>
+          <app-header-bar/>
+        </div>
+        <div class="main-container p-3">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="create customer"
+            class="p-button-success"
+            (click)="createCustomer()"
+          >
+          </button>
+          <div>
+            <div class="flex justify-content-center align-items-center flex-wrap gap-5 mt-4">
+              <app-customer-card
+                *ngFor="let customer of customers; let index=index"
+                [customer]="customer"
+                [customerIndex]="index"
+                (delete)="deleteCustomer($event)"
+                (update)="updateCustomer($event)"
+              ></app-customer-card>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+    <p-confirmDialog
+      header="Confirmation"
+      icon="pi pi-exclamation-triangle"
+      acceptLabel="Delete"
+      acceptButtonStyleClass="p-button-danger"
+      acceptIcon="pi pi-trash"
+      rejectLabel="Cancel"
+    />
+    <p-toast position="bottom-center"></p-toast>
+    
+    ```
+5. add cancel method in customer.component.ts
+    ```text
+    import {Component, OnInit} from '@angular/core';
+    import {CustomerDTO} from "../../models/customer-dto";
+    import {CustomerServiceService} from "../../services/customer/customer-service.service";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    import {ConfirmationService, MessageService} from "primeng/api";
+    
+    @Component({
+      selector: 'app-customer',
+      templateUrl: './customer.component.html',
+      styleUrl: './customer.component.scss'
+    })
+    export class CustomerComponent implements OnInit {
+      display: boolean = false;
+    
+      operation: 'create' | 'update' = 'create';
+    
+    
+      customers: CustomerDTO[] = [];
+      customer: CustomerRegistrationRequest = {};
+    
+      constructor(
+        private customerService: CustomerServiceService,
+        private messageService: MessageService,
+        private confirmationService: ConfirmationService,
+      ) {
+      }
+    
+      ngOnInit(): void {
+        this.findAllCustomers();
+      }
+    
+      private findAllCustomers() {
+        this.customerService.findAll()
+          .subscribe(
+            {
+              next: (data: CustomerDTO[]) => {
+                this.customers = data;
+                console.log(this.customers);
+              }
+            }
+          )
+      }
+    
+      save(customer: CustomerRegistrationRequest) {
+    
+        if (customer) {
+          if (this.operation === "create") {
+            this.customerService.registerCustomer(customer)
+              .subscribe(
+                {
+                  next: () => {
+                    this.display = false;
+                    this.findAllCustomers();
+                    this.customer = {};
+                    this.messageService.add(
+                      {
+                        severity: 'success',
+                        summary: 'Success',
+                        detail: `Customer ${customer.name} has been successfully saved.`,
+                      });
+                  }
+                });
+          } else if (this.operation === "update") {
+            this.customerService.updateCustomer(customer.id, customer)
+              .subscribe(
+                {
+                  next: () => {
+                    this.display = false;
+                    this.findAllCustomers();
+                    this.customer = {};
+                    this.messageService.add(
+                      {
+                        severity: 'success',
+                        summary: 'Customer Updated',
+                        detail: `Customer ${customer.name} has been successfully updated.`,
+                      });
+                  }
+                });
+          }
+    
+        }
+      }
+    
+      deleteCustomer(customer: CustomerDTO) {
+        this.confirmationService.confirm(
+          {
+            header: 'Delete Customer',
+            message: `Are you sure to delete ${customer.name}?`,
+            accept: () => {
+              this.customerService.deleteCustomer(customer.id)
+                .subscribe(
+                  {
+                    next: () => {
+                      this.findAllCustomers();
+                      this.messageService.add(
+                        {
+                          severity: 'success',
+                          summary: 'Customer deleted',
+                          detail: `Customer ${customer.name} has been successfully deleted.`,
+                        }
+                      )
+                    }
+                  }
+                )
+            }
+          }
+        )
+      }
+    
+      updateCustomer(customerDTO: CustomerDTO) {
+        this.display = true;
+        this.customer = customerDTO;
+        this.operation = 'update';
+      }
+    
+      createCustomer() {
+        this.display = true;
+        this.customer = {};
+        this.operation = 'create';
+      }
+    
+      cancel() {
+        this.display = false;
+        this.customer = {};
+        this.operation = 'create';
+      }
+    }
+    
+    ```
+
+#### FINISHED at 10 NOVEMBER 2024 11:27 AM
+
+### **STEP 670 10 NOVEMBER 2024 11:27 AM**
+
+1. tasks: display the customer login inform on the right top and implement signout
+2. update header-bar.component.ts
+    ```
+    import {Component} from '@angular/core';
+    import {MenuItem} from "primeng/api";
+    
+    @Component({
+      selector: 'app-header-bar',
+      templateUrl: './header-bar.component.html',
+      styleUrl: './header-bar.component.scss'
+    })
+    export class HeaderBarComponent {
+      items: MenuItem[] = [
+        {label: 'Profile', icon: 'pi pi-user'},
+        {label: 'Settings', icon: 'pi pi-cog'},
+        {separator: true},
+        {label: 'Sign out', icon: 'pi pi-sign-out'}
+      ];
+    
+      get userName(): string {
+        return '--';
+      }
+    
+      get userRole(): string {
+        return '--';
+      }
+    
+    }
+    
+    ```
+3. bind these two username and role in html
+    ```text
+    <div class="flex flex-column align-items-end border-bottom-1 border-gray-200 pt-3 pb-3">
+      <div class="flex flex-row align-items-center">
+        <button
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-bell"
+          class="p-button-rounded p-button-secondary p-button-text mr-3"
+        >
+        </button>
+        <p-avatar
+          image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+          size="normal"
+          shape="circle"
+          class="mr-2"
+    
+        ></p-avatar>
+        <div>
+          <p class="text-base mb-0 mt-1 text-gray-700">{{ userName }}</p>
+          <p class="text-sm mb-1 mt-0 text-gray-500">{{ userRole }}</p>
+        </div>
+        <div>
+          <button
+            (click)="menu.toggle($event)"
+            class="p-button-secondary p-button-text"
+            icon="pi pi-angle-down"
+            pButton
+            pRipple
+            type="button"
+          ></button>
+          <p-menu #menu [model]="items" [popup]="true"/>
+        </div>
+      </div>
+    </div>
+    
+    ```
+4. Exercise is to replace those test values with real values
+
+#### FINISHED at 10 NOVEMBER 2024 12:00 PM
+
+### **STEP 671 10 NOVEMBER 2024 12:00 PM**
+
+1. update header-bar.component.ts
+    ```text
+    import {Component} from '@angular/core';
+    import {MenuItem} from "primeng/api";
+    import {AuthenticationResponse} from "../../models/authentication-response";
+    
+    @Component({
+      selector: 'app-header-bar',
+      templateUrl: './header-bar.component.html',
+      styleUrl: './header-bar.component.scss'
+    })
+    export class HeaderBarComponent {
+      items: MenuItem[] = [
+        {label: 'Profile', icon: 'pi pi-user'},
+        {label: 'Settings', icon: 'pi pi-cog'},
+        {separator: true},
+        {label: 'Sign out', icon: 'pi pi-sign-out'}
+      ];
+    
+      storedUser = localStorage.getItem('user');
+    
+      get userName(): string {
+    
+        if (this.storedUser) {
+          const authResponse: AuthenticationResponse = JSON.parse(this.storedUser);
+          if (authResponse && authResponse.customerDTO && authResponse.customerDTO.username) {
+            return authResponse.customerDTO.username;
+          }
+        }
+        return '--';
+      }
+    
+      get userRole(): string {
+        if (this.storedUser) {
+          const authResponse: AuthenticationResponse = JSON.parse(this.storedUser);
+          if (authResponse && authResponse.customerDTO && authResponse.customerDTO.roles) {
+            return authResponse.customerDTO.roles[0];
+          }
+        }
+        return '--';
+      }
+    
+    }
+    
+    ```
+2. update header-bar.component.html
+    ```text
+    <div class="flex flex-column align-items-end border-bottom-1 border-gray-200 pt-3 pb-3">
+      <div class="flex flex-row align-items-center">
+        <button
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-bell"
+          class="p-button-rounded p-button-secondary p-button-text mr-3"
+        >
+        </button>
+        <p-avatar
+          image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+          size="normal"
+          shape="circle"
+          class="mr-2"
+    
+        ></p-avatar>
+        <div>
+          <p class="text-base mb-0 mt-1 text-gray-700">{{ userName }}</p>
+          <p class="text-sm mb-1 mt-0 text-gray-500">{{ userRole }}</p>
+        </div>
+        <div>
+          <button
+            (click)="menu.toggle($event)"
+            class="p-button-secondary p-button-text"
+            icon="pi pi-angle-down"
+            pButton
+            pRipple
+            type="button"
+          ></button>
+          <p-menu #menu [model]="items" [popup]="true"/>
+        </div>
+      </div>
+    </div>
+    
+    ```
+
+#### FINISHED at 10 NOVEMBER 2024 12:07 PM
+
+### **STEP 672 10 NOVEMBER 2024 12:07 PM**
+
+1. update header-bar.component.ts
+    ```
+    import {Component} from '@angular/core';
+    import {MenuItem, MenuItemCommandEvent} from "primeng/api";
+    import {AuthenticationResponse} from "../../models/authentication-response";
+    import {AuthenticationService} from "../../services/authentication/authentication.service";
+    import {Router} from "@angular/router";
+    
+    @Component({
+      selector: 'app-header-bar',
+      templateUrl: './header-bar.component.html',
+      styleUrl: './header-bar.component.scss'
+    })
+    export class HeaderBarComponent {
+    
+      constructor(
+        private router: Router,
+      ) {
+      }
+    
+      items: MenuItem[] = [
+        {label: 'Profile', icon: 'pi pi-user'},
+        {label: 'Settings', icon: 'pi pi-cog'},
+        {separator: true},
+        {
+          label: 'Sign out',
+          icon: 'pi pi-sign-out',
+          command: () => {
+            localStorage.clear();
+            this.router.navigate(['login']);
+          }
+        }
+      ];
+    
+      storedUser = localStorage.getItem('user');
+    
+      get userName(): string {
+    
+        if (this.storedUser) {
+          const authResponse: AuthenticationResponse = JSON.parse(this.storedUser);
+          if (authResponse && authResponse.customerDTO && authResponse.customerDTO.username) {
+            return authResponse.customerDTO.username;
+          }
+        }
+        return '--';
+      }
+    
+      get userRole(): string {
+        if (this.storedUser) {
+          const authResponse: AuthenticationResponse = JSON.parse(this.storedUser);
+          if (authResponse && authResponse.customerDTO && authResponse.customerDTO.roles) {
+            return authResponse.customerDTO.roles[0];
+          }
+        }
+        return '--';
+      }
+    
+    }
+    
+    ```
+
+#### FINISHED at 10 NOVEMBER 2024 12:18 PM
+
+### **STEP 673 10 NOVEMBER 2024 12:18 PM**
+
+1. exercise - implement signuppage
+
+#### FINISHED at 10 NOVEMBER 2024 12:20 PM
+
+### **STEP 674 10 NOVEMBER 2024 12:20 PM**
+
+1. ```ng g c Register```
+
+#### FINISHED at 10 NOVEMBER 2024 12:21 PM
+
+### **STEP 675 10 NOVEMBER 2024 12:21 PM**
+
+1. update app.routing.module.ts to add routing to register page
+    ```
+    import {NgModule} from '@angular/core';
+    import {RouterModule, Routes} from '@angular/router';
+    import {CustomerComponent} from "./components/customer/customer.component";
+    import {LoginComponent} from "./components/login/login.component";
+    import {AccessGuardService} from "./services/guard/access-guard.service";
+    import {RegisterComponent} from "./components/register/register.component";
+    
+    
+    const routes: Routes = [
+      {
+        path: 'customers',
+        component: CustomerComponent,
+        canActivate: [AccessGuardService]
+      },
+      {
+        path: 'login',
+        component: LoginComponent
+      },
+      {
+        path: 'register',
+        component: RegisterComponent
+      },
+    
+    ]
+    
+    @NgModule({
+      imports: [RouterModule.forRoot(routes)],
+      exports: [RouterModule]
+    })
+    export class AppRoutingModule {
+    }
+    
+    ```
+2. update login.component.html to redirect to register when click on signup
+    ```
+    <div class="flex" style="height: 100vh">
+      <div class="col-6 m-3 flex flex-column justify-content-center">
+        <div class="m-auto">
+    
+          <div class="text-center">
+            <p-avatar
+              image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+              styleClass="mr-2"
+              size="xlarge"
+              shape="circle"/>
+            <h1>Sign in into your Account.</h1>
+          </div>
+          <div>
+            <p-message *ngIf="errorMsg" severity="error" [text]="errorMsg" styleClass="mb-3"></p-message>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input
+              [(ngModel)]="authenticationRequest.username"
+              id="email"
+              pInputText
+              placeholder="MaryJane@gmail.com"
+              type="email"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input
+              [(ngModel)]="authenticationRequest.password"
+              id="password"
+              pInputText
+              placeholder=""
+              type="password"
+              class="w-full"
+            >
+          </div>
+          <button
+            pButton
+            label="Login"
+            class="w-full"
+            (click)="login()"
+          >
+          </button>
+          <button
+            pButton
+            label="Don't have an account? Signup now!"
+            class="w-full p-button-link pl-0"
+            (click)="register()"
+          >
+          </button>
+    
+        </div>
+      </div>
+      <div class="col-6 flex flex-column justify-content-center align-items-center right-container">
+        <h1>
+          <a href="#" target="_blank">Enroll now</a>
+        </h1>
+        <img
+          class="background p-6 pt-0"
+          src="https://user-images.githubusercontent.com/40702606/215539167-d7006790-b880-4929-83fb-c43fa74f429e.png"
+          alt="Nothing here :-))">
+    
+      </div>
+    </div>
+    
+    ```
+3. update login.component.html to redirect to register when click on signup
+    ```text
+    import {Component} from '@angular/core';
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    import {AuthenticationService} from "../../services/authentication/authentication.service";
+    import {Router} from "@angular/router";
+    
+    @Component({
+      selector: 'app-login',
+      templateUrl: './login.component.html',
+      styleUrl: './login.component.scss'
+    })
+    export class LoginComponent {
+      authenticationRequest: AuthenticationRequest = {};
+      errorMsg: string = '';
+    
+      constructor(
+        private authenticationService: AuthenticationService,
+        private router: Router
+      ) {
+      }
+    
+    
+      login() {
+        this.errorMsg = '';
+        this.authenticationService.login(this.authenticationRequest)
+          .subscribe({
+            next: (authenticationResponse) => {
+              // console.log(authenticationResponse);
+              localStorage.setItem('user', JSON.stringify(authenticationResponse));
+              this.router.navigate(['customers']);
+            },
+            error: (error) => {
+              if (error.error.statusCode === 401) {
+                this.errorMsg = 'Login and / or pass is incorrect';
+    
+              }
+            }
+          });
+      }
+    
+      register() {
+        this.router.navigate(['register']);
+      }
+    }
+    
+    
+    ```
+
+#### FINISHED at 10 NOVEMBER 2024 12:37 PM
+
+### **STEP 676 10 NOVEMBER 2024 12:37 PM**
+
+1. copy some content from login component
+2. update register.component.html
+    ```
+    <div class="flex" style="height: 100vh">
+      <div class="col-6 m-3 flex flex-column justify-content-center">
+        <div class="m-auto">
+    
+          <div class="text-center">
+            <p-avatar
+              image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+              styleClass="mr-2"
+              size="xlarge"
+              shape="circle"/>
+            <h1>Signup for a account.</h1>
+          </div>
+          <div>
+            <p-message *ngIf="errorMsg" severity="error" [text]="errorMsg" styleClass="mb-3"></p-message>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input
+              id="email"
+              pInputText
+              placeholder="MaryJane@gmail.com"
+              type="email"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input
+              id="password"
+              pInputText
+              placeholder=""
+              type="password"
+              class="w-full"
+            >
+          </div>
+          <button
+            pButton
+            label="Login"
+            class="w-full"
+          >
+          </button>
+    
+        </div>
+      </div>
+      <div class="col-6 flex flex-column justify-content-center align-items-center right-container">
+        <h1>
+          <a href="#" target="_blank">Enroll now</a>
+        </h1>
+        <img
+          class="background p-6 pt-0"
+          src="https://user-images.githubusercontent.com/40702606/215539167-d7006790-b880-4929-83fb-c43fa74f429e.png"
+          alt="Nothing here :-))">
+    
+      </div>
+    </div>
+    
+    ```
+3. update register.component.ts
+    ```text
+    import {Component} from '@angular/core';
+    
+    @Component({
+      selector: 'app-register',
+      templateUrl: './register.component.html',
+      styleUrl: './register.component.scss'
+    })
+    export class RegisterComponent {
+      errorMsg = '';
+    
+    }
+    
+    ```
+4. update register.component.scss
+    ```
+    .right-container {
+      background-image: linear-gradient(to right, #2b6cb0, #6b46c1);
+    
+      .background {
+        object-fit: scale-down;
+        height: auto;
+        max-width: 100%;
+      }
+    
+      a {
+        text-decoration: none;
+        color: #ffffff;
+      }
+    }
+    
+    ```
+
+#### FINISHED at 10 NOVEMBER 2024 1:45 PM
+
+### **STEP 677 10 NOVEMBER 2024 1:52 PM**
+
+1. update register.component.html
+    ```
+    <div class="flex" style="height: 100vh">
+      <div class="col-6 m-3 flex flex-column justify-content-center">
+        <div class="m-auto">
+    
+          <div class="text-center">
+            <p-avatar
+              image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+              styleClass="mr-2"
+              size="xlarge"
+              shape="circle"/>
+            <h1>Signup for a account.</h1>
+          </div>
+          <div>
+            <p-message *ngIf="errorMsg" severity="error" [text]="errorMsg" styleClass="mb-3"></p-message>
+          </div>
+          <div class="field">
+            <label for="name">Name</label>
+            <input
+              id="name"
+              pInputText
+              placeholder="Mary Jane"
+              type="text"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input
+              id="email"
+              pInputText
+              placeholder="MaryJane@gmail.com"
+              type="email"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input
+              id="password"
+              pInputText
+              placeholder=""
+              type="password"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="age">Age</label>
+            <input
+              id="age"
+              pInputText
+              placeholder="16"
+              type="number"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="gender">Gender</label>
+            <select
+              id="gender"
+              class="p-dropdown w-full custom-select"
+            >
+              <option value="">Select Option</option>
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+            </select>
+          </div>
+          <button
+            pButton
+            label="Create an Account"
+            class="w-full"
+          >
+          </button>
+          <button
+            (click)="login()"
+            pButton
+            label="Have an account? Login now!"
+            class="w-full p-button-link pl-0"
+    
+          >
+          </button>
+        </div>
+      </div>
+      <div class="col-6 flex flex-column justify-content-center align-items-center right-container">
+        <h1>
+          <a href="#" target="_blank">Enroll now</a>
+        </h1>
+        <img
+          class="background p-6 pt-0"
+          src="https://user-images.githubusercontent.com/40702606/215539167-d7006790-b880-4929-83fb-c43fa74f429e.png"
+          alt="Nothing here :-))">
+    
+      </div>
+    </div>
+    
+    ```
+2. update register.component.ts
+    ```
+    import {Component} from '@angular/core';
+    import {Router} from "@angular/router";
+    
+    @Component({
+      selector: 'app-register',
+      templateUrl: './register.component.html',
+      styleUrl: './register.component.scss'
+    })
+    export class RegisterComponent {
+      constructor(private router: Router,) {
+      }
+    
+      errorMsg: any;
+    
+    
+      login() {
+        this.router.navigate(['login']);
+      }
+    }
+    
+    ```
+3. update register.component.scss
+    ```text
+    .right-container {
+      background-image: linear-gradient(to right, #2b6cb0, #6b46c1);
+    
+      .background {
+        object-fit: scale-down;
+        height: auto;
+        max-width: 100%;
+      }
+    
+      a {
+        text-decoration: none;
+        color: #ffffff;
+      }
+    }
+    
+    .custom-select {
+      padding: 0.75rem 0.75rem;
+      border: 1px solid #ced4da;
+    
+    }
+    
+    
+    
+    ```
+
+#### FINISHED at 10 NOVEMBER 2024 2:22 PM
+
+### **STEP 678 10 NOVEMBER 2024 2:22 PM**
+
+1. update register.component.html
+    ```
+    <div class="flex" style="height: 100vh">
+      <div class="col-6 m-3 flex flex-column justify-content-center">
+        <div class="m-auto">
+    
+          <div class="text-center">
+            <p-avatar
+              image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+              styleClass="mr-2"
+              size="xlarge"
+              shape="circle"/>
+            <h1>Signup for a account.</h1>
+          </div>
+          <div>
+            <p-message *ngIf="errorMsg" severity="error" [text]="errorMsg" styleClass="mb-3"></p-message>
+          </div>
+          <div class="field">
+            <label for="name">Name</label>
+            <input
+              [(ngModel)]="customer.name" ]
+              id="name"
+              pInputText
+              placeholder="Mary Jane"
+              type="text"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input
+              [(ngModel)]="customer.email" ]
+              id="email"
+              pInputText
+              placeholder="MaryJane@gmail.com"
+              type="email"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input
+              [(ngModel)]="customer.password"
+              id="password"
+              pInputText
+              placeholder=""
+              type="password"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="age">Age</label>
+            <input
+              [(ngModel)]="customer.age"
+              id="age"
+              pInputText
+              placeholder="16"
+              type="number"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="gender">Gender</label>
+            <select
+              [(ngModel)]="customer.gender"
+              id="gender"
+              class="p-dropdown w-full custom-select"
+            >
+              <option value="">Select Option</option>
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+            </select>
+          </div>
+          <button
+            pButton
+            label="Create an Account"
+            class="w-full"
+          >
+          </button>
+          <button
+            (click)="login()"
+            pButton
+            label="Have an account? Login now!"
+            class="w-full p-button-link pl-0"
+    
+          >
+          </button>
+          <app-manage-customer></app-manage-customer>
+        </div>
+      </div>
+      <div class="col-6 flex flex-column justify-content-center align-items-center right-container">
+        <h1>
+          <a href="#" target="_blank">Enroll now</a>
+        </h1>
+        <img
+          class="background p-6 pt-0"
+          src="https://user-images.githubusercontent.com/40702606/215539167-d7006790-b880-4929-83fb-c43fa74f429e.png"
+          alt="Nothing here :-))">
+    
+      </div>
+    </div>
+    
+    ```
+2. update register.component.ts
+    ```text
+    import {Component} from '@angular/core';
+    import {Router} from "@angular/router";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    
+    @Component({
+      selector: 'app-register',
+      templateUrl: './register.component.html',
+      styleUrl: './register.component.scss'
+    })
+    export class RegisterComponent {
+    
+      errorMsg: any;
+    
+      customer: CustomerRegistrationRequest = {};
+    
+      constructor(private router: Router,) {
+      }
+    
+      login() {
+        this.router.navigate(['login']);
+      }
+    }
+    
+    ```
+
+#### FINISHED at 10 NOVEMBER 2024 2:22 PM
+
+### **STEP 679 10 NOVEMBER 2024 2:22 PM**
+
+1. after registration login the customer and redirect to customers page
+2. update register.component.ts
+    ```text
+    import {Component} from '@angular/core';
+    import {Router} from "@angular/router";
+    import {CustomerRegistrationRequest} from "../../models/customer-registration-request";
+    import {CustomerServiceService} from "../../services/customer/customer-service.service";
+    import {AuthenticationService} from "../../services/authentication/authentication.service";
+    import {AuthenticationRequest} from "../../models/authentication-request";
+    
+    @Component({
+      selector: 'app-register',
+      templateUrl: './register.component.html',
+      styleUrl: './register.component.scss'
+    })
+    export class RegisterComponent {
+    
+      errorMsg: any;
+    
+      customer: CustomerRegistrationRequest = {};
+    
+      constructor(private router: Router,
+                  private customerService: CustomerServiceService,
+                  private authenticationService: AuthenticationService
+      ) {
+      }
+    
+      login() {
+        this.router.navigate(['login']);
+      }
+    
+      createAccount() {
+        this.customerService.registerCustomer(this.customer)
+          .subscribe({
+            next: () => {
+              const authReq: AuthenticationRequest = {
+                username: this.customer.email,
+                password: this.customer.password,
+              }
+              this.authenticationService.login(authReq)
+                .subscribe({
+                  next: (authenticationResponse) => {
+                    // console.log(authenticationResponse);
+                    localStorage.setItem('user', JSON.stringify(authenticationResponse));
+                    this.router.navigate(['customers']);
+                  },
+                  error: (error) => {
+                    if (error.error.statusCode === 401) {
+                      this.errorMsg = 'Login and / or pass is incorrect';
+    
+                    }
+                  }
+                });
+            }
+          });
+      }
+    }
+    
+    ```
+3. there are some mistakes in file so update register.component.html
+    ```text
+    <div class="flex" style="height: 100vh">
+      <div class="col-6 m-3 flex flex-column justify-content-center">
+        <div class="m-auto">
+    
+          <div class="text-center">
+            <p-avatar
+              image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+              styleClass="mr-2"
+              size="xlarge"
+              shape="circle"/>
+            <h1>Signup for a account.</h1>
+          </div>
+          <div>
+            <p-message *ngIf="errorMsg" severity="error" [text]="errorMsg" styleClass="mb-3"></p-message>
+          </div>
+          <div class="field">
+            <label for="name">Name</label>
+            <input
+              [(ngModel)]="customer.name"
+              id="name"
+              pInputText
+              placeholder="Mary Jane"
+              type="text"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input
+              [(ngModel)]="customer.email"
+              id="email"
+              pInputText
+              placeholder="MaryJane@gmail.com"
+              type="email"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input
+              [(ngModel)]="customer.password"
+              id="password"
+              pInputText
+              placeholder=""
+              type="password"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="age">Age</label>
+            <input
+              [(ngModel)]="customer.age"
+              id="age"
+              pInputText
+              placeholder="16"
+              type="number"
+              class="w-full"
+            >
+          </div>
+          <div class="field">
+            <label for="gender">Gender</label>
+            <select
+              [(ngModel)]="customer.gender"
+              id="gender"
+              class="p-dropdown w-full custom-select"
+            >
+              <option value="">Select Option</option>
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+            </select>
+          </div>
+          <button
+            (click)="createAccount()"
+            pButton
+            label="Create an Account"
+            class="w-full"
+          >
+          </button>
+          <button
+            (click)="login()"
+            pButton
+            label="Have an account? Login now!"
+            class="w-full p-button-link pl-0"
+    
+          >
+          </button>
+        </div>
+      </div>
+      <div class="col-6 flex flex-column justify-content-center align-items-center right-container">
+        <h1>
+          <a href="#" target="_blank">Enroll now</a>
+        </h1>
+        <img
+          class="background p-6 pt-0"
+          src="https://user-images.githubusercontent.com/40702606/215539167-d7006790-b880-4929-83fb-c43fa74f429e.png"
+          alt="Nothing here :-))">
+    
+      </div>
+    </div>
+    
+    ```
+
+#### FINISHED at 11 NOVEMBER 2024 11:14 AM
+
+### **STEP 680 11 NOVEMBER 2024 11:14 AM**
+
+1. when someone http://localhost:4200/ it should redirect to login
+2. update app-routing.module.ts
+    ```text
+    import {NgModule} from '@angular/core';
+    import {RouterModule, Routes} from '@angular/router';
+    import {CustomerComponent} from "./components/customer/customer.component";
+    import {LoginComponent} from "./components/login/login.component";
+    import {AccessGuardService} from "./services/guard/access-guard.service";
+    import {RegisterComponent} from "./components/register/register.component";
+    
+    
+    const routes: Routes = [
+      {
+        path: '',
+        redirectTo: '/login',
+        pathMatch: 'full',
+      },
+      {
+        path: 'customers',
+        component: CustomerComponent,
+        canActivate: [AccessGuardService]
+      },
+      {
+        path: 'login',
+        component: LoginComponent
+      },
+      {
+        path: 'register',
+        component: RegisterComponent
+      },
+    
+    ]
+    
+    @NgModule({
+      imports: [RouterModule.forRoot(routes)],
+      exports: [RouterModule]
+    })
+    export class AppRoutingModule {
+    }
+    
+    ```
+
+#### FINISHED at 11 NOVEMBER 2024 11:19 AM
+
+### **STEP 681 11 NOVEMBER 2024 11:19 AM**
+
+1. update the main git ignore file
+2. delete the angular git ignore file
+3. 

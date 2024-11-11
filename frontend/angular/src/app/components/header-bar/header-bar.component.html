@@ -1,0 +1,34 @@
+<div class="flex flex-column align-items-end border-bottom-1 border-gray-200 pt-3 pb-3">
+  <div class="flex flex-row align-items-center">
+    <button
+      pButton
+      pRipple
+      type="button"
+      icon="pi pi-bell"
+      class="p-button-rounded p-button-secondary p-button-text mr-3"
+    >
+    </button>
+    <p-avatar
+      image="https://totalpng.com//public/uploads/preview/kedarnath-hindi-text-png-11657791984ueqb8jmssb.png"
+      size="normal"
+      shape="circle"
+      class="mr-2"
+
+    ></p-avatar>
+    <div>
+      <p class="text-base mb-0 mt-1 text-gray-700">{{ userName }}</p>
+      <p class="text-sm mb-1 mt-0 text-gray-500">{{ userRole }}</p>
+    </div>
+    <div>
+      <button
+        (click)="menu.toggle($event)"
+        class="p-button-secondary p-button-text"
+        icon="pi pi-angle-down"
+        pButton
+        pRipple
+        type="button"
+      ></button>
+      <p-menu #menu [model]="items" [popup]="true"/>
+    </div>
+  </div>
+</div>

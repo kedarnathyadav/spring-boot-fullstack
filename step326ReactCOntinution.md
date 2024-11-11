@@ -2207,7 +2207,7 @@ class CustomerRowMapperTest {
 
 Update CustomerJDBCDataAccessService:
 
-```java
+```text
 package com.kedarnath.customer;
 
 import org.springframework.jdbc.core.JdbcTemplate;
