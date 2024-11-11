@@ -4,9 +4,17 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.ArgumentCaptor;
 
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
+import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import static org.mockito.Mockito.*;
 
 class CustomerJPADataAccessServiceTest {
     private CustomerJPADataAccessService underTest;
@@ -27,11 +35,24 @@ class CustomerJPADataAccessServiceTest {
 
     @Test
     void selectAllCustomers() {
-        //When
-        underTest.selectAllCustomers();
+        // Given
+        Page<Customer> page = mock(Page.class);
+        List<Customer> customers = List.of(new Customer());  // Creating a mock list of customers
+        when(page.getContent()).thenReturn(customers);         // Mocking the getContent method of the page
+        when(customerRepository.findAll(any(Pageable.class))).thenReturn(page);  // Mocking the repository call
 
-        //Then
-        verify(customerRepository).findAll();
+        // When
+        List<Customer> expected = underTest.selectAllCustomers();  // Calling the method under test
+
+        // Then
+        assertThat(expected).isEqualTo(customers);  // Verifying the result is equal to the mocked list of customers
+
+        // Capturing the Pageable argument passed to findAll method
+        ArgumentCaptor<Pageable> pageArgumentCaptor = ArgumentCaptor.forClass(Pageable.class);
+        verify(customerRepository).findAll(pageArgumentCaptor.capture());  // Verifying the call to findAll
+
+        // Asserting the Pageable argument passed is of the correct type and has the expected page size
+        assertThat(pageArgumentCaptor.getValue().getPageSize()).isEqualTo(10);
     }
 
     @Test
